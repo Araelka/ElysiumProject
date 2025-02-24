@@ -25,7 +25,7 @@
         <!-- Кнопка входа/выхода для мобильной версии -->
         @guest
         <li>
-            <form action={{route('logout')}} method="GET" style="display:inline;">
+            <form action={{route('login')}} method="GET" style="display:inline;">
                 @csrf
                 <button type="submit" class="navbar__login-mobile">Вход</button>
             </form>
