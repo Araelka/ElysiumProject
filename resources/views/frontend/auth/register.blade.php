@@ -1,0 +1,44 @@
+@include('frontend/layout/header', ['title' => 'Регистрация']);
+
+
+<main class="register-page">
+    <div class="register-container">
+        <h1 class="register-title">Регистрация</h1>
+        <form class="register-form" action={{route('register')}} method="POST">
+            @csrf
+            <div class="register-form__group">
+                <label for="login" class="register-form__label">Логин</label>
+                <input type="text" id="login" name="login" class="register-form__input"  value='{{ old('login') }}' required>
+                @error('login')
+                    <span class="register-form__error">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="register-form__group">
+                <label for="email" class="register-form__label">Email</label>
+                <input type="email" id="email" name="email" class="register-form__input" value='{{ old('email') }}' required>
+                @error('email')
+                    <span class="register-form__error">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="register-form__group">
+                <label for="password" class="register-form__label">Пароль</label>
+                <input type="password" id="password" name="password" class="register-form__input" required>
+                @error('password')
+                    <span class="register-form__error">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="register-form__group">
+                <label for="password_confirmation" class="register-form__label">Подтвердите пароль</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" class="register-form__input" required>
+                @error('password_confirmation')
+                    <span class="register-form__error">{{ $message }}</span>
+                @enderror
+            </div>
+            <button type="submit" class="register-form__button">Зарегистрироваться</button>
+        </form>
+    </div>
+</main>
+
+
+
+@include('frontend/layout/footer');
