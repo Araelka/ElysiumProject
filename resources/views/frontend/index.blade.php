@@ -43,7 +43,7 @@
                     @endif
                 </div>
 
-                @if (!$posts->isEmpty())
+                @if ($selectedThemeId)
                 <form class="post-form" action={{ route('post.publish') }} method="POST">
                     @csrf
                     <div class="post-form__group">
