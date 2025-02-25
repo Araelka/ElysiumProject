@@ -1,6 +1,8 @@
-@include('frontend/layout/header', ['title' => 'Вход']);
+@extends('frontend.layout.layout')
+@section('title', 'Вход')
 
-<main class="login-page">
+@section('content')
+<div class="login-page">
 <div class="login-container">
 <h1 class="login-title">Вход</h1>
 
@@ -27,6 +29,5 @@
 </div>
 </form>
 </div>
-</main>
-
-@include('frontend/layout/footer');
+</div>
+@endsection

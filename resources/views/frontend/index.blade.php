@@ -1,34 +1,64 @@
-@include('frontend/layout/header', ['title' => 'Главная станица']);
+@extends('frontend.layout.layout')
 
-<main class="home-page">
-    <div class="container d-flex justify-content-center align-items-stretch"> <!-- Центрируем контейнер и растягиваем блоки -->
-        <div class="row w-100 h-100"> <!-- Устанавливаем ширину и высоту на 100% для корректного отображения колонок -->
-            <!-- Блок для выбора тем (20%) -->
+@section('content')
+<div class="home-page">
+    <div class="container d-flex justify-content-center align-items-stretch"> 
+        <div class="row w-100 h-100"> 
             <div class="col-md-2 sidebar d-flex flex-column justify-content-start">
-                <h3>Выберите тему</h3>
+                <h3>Локации</h3>
                 <ul class="topics-list">
-                    <li><a href="#" class="topic-link">Тема 1</a></li>
-                    <li><a href="#" class="topic-link">Тема 2</a></li>
-                    <li><a href="#" class="topic-link">Тема 3</a></li>
-                    <!-- Добавьте больше тем по необходимости -->
+                    @foreach ($themes as $theme)
+                        <li><a href="?theme_id={{ $theme->id }}" 
+                            class="topic-link {{ $selectedThemeId == $theme->id ? 'active' : '' }}">
+                             {{ $theme->name }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
 
             <!-- Блок для просмотра постов (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
-                <h3>Посты по выбранной теме</h3>
-                <div class="posts">
-                    <!-- Пример поста -->
-                    <div class="post">
-                        <h4>Заголовок поста</h4>
-                        <p>Краткое описание поста...</p>
-                    </div>
-                    
-                    <!-- Добавьте больше постов по необходимости -->
+                     @if (!$posts->isEmpty())
+                    <h3>{{ $posts[0]->theme->name }}</h3>
+                    @endif
+                    <div class="posts">
+                    @if ($posts->isEmpty())
+                    @else
+                    @foreach ($posts as $post)
+                        @section('title-theme', $post->theme->name)
+                        <div class="post">
+                            <div class="post-header">
+                                <h4>{{ $post->user->login }}</h4>
+                                <form action={{ route('post.destroy', $post->id) }} method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="delete-post-button">×</button>
+                                </form>
+                            </div>
+                            <p>{!! nl2br(e($post->content)) !!}</p>
+                            <small>{{ $post->created_at }}</small>
+                        </div>
+                    @endforeach
+                    @endif
                 </div>
+
+                @if (!$posts->isEmpty())
+                <form class="post-form" action={{ route('post.publish') }} method="POST">
+                    @csrf
+                    <div class="post-form__group">
+                        <input type="hidden" name="theme_id" value={{ $selectedThemeId }}>
+                        <label for="post-text" class="post-form__label">Введите текст поста:</label>
+                        <textarea id="post-text" name="post_text" class="post-form__input"></textarea>
+                    </div>
+                    <button type="submit" class="post-form__button">Отправить</button>
+                </form>
+                @endif
+
+
             </div>
         </div>
     </div>
-</main>
+</div>
+@endsection
 
-@include('frontend/layout/footer');

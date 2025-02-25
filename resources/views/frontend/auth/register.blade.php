@@ -1,7 +1,8 @@
-@include('frontend/layout/header', ['title' => 'Регистрация']);
+@extends('frontend.layout.layout')
+@section('title', 'Регистрация')
 
-
-<main class="register-page">
+@section('content')
+<div class="register-page">
     <div class="register-container">
         <h1 class="register-title">Регистрация</h1>
         <form class="register-form" action={{route('register')}} method="POST">
@@ -37,8 +38,6 @@
             <button type="submit" class="register-form__button">Зарегистрироваться</button>
         </form>
     </div>
-</main>
+</div>
+@endsection
 
-
-
-@include('frontend/layout/footer');
