@@ -450,8 +450,8 @@ body {
 .topics-list {
     list-style: none;
     padding: 0;
-    margin: 0;
 }
+
 
 .topic-link {
     text-decoration: none;
@@ -619,3 +619,23 @@ body {
     color: #f4d03f; /* Ярко-жёлтый при наведении */
 }
 
+.post-header {
+    display: flex;
+    justify-content: space-between; /* Размещаем заголовок и кнопки по краям */
+    align-items: center; /* Выравниваем элементы по центру */
+    margin-bottom: 10px; /* Отступ между заголовком и содержимым */
+}
+
+.edit-post-button {
+    background: none;
+    border: none;
+    color: #f4d03f; /* Розовый цвет */
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-right: 5px; /* Отступ справа от кнопки редактирования до кнопки удаления */
+}
+
+.edit-post-button:hover {
+    color: #ec7063; /* Ярко-жёлтый при наведении */
+}

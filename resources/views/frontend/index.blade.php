@@ -1,4 +1,8 @@
 @extends('frontend.layout.layout')
+@if ($selectedThemeId)
+@section('title', $themes[$selectedThemeId-1]->name)
+@endif
+
 
 @section('content')
 <div class="home-page">
@@ -19,17 +23,17 @@
 
             <!-- Блок для просмотра постов (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
-                     @if (!$posts->isEmpty())
-                    <h3>{{ $posts[0]->theme->name }}</h3>
+                     @if ($selectedThemeId)
+                    <h3>{{ $themes[$selectedThemeId-1]->name }}</h3>
                     @endif
                     <div class="posts">
                     @if ($posts->isEmpty())
                     @else
                     @foreach ($posts as $post)
-                        @section('title-theme', $post->theme->name)
                         <div class="post">
                             <div class="post-header">
                                 <h4>{{ $post->user->login }}</h4>
+                                <a href={{ route('post.edit', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
                                 <form action={{ route('post.destroy', $post->id) }} method="POST">
                                     @csrf
                                     @method('DELETE')
@@ -43,6 +47,7 @@
                     @endif
                 </div>
 
+                
                 @if ($selectedThemeId)
                 <form class="post-form" action={{ route('post.publish') }} method="POST">
                     @csrf
@@ -55,6 +60,7 @@
                 </form>
                 @endif
 
+                
 
             </div>
         </div>

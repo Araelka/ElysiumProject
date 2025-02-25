@@ -29,4 +29,10 @@ class PostController extends Controller
 
         return redirect()->back();
     }
+
+    public function showEditForm ($id){
+        $post = Post::findOrFail($id);
+        
+        return redirect()->back();
+    }
 }
