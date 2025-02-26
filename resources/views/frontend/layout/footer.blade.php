@@ -28,3 +28,31 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const postsContainer = document.querySelector('.posts');
+
+    // Функция для показа полосы прокрутки
+    function showScrollbar() {
+        postsContainer.classList.add('scrolling');
+    }
+
+    // Функция для скрытия полосы прокрутки
+    function hideScrollbar() {
+        postsContainer.classList.remove('scrolling');
+    }
+
+    // Добавляем обработчик прокрутки
+    postsContainer.addEventListener('scroll', function () {
+        showScrollbar(); // Показываем полосу при прокрутке
+
+        // Через 2 секунды после остановки прокрутки скрываем полосу
+        clearTimeout(postsContainer.scrollTimeout);
+        postsContainer.scrollTimeout = setTimeout(hideScrollbar, 2000);
+    });
+
+    // Добавляем обработчик наведения мыши
+    postsContainer.addEventListener('mouseenter', showScrollbar); // Показываем полосу при наведении
+    postsContainer.addEventListener('mouseleave', hideScrollbar); // Скрываем полосу при уходе мыши
+});
+</script>

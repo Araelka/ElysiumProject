@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 
+
 class PostController extends Controller
 {
     
@@ -46,13 +47,20 @@ class PostController extends Controller
 
     public function destroy ($id){
 
-        $post = Post::findOrFail($id)->delete();
+        $post = Post::findOrFail($id);
 
-        return redirect()->back();
+        if (auth()->id() == $post->user_id || auth()->user()->isAdmin()) {
+            $post->delete();
+            return redirect()->back();
+        }
     }
 
     public function showEditForm ($id){
         $post = Post::findOrFail($id);
+
+        if (auth()->id() != $post->user_id) {
+            return redirect()->route('homePage', ['theme_id' => $post->theme_id]);
+        }
 
         $themes = Theme::all();
 
@@ -68,11 +76,12 @@ class PostController extends Controller
             ['post_text' =>  ['required', 'string']
         ]);
 
-        $post = Post::findOrFail($request->input('post_id'));
-        $id = $post->theme_id;
-        $post->content = $validated['post_text'];
-        $post->update();
+        if (auth()->id() == $request->input('user_id')){
+            $post = Post::findOrFail($request->input('post_id'));
+            $post->content = $validated['post_text'];
+            $post->update();
+        }
 
-        return redirect()->route('homePage', ['theme_id' => $id]);
+        return redirect()->route('homePage', ['theme_id' => $request->input('theme_id')]);
     }
 }

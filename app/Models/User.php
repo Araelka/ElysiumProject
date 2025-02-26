@@ -21,7 +21,28 @@ class User extends Authenticatable
         'login',
         'email',
         'password',
+        'role'
     ];
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isEditor()
+    {
+        return in_array($this->role, ['admin', 'editor']);
+    }
+
+    public function isPlayer()
+    {
+        return in_array($this->role, ['admin', 'editor', 'player']);
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

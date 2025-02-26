@@ -34,18 +34,25 @@
                             <div class="post-header">
                                 <h4>{{ $post->user->login }}</h4>
                                 @auth
-                                    @if (auth()->id() == $post->user_id)
+                                    @if (auth()->id() == $post->user_id) 
                                     <a href={{ route('post.editShow', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
-                                    <form action={{ route('post.destroy', $post->id) }} method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="delete-post-button">×</button>
-                                    </form>
+                                    @endif
+                                    @if (auth()->id() == $post->user_id || Auth::user()->isEditor())
+                                        <form action={{ route('post.destroy', $post->id) }} method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="delete-post-button">×</button>
+                                        </form>
                                     @endif
                                 @endauth
                             </div>
                             <p>{!! nl2br(e($post->content)) !!}</p>
-                            <small>{{ $post->created_at }}</small>
+                            <small>
+                                {{ $post->updated_at }}
+                                @if ($post->updated_at != $post->created_at)
+                                    (изм)
+                                @endif
+                                </small>
                         </div>
                     @endforeach
                     @endif
@@ -58,9 +65,6 @@
                         @include('frontend.layout.postEditForm')
                     @endif
                 @endauth
-
-
-                
 
             </div>
         </div>

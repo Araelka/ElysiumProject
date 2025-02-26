@@ -478,30 +478,28 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: start; /* Выравнивание содержимого в начале блока */
-    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+    overflow-y: none; /* Добавляем вертикальную прокрутку */
     max-height: 90%; /* Ограничиваем максимальную высоту */
-
-    /* Стили для прокрутки */
-    scrollbar-width: thin; /* Для Firefox */
-    scrollbar-color: #f4d03f #1a1a40; /* Цвет полосы и фона прокрутки */
-}
-
-.content::-webkit-scrollbar {
-    width: 8px; /* Ширина полосы прокрутки */
-}
-
-.content::-webkit-scrollbar-track {
-    background: #1a1a40; /* Фон полосы прокрутки */
-}
-
-.content::-webkit-scrollbar-thumb {
-    background-color: #f4d03f; /* Цвет полосы прокрутки */
-    border-radius: 5px; /* Закругление полосы прокрутки */
 }
 
 .posts {
     height: 100%; /* Занимает всю высоту блока */
     overflow-y: auto; /* Добавляем вертикальную прокрутку */
+}
+
+.posts::-webkit-scrollbar {
+    width: 5px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.posts::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.posts::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
 }
 
 .post-header {
@@ -514,6 +512,8 @@ body {
 
 .post {
     margin-bottom: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
     padding: 10px;
     border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
     border-radius: 5px;
