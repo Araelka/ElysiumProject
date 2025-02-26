@@ -21,11 +21,49 @@
     document.addEventListener('DOMContentLoaded', () => {
     const mobileMenu = document.getElementById('mobile-menu');
     const menu = document.getElementById('menu');
+    const avatars = document.querySelectorAll('.navbar__user-avatar');
+
+    // Функция для закрытия всех меню
+    function closeAllMenus() {
+        menu.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        avatars.forEach(avatar => {
+            const dropdownMenu = avatar.nextElementSibling;
+            if (dropdownMenu && dropdownMenu.classList.contains('navbar__dropdown-menu')) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+    }
+
+    // Обработчик для гамбургер-меню
     mobileMenu.addEventListener('click', () => {
-    menu.classList.toggle('active');
-    mobileMenu.classList.toggle('active'); // Добавляем/удаляем класс 'active'
+        closeAllMenus(); // Закрываем все меню
+        menu.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
     });
+
+    // Обработчик для аватара
+    avatars.forEach(avatar => {
+        avatar.addEventListener('click', (event) => {
+            closeAllMenus(); // Закрываем все меню
+            const dropdownMenu = avatar.nextElementSibling;
+            if (dropdownMenu && dropdownMenu.classList.contains('navbar__dropdown-menu')) {
+                dropdownMenu.classList.toggle('active');
+            }
+        });
     });
+
+    // Закрытие меню при клике вне их
+    document.addEventListener('click', (event) => {
+        if (
+            !mobileMenu.contains(event.target) &&
+            !menu.contains(event.target) &&
+            !Array.from(avatars).some(avatar => avatar.contains(event.target))
+        ) {
+            closeAllMenus();
+        }
+    });
+});
 </script>
 
 <script>
