@@ -154,6 +154,7 @@ body {
     right: 0;
     background-color: rgba(10, 14, 23, 0.9);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border: 2px solid #f4d03f;
     border-radius: 10px;
     padding: 10px 0;
     list-style: none;
@@ -265,15 +266,23 @@ body {
     }
 
     .navbar__dropdown-menu {
-        position: static;
-        background-color: transparent;
-        box-shadow: none;
-        padding: 0;
-
-        max-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center; 
+        background-color: rgba(10, 14, 23, 0.9);
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         overflow: hidden;
-        transition: max-height 0.3s ease, opacity 0.3s ease;
+        border-radius: 10px;
         opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     .navbar__dropdown-menu li {
@@ -291,9 +300,9 @@ body {
     }
 
     .navbar__dropdown-menu.active {
-        display: block;
-        max-height: 200px; /* Максимальная высота меню */
+        display: flex;
         opacity: 1;
+        visibility: visible;
     }
 
     
