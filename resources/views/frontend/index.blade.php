@@ -33,12 +33,16 @@
                         <div class="post">
                             <div class="post-header">
                                 <h4>{{ $post->user->login }}</h4>
-                                <a href={{ route('post.edit', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
-                                <form action={{ route('post.destroy', $post->id) }} method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete-post-button">×</button>
-                                </form>
+                                @auth
+                                    @if (auth()->id() == $post->user_id)
+                                    <a href={{ route('post.editShow', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
+                                    <form action={{ route('post.destroy', $post->id) }} method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="delete-post-button">×</button>
+                                    </form>
+                                    @endif
+                                @endauth
                             </div>
                             <p>{!! nl2br(e($post->content)) !!}</p>
                             <small>{{ $post->created_at }}</small>
@@ -47,18 +51,14 @@
                     @endif
                 </div>
 
-                
-                @if ($selectedThemeId)
-                <form class="post-form" action={{ route('post.publish') }} method="POST">
-                    @csrf
-                    <div class="post-form__group">
-                        <input type="hidden" name="theme_id" value={{ $selectedThemeId }}>
-                        <label for="post-text" class="post-form__label">Введите текст поста:</label>
-                        <textarea id="post-text" name="post_text" class="post-form__input"></textarea>
-                    </div>
-                    <button type="submit" class="post-form__button">Отправить</button>
-                </form>
-                @endif
+                @auth
+                    @if ($selectedThemeId && !isset($postContent)) 
+                        @include('frontend.layout.postPublishForm')
+                    @elseif ($selectedThemeId && isset($postContent))
+                        @include('frontend.layout.postEditForm')
+                    @endif
+                @endauth
+
 
                 
 

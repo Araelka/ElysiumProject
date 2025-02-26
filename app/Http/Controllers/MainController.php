@@ -9,14 +9,4 @@ use Illuminate\Http\Request;
 class MainController extends Controller
 {
     //
-    public function index(Request $request){
-
-        $themes = Theme::all();
-
-        $selectedThemeId = $request->query('theme_id');
-
-        $posts = Post::where('theme_id', $selectedThemeId)->with(relations:['theme', 'user'])->get();
-
-        return view('frontend/index', ['themes' => $themes, 'posts' => $posts, 'selectedThemeId' => $selectedThemeId]);
-    }
 }
