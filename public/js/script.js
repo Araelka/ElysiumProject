@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
+//Скрипт для гамбургер-меню
 document.addEventListener('DOMContentLoaded', () => {
 const mobileMenu = document.getElementById('mobile-menu');
 const menu = document.getElementById('menu');
