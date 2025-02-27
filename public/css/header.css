@@ -8,8 +8,9 @@ body {
     background-position: center;
     background-attachment: fixed;
     color: #fff;
-    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+    overflow: hidden;
 }
+
 
 /* Стили для фиксированного меню */
 .navbar {
@@ -59,8 +60,8 @@ body {
 
 /* Общие стили для кнопок */
 .navbar__login,
-.navbar__logout,
 .navbar__login-mobile,
+.navbar__logout,
 .navbar__logout-mobile {
     text-decoration: none;
     color: #fff;
@@ -82,8 +83,8 @@ body {
 }
 
 .navbar__login:hover,
-.navbar__logout:hover,
 .navbar__login-mobile:hover,
+.navbar__logout:hover,
 .navbar__logout-mobile:hover {
     background-color: #f4d03f;
     color: #1a1a40;
@@ -117,95 +118,6 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Стили для контейнера аватара */
-.navbar__user-dropdown,
-.navbar__user-dropdown-mobile{
-    position: relative;
-    display: inline-block;
-}
-
-.navbar__user-dropdown-mobile{
-    display: none;
-}
-
-/* Стили для аватара */
-.navbar__user-avatar {
-    cursor: pointer;
-}
-
-.navbar__user-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #f4d03f;
-    transition: transform 0.3s ease;
-}
-
-.navbar__user-avatar img:hover {
-    transform: scale(1.1);
-}
-
-/* Стили для выпадающего меню */
-.navbar__dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: rgba(10, 14, 23, 0.9);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-    border: 2px solid #f4d03f;
-    border-radius: 10px;
-    padding: 10px 0;
-    list-style: none;
-    margin: 0;
-    z-index: 1000;
-    min-width: 150px;
-    white-space: nowrap;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-}
-
-.navbar__dropdown-menu.active {
-    max-height: 200px; /* Максимальная высота меню */
-    opacity: 1;
-}
-
-.navbar__dropdown-menu li {
-    text-align: center;
-    margin: 5px 0;
-}
-
-.navbar__dropdown-menu a,
-.navbar__dropdown-menu button {
-    display: block;
-    color: #f4d03f;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 8px 16px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    text-align: center;
-}
-
-.navbar__dropdown-menu a:hover,
-.navbar__dropdown-menu button:hover {
-    background-color: #f4d03f;
-    color: #1a1a40;
-}
-
-.navbar__dropdown-menu .navbar__logout {
-    width: calc(100% - 4px); /* Растягиваем на всё меню с отступами */
-    margin: 0 2px;
-}
-
-/* Показываем выпадающее меню при наведении */
-.navbar__user-dropdown:hover .navbar__dropdown-menu {
-    display: block;
-}
-
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
     .navbar__container {
@@ -224,6 +136,7 @@ body {
         left: 0;
         width: 100%;
         padding: 20px;
+        margin-top: 25px;
         box-sizing: border-box;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         overflow: hidden;
@@ -231,6 +144,7 @@ body {
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease, visibility 0.3s ease;
+        transform: translateY(-20px);
     }
 
     .navbar__menu.active {
@@ -247,14 +161,13 @@ body {
         font-size: 18px;
         color: #f4d03f;
         text-decoration: none;
-
         width: 100%;
         text-align: center;
     }
 
     .navbar__login-mobile,
     .navbar__logout-mobile {
-        display: none;
+        display: block;
     }
 
     .navbar__auth {
@@ -264,46 +177,4 @@ body {
     .navbar__toggle {
         display: flex;
     }
-
-    .navbar__dropdown-menu {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center; 
-        background-color: rgba(10, 14, 23, 0.9);
-        position: absolute;
-        top: 60px;
-        right: 0;
-        width: 100%;
-        padding: 20px;
-        box-sizing: border-box;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-        overflow: hidden;
-        border-radius: 10px;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .navbar__dropdown-menu li {
-        margin: 10px 0;
-    }
-
-    .navbar__dropdown-menu a,
-    .navbar__dropdown-menu button {
-        font-size: 18px;
-        padding: 10px;
-    }
-
-    .navbar__user-dropdown-mobile{
-        display: block;
-    }
-
-    .navbar__dropdown-menu.active {
-        display: flex;
-        opacity: 1;
-        visibility: visible;
-    }
-
-    
 }
