@@ -29,3 +29,9 @@ Route::middleware(['auth', 'player'])->group(function(){
     Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('post.editShow');
     Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
 });
+
+Route::middleware(['auth', 'admin'])->group(function() {
+    Route::get('admin', function() {
+        return view('frontend.admin');
+    });
+})->name('admin');

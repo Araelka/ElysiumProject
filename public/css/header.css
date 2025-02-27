@@ -108,7 +108,7 @@ body {
 }
 
 .navbar__toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+    transform: rotate(45deg) translate(10px, 6px);
 }
 
 .navbar__toggle.active span:nth-child(2) {
@@ -116,7 +116,7 @@ body {
 }
 
 .navbar__toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
+    transform: rotate(-45deg) translate(10px, -5px);
 }
 
 /* Стили для аватара пользователя */
@@ -205,21 +205,17 @@ body {
     white-space: nowrap; /* Запрещаем перенос текста */
 }
 
-.navbar__user-name::after {
-    content: " ";
-    position: absolute;
-    top: 100%; /* Внизу подсказка */
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: black transparent transparent transparent;
-  }
 
 
 .navbar__user-mobile .navbar__user-name {
     font-size: 14px; /* Меньший размер текста для мобильной версии */
     margin-right: 8px; /* Уменьшенный отступ */
+}
+
+.navbar__user-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
 
 

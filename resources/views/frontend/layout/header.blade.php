@@ -19,34 +19,36 @@
                 <button type="submit" class="navbar__login-mobile">Вход</button>
             </form>
         @else
+            <!-- Меню пользователя (мобильная версия) -->
             <div class="navbar__user-mobile">
                 <!-- Кнопка вызова меню -->
-                <span class="navbar__user-name">{{ Auth::user()->login }}</span>
-                <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-mobile">
+                <div class="navbar__user-trigger" id="user-trigger-mobile">
+                    <span class="navbar__user-name">{{ Auth::user()->login }}</span>
+                    <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-mobile">
+                </div>
             </div>
-            
-            
-            <!-- Меню пользователя (мобильная версия) -->
-            <ul class="navbar__user-menu" id="user-menu-mobile" role="menu" aria-hidden="true">
-                <li><a href="" class="navbar__link">Админ-панель</a></li>
-                <li><a href="" class="navbar__link">Настройки</a></li>
-                <li>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="navbar__link">Выход</button>
-                    </form>
-                </li>
-            </ul>
+                <ul class="navbar__user-menu" id="user-menu-mobile" role="menu" aria-hidden="true">
+                    <li><a href="" class="navbar__link">Админ-панель</a></li>
+                    <li><a href="" class="navbar__link">Настройки</a></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="navbar__link">Выход</button>
+                        </form>
+                    </li>
+                </ul>
         @endguest
         <!-- Кнопки для десктопной версии -->
         <div class="navbar__auth">
             @guest
                 <a href="{{ route('login') }}" class="navbar__login">Вход</a>
             @else
-                <!-- Кнопка аватара пользователя (десктопная версия) -->
+                <!-- Меню пользователя (десктопная версия) -->
                 <div class="navbar__user">
-                    <span class="navbar__user-name">{{ Auth::user()->login }}</span>
-                    <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-desktop">
+                    <div class="navbar__user-trigger" id="user-trigger-desktop">
+                        <span class="navbar__user-name">{{ Auth::user()->login }}</span>
+                        <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-desktop">
+                    </div>
                     <ul class="navbar__user-menu" id="user-menu-desktop" role="menu" aria-hidden="true">
                         <li><a href="" class="navbar__link">Админ-панель</a></li>
                         <li><a href="" class="navbar__link">Настройки</a></li>
