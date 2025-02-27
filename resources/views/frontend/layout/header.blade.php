@@ -28,7 +28,9 @@
                 </div>
             </div>
                 <ul class="navbar__user-menu" id="user-menu-mobile" role="menu" aria-hidden="true">
-                    <li><a href="" class="navbar__link">Админ-панель</a></li>
+                    @if (Auth::user()->isAdmin())
+                        <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
+                    @endif
                     <li><a href="" class="navbar__link">Настройки</a></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
@@ -50,7 +52,9 @@
                         <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-desktop">
                     </div>
                     <ul class="navbar__user-menu" id="user-menu-desktop" role="menu" aria-hidden="true">
-                        <li><a href="" class="navbar__link">Админ-панель</a></li>
+                        @if (Auth::user()->isAdmin())
+                            <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
+                        @endif
                         <li><a href="" class="navbar__link">Настройки</a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">

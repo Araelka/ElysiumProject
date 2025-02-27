@@ -26,13 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция для закрытия всех меню
     function closeMenus(...menus) {
-        menus.forEach(menu => {
-            if (menu && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
-        });
-
-        // Сбрасываем состояние гамбургер-меню
+        menus.forEach(menu => menu?.classList.remove('active'));
         if (mobileMenu) {
             mobileMenu.classList.remove('active');
             mobileMenu.setAttribute('aria-expanded', false);
@@ -45,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработчик для гамбургер-меню
     if (mobileMenu && mainMenu) {
         mobileMenu.addEventListener('click', (event) => {
-            event.stopPropagation(); // Предотвращаем всплытие события
-            closeMenus(userMenuMobile, userMenuDesktop); // Закрываем другие меню
+            event.stopPropagation();
+            closeMenus(userMenuMobile, userMenuDesktop);
             mainMenu.classList.toggle('active');
             mobileMenu.classList.toggle('active');
             mobileMenu.setAttribute('aria-expanded', mainMenu.classList.contains('active'));
@@ -57,42 +51,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Общая функция для обработки кликов по триггерам пользовательского меню
     function handleUserTriggerClick(userTrigger, userMenu) {
         userTrigger.addEventListener('click', (event) => {
-            event.stopPropagation(); // Останавливаем распространение события
+            event.stopPropagation();
             if (userMenu.classList.contains('active')) {
-                userMenu.classList.remove('active'); // Закрываем меню, если оно уже открыто
+                userMenu.classList.remove('active');
             } else {
-                closeMenus(mainMenu, userMenuMobile, userMenuDesktop); // Закрываем другие меню
-                userMenu.classList.add('active'); // Открываем текущее меню
+                closeMenus(mainMenu, userMenuMobile, userMenuDesktop);
+                userMenu.classList.add('active');
             }
         });
     }
 
     // Привязываем обработчики для мобильного и десктопного пользовательского меню
-    if (userTriggerMobile && userMenuMobile) {
-        handleUserTriggerClick(userTriggerMobile, userMenuMobile);
-    }
-    if (userTriggerDesktop && userMenuDesktop) {
-        handleUserTriggerClick(userTriggerDesktop, userMenuDesktop);
-    }
+    [userTriggerMobile, userTriggerDesktop].forEach((trigger, index) => {
+        const menu = index === 0 ? userMenuMobile : userMenuDesktop;
+        if (trigger && menu) {
+            handleUserTriggerClick(trigger, menu);
+        }
+    });
 
     // Общий обработчик для закрытия меню при клике вне их области
     document.addEventListener('click', (event) => {
-        const isClickInsideMobileMenu = mobileMenu && mobileMenu.contains(event.target);
-        const isClickInsideMainMenu = mainMenu && mainMenu.contains(event.target);
-        const isClickInsideUserTriggerMobile = userTriggerMobile && userTriggerMobile.contains(event.target);
-        const isClickInsideUserMenuMobile = userMenuMobile && userMenuMobile.contains(event.target);
-        const isClickInsideUserTriggerDesktop = userTriggerDesktop && userTriggerDesktop.contains(event.target);
-        const isClickInsideUserMenuDesktop = userMenuDesktop && userMenuDesktop.contains(event.target);
+        const isClickInsideMenu = 
+            (mobileMenu?.contains(event.target) || mainMenu?.contains(event.target)) ||
+            (userTriggerMobile?.contains(event.target) || userMenuMobile?.contains(event.target)) ||
+            (userTriggerDesktop?.contains(event.target) || userMenuDesktop?.contains(event.target));
 
-        // Если клик был вне всех меню, закрываем все меню
-        if (
-            !isClickInsideMobileMenu &&
-            !isClickInsideMainMenu &&
-            !isClickInsideUserTriggerMobile &&
-            !isClickInsideUserMenuMobile &&
-            !isClickInsideUserTriggerDesktop &&
-            !isClickInsideUserMenuDesktop
-        ) {
+        if (!isClickInsideMenu) {
             closeMenus(mainMenu, userMenuMobile, userMenuDesktop);
         }
     });

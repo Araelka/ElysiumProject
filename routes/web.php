@@ -33,5 +33,5 @@ Route::middleware(['auth', 'player'])->group(function(){
 Route::middleware(['auth', 'admin'])->group(function() {
     Route::get('admin', function() {
         return view('frontend.admin');
-    });
+    })->name('admin');
 })->name('admin');
