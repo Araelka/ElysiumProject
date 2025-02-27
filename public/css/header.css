@@ -49,8 +49,8 @@ body {
 }
 
 .navbar__link:hover {
-    color: #ec7063;
-    transform: scale(1.1);
+    /* color: #ec7063; */
+    text-decoration: underline;
 }
 
 .navbar__auth {
@@ -63,6 +63,7 @@ body {
 .navbar__login-mobile,
 .navbar__logout,
 .navbar__logout-mobile {
+    cursor: pointer;
     text-decoration: none;
     color: #fff;
     font-size: 18px;
@@ -118,13 +119,116 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
+/* Стили для аватара пользователя */
+.navbar__user,
+.navbar__user-mobile {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.navbar__user-mobile {
+    display: none;
+}
+.navbar__user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 0px;
+    border: 2px solid #f4d03f;
+}
+
+
+.navbar__user-menu {
+    list-style: none;
+    background-color: rgba(10, 14, 23, 0.9);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 175px;
+    align-items: center;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-25px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; 
+}
+.navbar__user-menu.active {
+    opacity: 1;
+    visibility: visible; 
+    transform: translateY(0); 
+}
+.navbar__user-menu li {
+    margin-bottom: 0px;
+    width: 100%;
+}
+.navbar__user-menu a,
+.navbar__user-menu button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    color: #f4d03f;
+    font-size: 18px;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    padding: 10px; 
+    box-sizing: border-box; 
+    text-align: left; 
+    background-color: #ec716300;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 5px;
+}
+.navbar__user-menu a:hover,
+.navbar__user-menu button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+    text-decoration: none;
+}
+
+/* Стили для имени пользователя */
+.navbar__user-name {
+    font-size: 16px; /* Размер текста */
+    font-weight: bold; /* Жирный шрифт */
+    color: #f4d03f; /* Цвет текста */
+    margin-right: 10px; /* Отступ справа от имени до аватара */
+    line-height: 30px; /* Выравнивание по высоте аватара */
+    white-space: nowrap; /* Запрещаем перенос текста */
+}
+
+.navbar__user-name::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* Внизу подсказка */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+  }
+
+
+.navbar__user-mobile .navbar__user-name {
+    font-size: 14px; /* Меньший размер текста для мобильной версии */
+    margin-right: 8px; /* Уменьшенный отступ */
+}
+
+
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
     .navbar__container {
         max-width: 100%;
         padding: 10px 20px;
     }
-
     .navbar__menu {
         display: flex;
         flex-direction: column;
@@ -136,27 +240,27 @@ body {
         left: 0;
         width: 100%;
         padding: 20px;
-        margin-top: 25px;
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-top: 0px;
         box-sizing: border-box;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         overflow: hidden;
         border-radius: 10px;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        transform: translateY(-20px);
+        transform: translateY(-25px);
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; 
     }
-
     .navbar__menu.active {
         display: flex;
         opacity: 1;
         visibility: visible;
+        transform: translateY(0px); /* Меню возвращается в исходное положение */
     }
-
     .navbar__menu li {
         margin-bottom: 15px;
     }
-
     .navbar__menu a {
         font-size: 18px;
         color: #f4d03f;
@@ -164,17 +268,74 @@ body {
         width: 100%;
         text-align: center;
     }
-
     .navbar__login-mobile,
     .navbar__logout-mobile {
         display: block;
     }
-
     .navbar__auth {
         display: none;
     }
-
     .navbar__toggle {
         display: flex;
     }
+
+    /* Стили для аватара пользователя в мобильной версии */
+.navbar__user-mobile {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.navbar__user-menu#user-menu-mobile {
+    position: absolute;
+    top: 60px; /* Высота фиксированного меню */
+    left: 0; /* Растягиваем на всю ширину */
+    width: 100%; /* Занимает всю ширину экрана */
+    padding: 20px; /* Отступы внутри меню */
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-top: 0px; /* Расстояние от верхнего края */
+    box-sizing: border-box; /* Учитываем padding в размерах */
+    background-color: rgba(10, 14, 23, 0.9); /* Фон как у гамбургер-меню */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень как у гамбургер-меню */
+    overflow: hidden; /* Скрываем лишнее содержимое */
+    border-radius: 10px; /* Скругление углов */
+    opacity: 0; /* Начальная прозрачность */
+    visibility: hidden; /* Начальная видимость */
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; /* Плавные переходы */
+    transform: translateY(-25px); /* Начальное смещение */
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Кнопки в столбец */
+    align-items: center; /* Центрируем элементы */
+    text-align: center; /* Текст по центру */
+}
+
+.navbar__user-menu#user-menu-mobile.active {
+    opacity: 1; /* Делаем видимым */
+    visibility: visible; /* Делаем активным */
+    transform: translateY(0); /* Возвращаем на место */
+}
+
+.navbar__user-menu#user-menu-mobile li {
+    margin-bottom: 15px; /* Отступ между элементами */
+    width: 100%; /* Занимают всю ширину */
+}
+
+.navbar__user-menu#user-menu-mobile a,
+.navbar__user-menu#user-menu-mobile button {
+    font-size: 18px; /* Размер текста */
+    color: #f4d03f; /* Цвет текста */
+    text-decoration: none; /* Убираем подчеркивание */
+    width: 100%; /* Занимают всю ширину */
+    text-align: center; /* Текст по центру */
+    background: none; /* Убираем фон */
+    border: none; /* Убираем границы */
+    padding: 10px; /* Отступы внутри кнопок */
+    box-sizing: border-box; /* Учитываем padding в размерах */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Плавные переходы */
+}
+
+.navbar__user-menu#user-menu-mobile a:hover,
+.navbar__user-menu#user-menu-mobile button:hover {
+    text-decoration: underline;
+}
 }

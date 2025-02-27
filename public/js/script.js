@@ -17,19 +17,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
 //Скрипт для гамбургер-меню
 document.addEventListener('DOMContentLoaded', () => {
-const mobileMenu = document.getElementById('mobile-menu');
-const menu = document.getElementById('menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mainMenu = document.getElementById('main-menu');
+    const userAvatarMobile = document.getElementById('user-avatar-mobile');
+    const userMenuMobile = document.getElementById('user-menu-mobile');
+    const userAvatarDesktop = document.getElementById('user-avatar-desktop');
+    const userMenuDesktop = document.getElementById('user-menu-desktop');
 
-if (mobileMenu && menu) {
-    mobileMenu.addEventListener('click', () => {
-        const isActive = menu.classList.contains('active');
-        menu.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
+    function closeMenus(...menus) {
+        menus.forEach(menu => {
+            if (menu && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
+    }
 
-        mobileMenu.setAttribute('aria-expanded', !isActive);
-        menu.setAttribute('aria-hidden', isActive);
-    });
-}
+    function handleUserAvatarClick(userAvatar, userMenu) {
+        userAvatar.addEventListener('click', () => {
+            closeMenus(mainMenu, userMenuMobile, userMenuDesktop);
+            userMenu.classList.toggle('active');
+        });
+
+        // Закрыть меню при клике вне его области
+        document.addEventListener('click', (event) => {
+            if (!userAvatar.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+    }
+
+    if (mobileMenu && mainMenu) {
+        mobileMenu.addEventListener('click', () => {
+            closeMenus(userMenuMobile, userMenuDesktop);
+            mainMenu.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            mobileMenu.setAttribute('aria-expanded', mainMenu.classList.contains('active'));
+            mainMenu.setAttribute('aria-hidden', !mainMenu.classList.contains('active'));
+        });
+    }
+
+    if (userAvatarMobile && userMenuMobile) {
+        handleUserAvatarClick(userAvatarMobile, userMenuMobile);
+    }
+
+    if (userAvatarDesktop && userMenuDesktop) {
+        handleUserAvatarClick(userAvatarDesktop, userMenuDesktop);
+    }
 });
 
 

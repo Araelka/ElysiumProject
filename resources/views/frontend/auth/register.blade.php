@@ -1,4 +1,5 @@
 @extends('frontend.layout.layout')
+<link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 @section('title', 'Регистрация')
 
 @section('content')
