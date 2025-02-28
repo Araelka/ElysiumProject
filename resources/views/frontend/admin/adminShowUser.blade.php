@@ -2,7 +2,7 @@
 @section('title', 'Редактирование пользователя: ' . $user->login)
 @section('table')
 <div class="button-container custom-button-container">
-    <form action="" method="POST" class="data-table">
+    <form action={{ route('admin.edit', $user->id) }} method="POST" class="data-table">
         @csrf
         @method('PUT')
         <div class="form-group">

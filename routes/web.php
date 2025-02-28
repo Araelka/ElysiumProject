@@ -36,5 +36,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::get('users', [AdminController::class, 'showTableUser'])->name('admin.showUsers');
     Route::delete('users/{id}/destroy', [AdminController::class, 'destroy'])->name('admin.destroy');
     Route::get('users/{id}/edit', [AdminController::class, 'showEditForm'])->name('admin.showEditForm');
+    Route::put('users/{id}/edit', [AdminController::class, 'edit'])->name('admin.edit');
 });
 

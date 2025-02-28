@@ -38,4 +38,12 @@ class AdminController extends Controller
 
         return view('frontend.admin.adminShowUser', ['user' => $user, 'roles' => $roles]);
     }
+
+    public function edit (Request $request, $id) {
+        $user = User::findOrFail($id);
+        $user->role_id = $request->input('role_id');
+        $user->update();
+
+        return redirect()->route('admin.showUsers');
+    }
 }
