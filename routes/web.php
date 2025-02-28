@@ -34,6 +34,7 @@ Route::middleware(['auth', 'player'])->group(function(){
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::get('/', [AdminController::class, 'index'])->name('admin');
     Route::get('users', [AdminController::class, 'showTableUser'])->name('admin.showUsers');
-    Route::delete('destroy/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
+    Route::delete('users/{id}/destroy', [AdminController::class, 'destroy'])->name('admin.destroy');
+    Route::get('users/{id}/edit', [AdminController::class, 'showEditForm'])->name('admin.showEditForm');
 });
 

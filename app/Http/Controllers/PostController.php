@@ -6,6 +6,7 @@ use App\Events\PostCreated;
 use App\Models\Post;
 use App\Models\Theme;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ThemeController;
 
 
 class PostController extends Controller

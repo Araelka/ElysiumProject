@@ -22,7 +22,7 @@
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->role->name }}</td>
                 <td>
-                    <a href="" class="edit-button">Редактировать</a>
+                    <a href={{ route('admin.showEditForm', $user->id) }} class="edit-button">Редактировать</a>
                     <form action={{ route('admin.destroy', $user->id) }} method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')

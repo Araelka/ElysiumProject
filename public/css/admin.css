@@ -49,6 +49,11 @@
     transition: background-color 0.3s ease;
 }
 
+.table-link.active {
+    background-color: #f4d03f; /* Ярко-жёлтый фон */
+    color: #1a1a40; /* Тёмный текст */
+}
+
 .table-link:hover {
     background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
     color: #1a1a40; /* Тёмный текст */
@@ -196,16 +201,17 @@
     padding: 10px 20px;
     font-size: 18px;
     font-weight: bold;
-    border: none;
+    border: none; /* Убираем границы */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 5px; /* Добавляем отступы */
+    box-sizing: border-box; /* Учитываем padding и border в размерах */
 }
 
 #confirm-delete {
     background-color: #ff4d4d; /* Красный цвет */
     color: #fff; /* Белый текст */
-    margin-right: 10px;
 }
 
 #confirm-delete:hover {
@@ -221,4 +227,126 @@
 #cancel-delete:hover {
     background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
     color: #1a1a40; /* Тёмный текст */
+}
+
+/* Стили для стараницы редактирования */
+.table-container {
+    height: 100%; /* Занимает всю высоту блока */
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #f4d03f;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent; /* Темный фон */
+    color: #fff; /* Светлый текст */
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #ec7063;
+    outline: none;
+}
+
+.form-group select:focus {
+    background-color: rgba(10, 14, 23, 0.7); 
+    border-color: #ec7063;
+    outline: none;
+}
+
+
+.button-group .left-buttons .save-button,
+.button-group .right-buttons .reset-password-button,
+.button-group .right-buttons .delete-button {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.button-group .left-buttons .save-button {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.button-group .left-buttons .save-button:hover {
+    background-color: #ec7063;
+}
+
+.button-group .right-buttons .reset-password-button {
+    background-color: transparent;
+    color: #f4d03f;
+    border: 2px solid #f4d03f;
+}
+
+.button-group .right-buttons .reset-password-button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.button-group .right-buttons .delete-button {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.button-group .right-buttons .delete-button:hover {
+    background-color: #cc0000;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.right-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.button-group form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle; /* Выравнивание по вертикали */
 }

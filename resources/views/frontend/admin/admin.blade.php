@@ -11,7 +11,7 @@
                 <div class="table-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="table-selection d-flex align-items-center">
                         <ul class="table-list d-flex">
-                            <li><a href={{ route('admin.showUsers') }} class="table-link">Пользователи</a></li>
+                            <li><a href={{ route('admin.showUsers') }} class="table-link {{ request()->routeIs('admin.showUsers') ? 'active' : '' }}">Пользователи</a></li>
                             <li><a href="#" class="table-link">Таблица 2</a></li>
                             <li><a href="#" class="table-link">Таблица 3</a></li>
                         </ul>

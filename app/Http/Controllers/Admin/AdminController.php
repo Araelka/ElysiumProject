@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -19,6 +20,7 @@ class AdminController extends Controller
     }
 
     public function destroy ($id) {
+
         if (auth()->user()->isAdmin()){
             $user = User::findOrFail($id);
             if ($user->role_id != 1) {
@@ -26,6 +28,14 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->back();
+        return redirect()->route('admin.showUsers');
+    }
+
+    public function showEditForm ($id){
+        $user = User::with('role')->findOrFail($id);
+
+        $roles = Role::all();
+
+        return view('frontend.admin.adminShowUser', ['user' => $user, 'roles' => $roles]);
     }
 }
