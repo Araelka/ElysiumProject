@@ -82,33 +82,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ОБРАТНОКА МОДАЛЬНОГО ОКНА
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем элементы
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    const modal = document.getElementById('confirm-delete-modal');
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    const cancelDeleteButton = document.getElementById('cancel-delete');
+    const closeButton = document.querySelector('.close');
 
+    let currentForm = null;
 
+    // Функция для открытия модального окна
+    function openModal(event) {
+        event.preventDefault();
+        modal.style.display = 'block';
+        currentForm = event.target.closest('form');
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
-const postsContainer = document.querySelector('.posts');
+    // Функция для закрытия модального окна
+    function closeModal() {
+        modal.style.display = 'none';
+        currentForm = null;
+    }
 
-// Функция для показа полосы прокрутки
-function showScrollbar() {
-    postsContainer.classList.add('scrolling');
-}
+    // Обработчик события для кнопок удаления
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', openModal);
+    });
 
-// Функция для скрытия полосы прокрутки
-function hideScrollbar() {
-    postsContainer.classList.remove('scrolling');
-}
+    // Обработчик события для кнопки подтверждения удаления
+    confirmDeleteButton.addEventListener('click', function() {
+        if (currentForm) {
+            currentForm.submit();
+        }
+        closeModal();
+    });
 
-// Добавляем обработчик прокрутки
-postsContainer.addEventListener('scroll', function () {
-    showScrollbar(); // Показываем полосу при прокрутке
-
-    // Через 2 секунды после остановки прокрутки скрываем полосу
-    clearTimeout(postsContainer.scrollTimeout);
-    postsContainer.scrollTimeout = setTimeout(hideScrollbar, 2000);
+    // Обработчик события для кнопки отмены и крестика
+    [cancelDeleteButton, closeButton].forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
 });
-
-// Добавляем обработчик наведения мыши
-postsContainer.addEventListener('mouseenter', showScrollbar); // Показываем полосу при наведении
-postsContainer.addEventListener('mouseleave', hideScrollbar); // Скрываем полосу при уходе мыши
-});
-

@@ -51,8 +51,9 @@ class PostController extends Controller
 
         if (auth()->id() == $post->user_id || auth()->user()->isAdmin()) {
             $post->delete();
-            return redirect()->back();
         }
+
+        return redirect()->back();
     }
 
     public function showEditForm ($id){

@@ -21,27 +21,31 @@ class User extends Authenticatable
         'login',
         'email',
         'password',
-        'role'
+        'role_id'
     ];
 
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->role_id === 1;
     }
 
     public function isEditor()
     {
-        return in_array($this->role, ['admin', 'editor']);
+        return in_array($this->role_id, [1, 2]);
     }
 
     public function isPlayer()
     {
-        return in_array($this->role, ['admin', 'editor', 'player']);
+        return in_array($this->role_id, [1, 2, 3]);
     }
 
     public function isUser()
     {
-        return $this->role === 'user';
+        return $this->role_id === 4;
+    }
+
+    public function role(){
+        return $this->belongsTo(Role::class);
     }
 
     /**

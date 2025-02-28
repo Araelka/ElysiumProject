@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MainController;
@@ -30,8 +31,9 @@ Route::middleware(['auth', 'player'])->group(function(){
     Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
 });
 
-Route::middleware(['auth', 'admin'])->group(function() {
-    Route::get('admin', function() {
-        return view('frontend.admin');
-    })->name('admin');
-})->name('admin');
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
+    Route::get('/', [AdminController::class, 'index'])->name('admin');
+    Route::get('users', [AdminController::class, 'showTableUser'])->name('admin.showUsers');
+    Route::delete('destroy/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
+});
+

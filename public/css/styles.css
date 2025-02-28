@@ -179,6 +179,23 @@
     transition: border-color 0.3s ease;
     box-sizing: border-box;
     resize: none;
+
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+}
+
+.post-form__input::-webkit-scrollbar {
+    width: 5px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.post-form__input::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.post-form__input::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
 }
 
 .post-form__input:focus {
@@ -247,33 +264,3 @@
 }
 
 
-.admin-content {
-    background-color: rgba(10, 14, 23, 0.9);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%; /* Ширина 20% */
-    margin-right: 20px; /* Отступ справа */
-    display: flex;
-    flex-direction: column;
-    justify-content: start; /* Выравнивание содержимого в начале блока */
-    overflow-y: auto; /* Добавляем вертикальную прокрутку */
-    max-height: 90%; /* Ограничиваем максимальную высоту */
-
-    /* Стили для прокрутки */
-    scrollbar-width: thin; /* Для Firefox */
-    scrollbar-color: #f4d03f #1a1a40; /* Цвет полосы и фона прокрутки */
-}
-
-.admin-content::-webkit-scrollbar {
-    width: 5px; /* Ширина полосы прокрутки */
-}
-
-.admin-content::-webkit-scrollbar-track {
-    background: #1a1a40; /* Фон полосы прокрутки */
-}
-
-.admin-content::-webkit-scrollbar-thumb {
-    background-color: #f4d03f; /* Цвет полосы прокрутки */
-    border-radius: 5px; /* Закругление полосы прокрутки */
-}

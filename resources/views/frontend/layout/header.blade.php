@@ -24,7 +24,7 @@
                 <!-- Кнопка вызова меню -->
                 <div class="navbar__user-trigger" id="user-trigger-mobile">
                     <span class="navbar__user-name">{{ Auth::user()->login }}</span>
-                    <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-mobile">
+                    <img src="{{ asset('images/default-avatar.png') }}" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-mobile">
                 </div>
             </div>
                 <ul class="navbar__user-menu" id="user-menu-mobile" role="menu" aria-hidden="true">
@@ -49,7 +49,7 @@
                 <div class="navbar__user">
                     <div class="navbar__user-trigger" id="user-trigger-desktop">
                         <span class="navbar__user-name">{{ Auth::user()->login }}</span>
-                        <img src="images/default-avatar.png" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-desktop">
+                        <img src="{{ asset('images/default-avatar.png') }}" alt="User Avatar" class="navbar__user-avatar" id="user-avatar-desktop">
                     </div>
                     <ul class="navbar__user-menu" id="user-menu-desktop" role="menu" aria-hidden="true">
                         @if (Auth::user()->isAdmin())

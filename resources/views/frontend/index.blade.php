@@ -32,7 +32,7 @@
                     @foreach ($posts as $post)
                         <div class="post">
                             <div class="post-header">
-                                <h4>{{ $post->user->login }}</h4>
+                                <h4 style="padding-left: 5px">{{ $post->user->login }}</h4>
                                 @auth
                                     @if (auth()->id() == $post->user_id) 
                                     <a href={{ route('post.editShow', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
