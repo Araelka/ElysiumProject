@@ -8,7 +8,7 @@
 <h1 class="login-title">Вход</h1>
 
 @error('identifier')
-    <span class="register-form__error">{{ $message }}</span>
+    <span class="form__error">{{ $message }}</span>
 @enderror
 <form class="login-form" action={{ route('login') }} method="POST">
 @csrf

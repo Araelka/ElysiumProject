@@ -212,6 +212,7 @@
 #confirm-delete {
     background-color: #ff4d4d; /* Красный цвет */
     color: #fff; /* Белый текст */
+    border: 2px solid #ffffff00;
 }
 
 #confirm-delete:hover {
@@ -321,6 +322,7 @@
 .button-group .right-buttons .delete-button {
     background-color: #ff4d4d;
     color: #fff;
+    border: 2px solid #ffffff00;
 }
 
 .button-group .right-buttons .delete-button:hover {

@@ -40,7 +40,12 @@ class AdminController extends Controller
     }
 
     public function edit (Request $request, $id) {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'unique:users', 'max:255'],
+            'role_id' => ['required', 'integer', 'exists:roles,id']
+        ]);
         $user = User::findOrFail($id);
+        $user->email = $request->input('email');
         $user->role_id = $request->input('role_id');
         $user->update();
 

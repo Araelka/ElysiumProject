@@ -7,11 +7,14 @@
         @method('PUT')
         <div class="form-group">
             <label for="login">Логин:</label>
-            <input type="text" id="login" name="login" value="{{ $user->login }}">
+            <input type="text" id="login" name="login" value="{{ $user->login }}" readonly>
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="{{ $user->email }}">
+            @error('email')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="role">Роль:</label>

@@ -90,7 +90,6 @@
 }
 
 .register-link {
-    margin-top: 20px; /* Отступ сверху */
     text-align: center;
     font-size: 16px;
     color: #f4d03f; /* Ярко-жёлтый текст */
@@ -189,10 +188,9 @@
     transform: scale(1.05);
 }
 
-/* Стиль для ошибок */
-.register-form__error {
-    display: block;
-    margin-top: 5px;
-    font-size: 14px;
-    color: #ec7063; /* Красный цвет текста */
+.register-form__input:-webkit-autofill,
+.register-form__input:-webkit-autofill:focus,
+.login-form__input:-webkit-autofill,
+.login-form__input:-webkit-autofill:focus  {
+    transition: background-color 0s 600000s, color 0s 600000s !important;
 }
