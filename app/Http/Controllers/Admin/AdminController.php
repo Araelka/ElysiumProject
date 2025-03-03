@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminRequest;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Str;
 
 class AdminController extends Controller
 {
@@ -19,7 +22,7 @@ class AdminController extends Controller
         return view('frontend.admin.adminShowUsers', ['users' => $users]);
     }
 
-    public function destroy ($id) {
+    public function destroyUser ($id) {
 
         if (auth()->user()->isAdmin()){
             $user = User::findOrFail($id);
@@ -31,7 +34,7 @@ class AdminController extends Controller
         return redirect()->route('admin.showUsers');
     }
 
-    public function showEditForm ($id){
+    public function showEditUserForm ($id){
         $user = User::with('role')->findOrFail($id);
 
         $roles = Role::all();
@@ -39,16 +42,35 @@ class AdminController extends Controller
         return view('frontend.admin.adminShowUser', ['user' => $user, 'roles' => $roles]);
     }
 
-    public function edit (Request $request, $id) {
-        $validated = $request->validate([
-            'email' => ['required', 'string', 'email', 'unique:users', 'max:255'],
-            'role_id' => ['required', 'integer', 'exists:roles,id']
-        ]);
+    public function editUser (AdminRequest $request, $id) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $user = User::findOrFail($id);
-        $user->email = $request->input('email');
-        $user->role_id = $request->input('role_id');
-        $user->update();
+        $validated = $request->validated();
+        $user->update([
+            'email' => $validated['email'],
+            'role_id' => $validated['role_id']
+        ]);
 
         return redirect()->route('admin.showUsers');
+
     }
+
+    public function resetPassword (Request $request, $id) {
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+        
+        $user = User::findOrFail($id);
+        $newPassword = Str::random(10);
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        return redirect()->back()->with('newPassword', $newPassword);
+    }
+
 }

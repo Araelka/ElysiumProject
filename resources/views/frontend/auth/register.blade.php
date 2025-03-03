@@ -10,28 +10,28 @@
             @csrf
             <div class="register-form__group">
                 <label for="login" class="register-form__label">Логин</label>
-                <input type="text" id="login" name="login" class="register-form__input"  value='{{ old('login') }}' required>
+                <input type="text" id="login" name="login" class="register-form__input"  value='{{ old('login') }}'>
                 @error('login')
                     <span class="form__error">{{ $message }}</span>
                 @enderror
             </div>
             <div class="register-form__group">
                 <label for="email" class="register-form__label">Email</label>
-                <input type="email" id="email" name="email" class="register-form__input" value='{{ old('email') }}' required>
+                <input type="email" id="email" name="email" class="register-form__input" value='{{ old('email') }}'>
                 @error('email')
                     <span class="form__error">{{ $message }}</span>
                 @enderror
             </div>
             <div class="register-form__group">
                 <label for="password" class="register-form__label">Пароль</label>
-                <input type="password" id="password" name="password" class="register-form__input" required>
+                <input type="password" id="password" name="password" class="register-form__input">
                 @error('password')
                     <span class="form__error">{{ $message }}</span>
                 @enderror
             </div>
             <div class="register-form__group">
                 <label for="password_confirmation" class="register-form__label">Подтвердите пароль</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" class="register-form__input" required>
+                <input type="password" id="password_confirmation" name="password_confirmation" class="register-form__input">
                 @error('password_confirmation')
                     <span class="form__error">{{ $message }}</span>
                 @enderror

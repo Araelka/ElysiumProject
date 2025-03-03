@@ -175,14 +175,17 @@
     width: 30%;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень */
+    position: relative;
 }
 
 .close {
     color: #f4d03f; /* Ярко-жёлтый цвет */
-    float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    position: absolute; /* Позиционируем крестик вне основного потока документа */
+    top: 0px; /* Поднимаем крестик на строчку выше */
+    right: 10px; /* Располагаем крестик справа */
 }
 
 .close:hover,
@@ -197,7 +200,8 @@
 }
 
 #confirm-delete,
-#cancel-delete {
+#cancel-delete,
+#close-reset-password-modal  {
     padding: 10px 20px;
     font-size: 18px;
     font-weight: bold;
@@ -219,13 +223,15 @@
     background-color: #cc0000; /* Темно-красный цвет при наведении */
 }
 
-#cancel-delete {
+#cancel-delete,
+#close-reset-password-modal {
     background-color: transparent; /* Прозрачный фон */
     color: #f4d03f; /* Ярко-жёлтый текст */
     border: 2px solid #f4d03f; /* Ярко-жёлтая рамка */
 }
 
-#cancel-delete:hover {
+#cancel-delete:hover,
+#close-reset-password-modal:hover  {
     background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
     color: #1a1a40; /* Тёмный текст */
 }
