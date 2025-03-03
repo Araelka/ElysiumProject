@@ -358,3 +358,38 @@
     padding: 0;
     vertical-align: middle; /* Выравнивание по вертикали */
 }
+
+.add-button {
+    background-color: transparent;
+    color: #fff;
+    padding: 5px 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid #f4d03f;
+    transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.delete-button {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: 2px solid #ffffff00;
+    padding: 5px 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.top-menu {
+    display: flex; 
+    justify-content: flex-end;
+    gap: 10px;
+}

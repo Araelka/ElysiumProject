@@ -3,6 +3,17 @@
 @section('table')
 
 <div class="table-container">
+    <div class="top-menu">
+        <form action="" method="GET">
+            <button type="submit" class="add-button">Создать</button>
+        </form>
+
+        <form action="" method="GET">
+            <button type="submit" class="delete-button">Удалить</button>
+        </form>
+    </div>
+
+
     <table class="data-table">
         <thead>
             <tr>
