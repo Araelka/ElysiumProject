@@ -1,6 +1,6 @@
 @extends('frontend.layout.layout')
-@if ($selectedThemeId)
-@section('title', $themes[$selectedThemeId-1]->name)
+@if ($selectedLocation) 
+@section('title', $selectedLocation->name)
 @endif
 
 
@@ -11,10 +11,10 @@
             <div class="col-md-2 sidebar d-flex flex-column justify-content-start">
                 <h3>Локации</h3>
                 <ul class="topics-list">
-                    @foreach ($themes as $theme)
-                        <li><a href="?theme_id={{ $theme->id }}" 
-                            class="topic-link {{ $selectedThemeId == $theme->id ? 'active' : '' }}">
-                             {{ $theme->name }}
+                    @foreach ($locations as $location)
+                        <li><a href="?location_id={{ $location->id }}" 
+                            class="topic-link {{ $selectedLocation && $selectedLocation->id == $location->id ? 'active' : '' }}">
+                             {{ $location->name }}
                             </a>
                         </li>
                     @endforeach
@@ -23,8 +23,8 @@
 
             <!-- Блок для просмотра постов (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
-                     @if ($selectedThemeId)
-                    <h3>{{ $themes[$selectedThemeId-1]->name }}</h3>
+                     @if ($selectedLocation)
+                    <h3>{{ $selectedLocation->name }}</h3>
                     @endif
                     <div class="posts">
                     @if ($posts->isEmpty())
@@ -59,9 +59,9 @@
                 </div>
 
                 @auth
-                    @if ($selectedThemeId && !isset($postContent)) 
+                    @if ($selectedLocation && !isset($postContent)) 
                         @include('frontend.layout.postPublishForm')
-                    @elseif ($selectedThemeId && isset($postContent))
+                    @elseif ($selectedLocation && isset($postContent))
                         @include('frontend.layout.postEditForm')
                     @endif
                 @endauth

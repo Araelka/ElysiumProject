@@ -5,7 +5,7 @@
 
 
 <div class="button-container custom-button-container">
-    <form action={{ route('admin.edit', $user->id) }} method="POST" class="data-table">
+    <form action={{ route('admin.editUser', $user->id) }} method="POST" class="data-table">
         @csrf
         @method('PUT')
         <div class="form-group">
@@ -43,7 +43,7 @@
                     @method('PUT')
                     <button type="submit" class="reset-password-button">Сбросить пароль</button>
                 </form>
-                <form action="{{ route('admin.destroy', $user->id) }}" method="POST" style="display:inline-block;">
+                <form action="{{ route('admin.destroyUser', $user->id) }}" method="POST" style="display:inline-block;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="delete-button">Удалить</button>

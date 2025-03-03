@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PostCreated;
+use App\Models\Location;
 use App\Models\Post;
 use App\Models\Theme;
 use Illuminate\Http\Request;
@@ -14,17 +15,19 @@ class PostController extends Controller
     
     public function index(Request $request){
 
-        $themes = Theme::all();
+        $locations = Location::all();
 
-        $selectedThemeId = $request->query('theme_id');
+        $selectedLocationId = $request->query('location_id');
 
-        $posts = $this->selectPostsByTheme($selectedThemeId);
+        $selectedLocation = Location::find($selectedLocationId);
 
-        return view('frontend/index', ['themes' => $themes, 'posts' => $posts, 'selectedThemeId' => $selectedThemeId]);
+        $posts = $this->selectPostsByLocation($selectedLocationId);
+
+        return view('frontend/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation]);
     }
 
-    private function selectPostsByTheme ($selectedThemeId) {
-        $posts = Post::where('theme_id', $selectedThemeId)->with(relations:['theme', 'user'])->get();
+    private function selectPostsByLocation ($selectedLocationId) {
+        $posts = Post::where('location_id', $selectedLocationId)->with(relations:['locations', 'user'])->get();
 
         return $posts;
     }
@@ -40,7 +43,7 @@ class PostController extends Controller
         $post = new Post();
         $post->content = $validated['post_text'];
         $post->user_id = auth()->id();
-        $post->theme_id = $request->input('theme_id');
+        $post->location_id = $request->input('location_id');
         $post->save();
 
         return redirect()->back();
@@ -61,16 +64,18 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
 
         if (auth()->id() != $post->user_id) {
-            return redirect()->route('homePage', ['theme_id' => $post->theme_id]);
+            return redirect()->route('homePage', ['location_id' => $post->location_id]);
         }
 
-        $themes = Theme::all();
+        $locations = Location::all();
 
-        $selectedThemeId = $post->theme->id;
+        $selectedLocationId = $post->location_id;
 
-        $posts = $this->selectPostsByTheme($selectedThemeId);
+        $selectedLocation = Location::find($selectedLocationId);
 
-        return view('frontend/index', ['themes' => $themes, 'posts' => $posts, 'selectedThemeId' => $selectedThemeId, 'postContent' => $post]);
+        $posts = $this->selectPostsByLocation($selectedLocationId);
+
+        return view('frontend/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation, 'postContent' => $post]);
     }
 
     public function edit(Request $request) {
@@ -84,6 +89,6 @@ class PostController extends Controller
             $post->update();
         }
 
-        return redirect()->route('homePage', ['theme_id' => $request->input('theme_id')]);
+        return redirect()->route('homePage', ['location_id' => $request->input('location_id')]);
     }
 }

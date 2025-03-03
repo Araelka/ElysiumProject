@@ -16,7 +16,7 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function theme(){
-        return $this->belongsTo(Theme::class);
+    public function locations(){
+        return $this->belongsTo(Location::class);
     }
 }

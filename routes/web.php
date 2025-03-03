@@ -33,10 +33,16 @@ Route::middleware(['auth', 'player'])->group(function(){
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::get('/', [AdminController::class, 'index'])->name('admin');
+
     Route::get('users', [AdminController::class, 'showTableUser'])->name('admin.showUsers');
-    Route::delete('users/{id}/destroy', [AdminController::class, 'destroyUser'])->name('admin.destroy');
-    Route::get('users/{id}/edit', [AdminController::class, 'showEditUserForm'])->name('admin.showEditForm');
-    Route::put('users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.edit');
+    Route::delete('users/{id}/destroy', [AdminController::class, 'destroyUser'])->name('admin.destroyUser');
+    Route::get('users/{id}/edit', [AdminController::class, 'showEditUserForm'])->name('admin.showUserEditForm');
+    Route::put('users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.editUser');
     Route::put('user/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('admin.resetPassword');
+
+    Route::get('locations', [AdminController::class, 'showTableLocations'])->name('admin.showLocations');
+    Route::delete('locations/{id}/destroy', [AdminController::class, 'destroyLocation'])->name('admin.destroyLocation');
+    Route::get('locations{id}/edit', [AdminController::class, 'showEditLocationForm'])->name('admin.showLocationEditForm');
+    Route::put('locations/{id}/edit', [AdminController::class, 'editLocation'])->name('admin.editLocation');
 });
 

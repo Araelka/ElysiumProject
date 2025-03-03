@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminRequest;
+use App\Models\Location;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -24,11 +25,13 @@ class AdminController extends Controller
 
     public function destroyUser ($id) {
 
-        if (auth()->user()->isAdmin()){
-            $user = User::findOrFail($id);
-            if ($user->role_id != 1) {
-                $user->delete();
-            }
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $user = User::findOrFail($id);
+        if ($user->role_id != 1) {
+            $user->delete();
         }
 
         return redirect()->route('admin.showUsers');
@@ -71,6 +74,50 @@ class AdminController extends Controller
         $user->save();
 
         return redirect()->back()->with('newPassword', $newPassword);
+    }
+
+    public function showTableLocations () {
+
+        $locations = Location::withCount('posts')->get();
+
+        return view('frontend.admin.adminShowLocations', ['locations' => $locations]);
+    }
+
+    public function destroyLocation($id) {
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        Location::findOrFail($id)->delete();
+
+        return redirect()->route('admin.showLocations');
+    }
+
+    public function showEditLocationForm($id) {
+        
+        $location = Location::findOrFail($id);
+
+        return view('frontend.admin.adminShowLocation', ['location' => $location]);
+    }
+
+    public function editLocation (Request $request, $id) {
+
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string']
+        ]);
+
+        $location = Location::findOrFail($id);
+        $location->update([
+            'name' => $validated['name']
+        ]);
+
+        return redirect()->route('admin.showLocations');
     }
 
 }

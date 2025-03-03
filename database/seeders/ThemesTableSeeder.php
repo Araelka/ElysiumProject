@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Location;
 use App\Models\Theme;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,7 +14,7 @@ class ThemesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        Theme::create(['name' => 'Первая тема']);
-        Theme::create(['name' => 'Вторая тема']);
+        Location::create(['name' => 'Первая локация']);
+        Location::create(['name' => 'Вторая локация']);
     }
 }
