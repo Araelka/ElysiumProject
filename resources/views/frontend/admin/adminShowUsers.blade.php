@@ -7,13 +7,14 @@
         <button type="submit" class="add-button">Создать</button>
     </form>
 
-    <form id="bulk-delete-form" action="" method="POST">
+    <form id="bulk-ban-form" action={{ route('admin.bulkUserBan') }} method="POST" data-action="ban">
         @csrf
+        @method('PUT')
         <input type="hidden" name="selected_ids" data-input-type="users-ban" value="">
         <button type="submit" class="delete-button">Забанить выбранные</button>
     </form>
 
-    <form id="bulk-delete-form" action={{ route('admin.bulkUserDestroy') }} method="POST">
+    <form id="bulk-delete-form" action={{ route('admin.bulkUserDestroy') }} method="POST" data-action="delete">
         @csrf
         <input type="hidden" name="selected_ids" data-input-type="users-delete" value="">
         <button type="submit" class="delete-button">Удалить выбранные</button>
@@ -56,3 +57,5 @@
 
 </div>
 @endsection
+
+

@@ -178,6 +178,12 @@
     position: relative;
 }
 
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 1.5; /* Улучшим читаемость текста */
+}
+
 .close {
     color: #f4d03f; /* Ярко-жёлтый цвет */
     font-size: 28px;
@@ -194,10 +200,6 @@
     text-decoration: none;
 }
 
-.modal-content p {
-    margin-bottom: 20px;
-    font-size: 18px;
-}
 
 #confirm-delete,
 #cancel-delete,
@@ -234,6 +236,58 @@
 #close-reset-password-modal:hover  {
     background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
     color: #1a1a40; /* Тёмный текст */
+}
+
+#ban-reason {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+#ban-reason:focus {
+    border-color: #ec7063;
+    outline: none;
+}
+
+#confirm-ban,
+#cancel-ban {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+#confirm-ban {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: 2px solid #ffffff00;
+}
+
+#confirm-ban:hover {
+    background-color: #cc0000;
+}
+
+#cancel-ban {
+    background-color: transparent;
+    color: #f4d03f;
+    border: 2px solid #f4d03f;
+}
+
+#cancel-ban:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
 }
 
 /* Стили для стараницы редактирования */

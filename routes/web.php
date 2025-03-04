@@ -40,6 +40,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::put('users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.editUser');
     Route::put('user/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('admin.resetPassword'); 
     Route::post('users/bulk-destroy', [AdminController::class, 'bulkUserDestroy'])->name('admin.bulkUserDestroy');
+    Route::put('users/bulk-ban', [AdminController::class, 'bulkUserBan'])->name('admin.bulkUserBan');
 
     Route::get('locations', [AdminController::class, 'showTableLocations'])->name('admin.showLocations');
     Route::delete('locations/{id}/destroy', [AdminController::class, 'destroyLocation'])->name('admin.destroyLocation');

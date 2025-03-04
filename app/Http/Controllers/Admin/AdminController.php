@@ -96,6 +96,33 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function bulkUserBan (Request $request) {
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'selected_ids' => ['required', 'string'],
+            'ban_reason' => ['nullable', 'string'], 
+        ]);
+
+        $selectedIds = explode(',', $validated['selected_ids']);
+
+        $idsArray = array_filter($selectedIds, 'is_numeric');
+        $banReason = $validated['ban_reason'] ?? 'Нарушение правил сообщества';
+
+        if (empty($idsArray)) {
+            return redirect()->back()->withErrors('Не выбраны элементы для удаления');
+        }
+
+        User::whereIn('id', $idsArray)->get()->each(function($user) use ($banReason) {
+            $user->ban($banReason);
+        });
+
+        return redirect()->back();
+    }
+
     public function resetPassword (Request $request, $id) {
 
         if (!auth()->user()->isAdmin()) {

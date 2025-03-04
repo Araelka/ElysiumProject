@@ -30,10 +30,21 @@
 <div id="confirm-delete-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Вы уверены, что хотите удалить этот элемент?</p>
+        <p>Вы уверены, что хотите удалить выбранные элементы?</p>
         <button id="confirm-delete">Удалить</button>
         <button id="cancel-delete">Отмена</button>
     </div>
 </div>
 
+<!-- Модальное окно для подтверждения бана -->
+<div id="confirm-ban-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Вы уверены, что хотите забанить выбранных пользователей?</p>
+        <label for="ban-reason">Причина бана:</label>
+        <input type="text" id="ban-reason" placeholder="Укажите причину бана">
+        <button id="confirm-ban">Забанить</button>
+        <button id="cancel-ban">Отмена</button>
+    </div>
+</div>
 @endsection

@@ -82,49 +82,117 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ОБРАТНОКА МОДАЛЬНОГО ОКНА
-document.addEventListener('DOMContentLoaded', function() {
-    // Получаем элементы
-    const deleteButtons = document.querySelectorAll('.delete-button');
-    const modal = document.getElementById('confirm-delete-modal');
+// ОБРАБОТКА МОДАЛЬНОГО ОКНА
+document.addEventListener('DOMContentLoaded', function () {
+    // Элементы для модальных окон
+    const deleteModal = document.getElementById('confirm-delete-modal');
+    const banModal = document.getElementById('confirm-ban-modal');
+
+    // Общие элементы для обоих модальных окон
     const confirmDeleteButton = document.getElementById('confirm-delete');
     const cancelDeleteButton = document.getElementById('cancel-delete');
-    const closeButton = document.querySelector('.close');
+    const deleteCloseButton = deleteModal.querySelector('.close');
+
+    const confirmBanButton = document.getElementById('confirm-ban');
+    const cancelBanButton = document.getElementById('cancel-ban');
+    const banCloseButton = banModal.querySelector('.close');
+    const banReasonInput = document.getElementById('ban-reason');
 
     let currentForm = null;
 
-    // Функция для открытия модального окна
-    function openModal(event) {
+    // Функция для открытия модального окна удаления
+    function openDeleteModal(event) {
         event.preventDefault();
-        modal.style.display = 'block';
+        deleteModal.style.display = 'block';
         currentForm = event.target.closest('form');
     }
 
-    // Функция для закрытия модального окна
-    function closeModal() {
-        modal.style.display = 'none';
+    // Функция для закрытия модального окна удаления
+    function closeDeleteModal() {
+        deleteModal.style.display = 'none';
         currentForm = null;
     }
 
-    // Обработчик события для кнопок удаления
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', openModal);
+    // Функция для открытия модального окна бана
+    function openBanModal(event) {
+        event.preventDefault();
+
+        // Находим скрытое поле для бана по data-input-type
+        const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+        if (!selectedIdsInput || !selectedIdsInput.value) {
+            alert('Не выбраны пользователи для бана');
+            return;
+        }
+
+        banModal.style.display = 'block';
+    }
+
+    // Функция для закрытия модального окна бана
+    function closeBanModal() {
+        banModal.style.display = 'none';
+        banReasonInput.value = ''; // Очищаем поле причины бана
+    }
+
+    // Обработчик события для всех кнопок отправки форм
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const form = event.target.closest('form');
+            const action = form.dataset.action;
+
+            if (action === 'ban') {
+                openBanModal(event);
+            } else if (action === 'delete') {
+                openDeleteModal(event);
+            }
+        });
     });
 
     // Обработчик события для кнопки подтверждения удаления
-    confirmDeleteButton.addEventListener('click', function() {
+    confirmDeleteButton.addEventListener('click', function () {
         if (currentForm) {
             currentForm.submit();
         }
-        closeModal();
+        closeDeleteModal();
     });
 
-    // Обработчик события для кнопки отмены и крестика
-    [cancelDeleteButton, closeButton].forEach(button => {
-        button.addEventListener('click', closeModal);
+    // Обработчик события для кнопки отмены и крестика (удаление)
+    [cancelDeleteButton, deleteCloseButton].forEach(button => {
+        button.addEventListener('click', closeDeleteModal);
+    });
+
+    // Обработчик события для кнопки подтверждения бана
+    confirmBanButton.addEventListener('click', function () {
+        const reason = banReasonInput.value.trim();
+        if (!reason) {
+            alert('Укажите причину бана');
+            return;
+        }
+
+        // Находим скрытое поле для бана по data-input-type
+        const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+        if (!selectedIdsInput || !selectedIdsInput.value) {
+            alert('Не выбраны пользователи для бана');
+            return;
+        }
+
+        // Добавляем причину бана в форму как скрытое поле
+        const hiddenReasonInput = document.createElement('input');
+        hiddenReasonInput.type = 'hidden';
+        hiddenReasonInput.name = 'ban_reason';
+        hiddenReasonInput.value = reason;
+
+        const banForm = document.querySelector('#bulk-ban-form');
+        banForm.appendChild(hiddenReasonInput);
+        banForm.submit(); // Отправляем форму
+    });
+
+    // Обработчик события для кнопки отмены и крестика (бан)
+    [cancelBanButton, banCloseButton].forEach(button => {
+        button.addEventListener('click', closeBanModal);
     });
 });
-
 
 
 // ОБРАБОТЧИК ЧЕКБОКСОВ ДЛЯ МАССОВОГО УДАЛЕНИЯ
@@ -202,3 +270,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
