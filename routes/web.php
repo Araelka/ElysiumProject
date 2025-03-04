@@ -42,7 +42,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
 
     Route::get('locations', [AdminController::class, 'showTableLocations'])->name('admin.showLocations');
     Route::delete('locations/{id}/destroy', [AdminController::class, 'destroyLocation'])->name('admin.destroyLocation');
+    Route::post('locations/bulk-destroy', [AdminController::class, 'bulkLocationDestroy'])->name('admin.bulkDestroyLocation');
     Route::get('locations{id}/edit', [AdminController::class, 'showEditLocationForm'])->name('admin.showLocationEditForm');
     Route::put('locations/{id}/edit', [AdminController::class, 'editLocation'])->name('admin.editLocation');
+    Route::get('locations/create', [AdminController::class, 'showCreateLocationForm'])->name('admin.showLocationCreateForm');
+    Route::post('locations/create', [AdminController::class, 'createLocation'])->name('admin.createLocation');
 });
 

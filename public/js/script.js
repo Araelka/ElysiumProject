@@ -126,3 +126,76 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+// ОБРАБОТЧИК ЧЕКБОКСОВ ДЛЯ МАССОВОГО УДАЛЕНИЯ
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.location-checkbox');
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const selectedIdsInput = document.getElementById('selected-ids');
+
+    // Обработка выбора всех чекбоксов
+    selectAllCheckbox.addEventListener('change', function () {
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateSelectedIds();
+    });
+
+    // Обработка выбора отдельных чекбоксов
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            updateSelectedIds();
+        });
+    });
+
+    // Функция для обновления значения скрытого поля с выбранными ID
+    function updateSelectedIds() {
+        const selectedIds = Array.from(checkboxes)
+            .filter(function (checkbox) {
+                return checkbox.checked;
+            })
+            .map(function (checkbox) {
+                return checkbox.dataset.locationId;
+            });
+        selectedIdsInput.value = selectedIds.join(',');
+    }
+});
+
+// ОБРАБОТЧИК ПОИСКА
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.querySelector('.search-input');
+    const tableSelectionLinks = document.querySelectorAll('.table-link');
+
+    searchInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Предотвращаем стандартное поведение при нажатии Enter
+
+            const searchTerm = event.target.value.trim();
+            if (searchTerm.length > 0) {
+                // Получаем текущую выбранную таблицу
+                let currentTableRoute = '';
+                tableSelectionLinks.forEach(function (link) {
+                    if (link.classList.contains('active')) {
+                        currentTableRoute = link.getAttribute('href');
+                    }
+                });
+
+                // Добавляем параметр поиска к URL текущей таблицы
+                const searchUrl = new URL(currentTableRoute);
+                searchUrl.searchParams.set('search', searchTerm);
+
+                // Перенаправляем пользователя на страницу с результатами поиска
+                window.location.href = searchUrl.toString();
+            } else {
+                // Если строка поиска пустая, перенаправляем пользователя на текущую страницу без параметра поиска
+                let currentTableRoute = '';
+                tableSelectionLinks.forEach(function (link) {
+                    if (link.classList.contains('active')) {
+                        currentTableRoute = link.getAttribute('href');
+                    }
+                });
+                window.location.href = currentTableRoute;
+            }
+        }
+    });
+});

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NoSpaces;
 use Illuminate\Foundation\Http\FormRequest;
 use function PHPUnit\Framework\returnArgument;
 
@@ -15,6 +16,12 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()  {
+        $this->merge([
+            'login' => mb_strtolower($this->input('login'))
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,19 +30,39 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:6', 'confirmed']
+            'login' => [
+                'required', 
+                'string', 
+                'max:255', 
+                'unique:users',
+                'regex: /^[a-zA-Z0-9_\-]+$/',
+                new NoSpaces()
+                ],
+
+            'email' => [
+                'required', 
+                'string', 
+                'email',
+                'max:255', 
+                'unique:users'],
+
+            'password' => [
+                'required', 
+                'string', 
+                'min:6', 
+                'confirmed']
         ];
     }
 
     public function messages() {
         return [
             'login.required' => 'Поле "Логин" обязательно для заполнения',
-            'email.required' => 'Поле "Email" обязательно для заполнения',
-            'password.required' => 'Поле "Пароль" обязательно для заполнения',
+            'login.regex' => 'Логин может содержать только английские буквы, цифры, подчёркивания (_) и дефисы (-)',
             'login.unique' => 'Этот логин уже используется',
+            'login.no_spaces' => 'Логин не должен содержать пробелов',
+            'email.required' => 'Поле "Email" обязательно для заполнения',
             'email.unique' => 'Этот email уже используется',
+            'password.required' => 'Поле "Пароль" обязательно для заполнения',
             'password.min' => 'Парольдолжен содержать миниум 6 символов',
             'password.confirmed' => 'Пароли не совпадают'
         ];

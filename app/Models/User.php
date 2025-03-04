@@ -24,6 +24,10 @@ class User extends Authenticatable
         'role_id'
     ];
 
+    public function setLoginAttribute ($value) {
+        $this->attributes['login'] = mb_strtolower(str_replace(' ', '', $value));
+    }
+
     public function isAdmin()
     {
         return $this->role_id === 1;

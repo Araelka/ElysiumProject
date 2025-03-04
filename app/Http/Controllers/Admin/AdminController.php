@@ -17,10 +17,21 @@ class AdminController extends Controller
         return view('frontend.admin.admin');
     }
 
-    public function showTableUser () {
-        $users = User::with('role')->get();
+    public function showTableUser (Request $request) {
+        // $users = User::with('role')->get();
 
-        return view('frontend.admin.adminShowUsers', ['users' => $users]);
+        // return view('frontend.admin.adminShowUsers', ['users' => $users]);
+
+        $searchTerm = $request->query('search');
+        $searchFields = ['login', 'email'];
+
+        $users = User::when($searchTerm, function ($query) use ($searchTerm, $searchFields) {
+            foreach ($searchFields as $field) {
+                $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+            }
+        })->with('role')->get();
+
+        return view('frontend.admin.adminShowUsers', compact('users'));
     }
 
     public function destroyUser ($id) {
@@ -76,11 +87,19 @@ class AdminController extends Controller
         return redirect()->back()->with('newPassword', $newPassword);
     }
 
-    public function showTableLocations () {
+    public function showTableLocations (Request $request) {
 
-        $locations = Location::withCount('posts')->get();
+        // $locations = Location::withCount('posts')->get();
 
-        return view('frontend.admin.adminShowLocations', ['locations' => $locations]);
+        // return view('frontend.admin.adminShowLocations', ['locations' => $locations]);
+
+        $searchTerm = $request->query('search');
+        
+        $locations = Location::when($searchTerm, function ($query) use ($searchTerm) {
+            $query->whereRaw('UPPER(name) LIKE ?', ['%' . mb_strtoupper($searchTerm) . '%']);
+        })->withCount('posts')->get();
+
+        return view('frontend.admin.adminShowLocations', compact('locations'));
     }
 
     public function destroyLocation($id) {
@@ -119,5 +138,43 @@ class AdminController extends Controller
 
         return redirect()->route('admin.showLocations');
     }
+
+    public function bulkLocationDestroy (Request $request) {
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $selectedIds = $request->input('selected_ids');
+        if (!empty($selectedIds)){
+            $idsArray = explode(',', $selectedIds);
+            Location::whereIn('id', $idsArray)->delete();
+        }
+
+        return redirect()->back();
+    }
+
+    public function showCreateLocationForm () {
+        return view('frontend.admin.adminCreateLocation');
+    }
+
+    public function createLocation (Request $request) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string']
+        ]);
+
+        Location::create([
+            'name' => $validated['name']
+        ]);
+
+        return redirect()->route('admin.showLocations');
+    }
+
+    
 
 }

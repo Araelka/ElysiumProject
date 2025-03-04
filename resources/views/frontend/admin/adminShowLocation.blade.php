@@ -1,5 +1,5 @@
 @extends('frontend.admin.admin')
-@section('title', 'Редактирование пользователя: ' . $location->name)
+@section('title', 'Редактирование локации: ' . $location->name)
 @section('table')
 
 <div class="button-container custom-button-container">

@@ -4,12 +4,14 @@
 
 <div class="table-container">
     <div class="top-menu">
-        <form action="" method="GET">
+        <form action={{ route('admin.showLocationCreateForm') }} method="GET">
             <button type="submit" class="add-button">Создать</button>
         </form>
 
-        <form action="" method="GET">
-            <button type="submit" class="delete-button">Удалить</button>
+        <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST">
+            @csrf
+            <input type="hidden" name="selected_ids" id="selected-ids" value="">
+            <button type="submit" class="delete-button">Удалить выбранные</button>
         </form>
     </div>
 
@@ -17,6 +19,7 @@
     <table class="data-table">
         <thead>
             <tr>
+                <th><input type="checkbox" id="select-all-checkbox"></th>
                 <th>ID</th>
                 <th>Наименование</th>
                 <th>Количество записей</th>
@@ -27,6 +30,7 @@
         @isset($locations)
             @foreach ($locations as $location)
             <tr>
+                <td><input type="checkbox" class="location-checkbox" data-location-id="{{ $location->id }}"></td>
                 <td>{{ $location->id }}</td>
                 <td>{{ $location->name }}</td>
                 <td>{{ $location->posts_count }}</td>

@@ -15,4 +15,9 @@ class Location extends Model
     public function posts (){
         return $this->hasMany(Post::class);
     }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = mb_strtoupper($value);
+    }
 }
