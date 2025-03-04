@@ -23,9 +23,10 @@ class AuthController extends Controller
             $field = 'email'; 
         } else {
             $field = 'login'; 
+            $credentials['identifier'] = mb_strtolower($credentials['identifier']);
         }
 
-        if (Auth::attempt([$field => $request->input('identifier'), 'password' => $request->input('password')])){
+        if (Auth::attempt([$field => $credentials['identifier'], 'password' => $credentials['password']])){
             $request->session()->regenerate();
             return redirect('/');
         };

@@ -35,8 +35,8 @@ class RegisterRequest extends FormRequest
                 'string', 
                 'max:255', 
                 'unique:users',
-                'regex: /^[a-zA-Z0-9_\-]+$/',
-                new NoSpaces()
+                'regex: /^[a-zA-Z0-9_\-\ ]+$/',
+                new NoSpaces('Поле "Логин" не должно содержать пробелов')
                 ],
 
             'email' => [
@@ -57,14 +57,14 @@ class RegisterRequest extends FormRequest
     public function messages() {
         return [
             'login.required' => 'Поле "Логин" обязательно для заполнения',
+            'login.no_spaces' => 'Логин не должен содержать пробелов',
             'login.regex' => 'Логин может содержать только английские буквы, цифры, подчёркивания (_) и дефисы (-)',
             'login.unique' => 'Этот логин уже используется',
-            'login.no_spaces' => 'Логин не должен содержать пробелов',
             'email.required' => 'Поле "Email" обязательно для заполнения',
             'email.unique' => 'Этот email уже используется',
             'password.required' => 'Поле "Пароль" обязательно для заполнения',
             'password.min' => 'Парольдолжен содержать миниум 6 символов',
-            'password.confirmed' => 'Пароли не совпадают'
+            'password.confirmed' => 'Пароли не совпадают',
         ];
     }
 }

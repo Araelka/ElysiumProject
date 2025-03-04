@@ -7,6 +7,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class NoSpaces implements ValidationRule
 {
+
+    protected $customMessage;
+
+    public function __construct($customMessage = null)
+    {
+        $this->customMessage = $customMessage;
+    }
+
     /**
      * Run the validation rule.
      *
@@ -14,15 +22,14 @@ class NoSpaces implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        //
+        if (preg_match('/\s/', $value)) {
+            $fail($this->customMessage ?? "Поле :attribute не должно содержать пробелов.");
+        }
     }
 
-    public function passes($attribute, $value) {
-        return !preg_match('/\s/', $value);
-    }
 
     public function message()
     {
-        return 'Поле :attribute не должно содержать пробелов.';
+        return $this->customMessage ?? 'Поле :attribute не должно содержать пробелов.';
     }
 }
