@@ -2,20 +2,19 @@
 @section('title', 'Локации')
 @section('table')
 
+
+<div class="top-menu">
+    <form action={{ route('admin.showLocationCreateForm') }} method="GET">
+        <button type="submit" class="add-button">Создать</button>
+    </form>
+
+    <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST">
+        @csrf
+        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <button type="submit" class="delete-button">Удалить выбранные</button>
+    </form>
+</div>
 <div class="table-container">
-    <div class="top-menu">
-        <form action={{ route('admin.showLocationCreateForm') }} method="GET">
-            <button type="submit" class="add-button">Создать</button>
-        </form>
-
-        <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST">
-            @csrf
-            <input type="hidden" name="selected_ids" id="selected-ids" value="">
-            <button type="submit" class="delete-button">Удалить выбранные</button>
-        </form>
-    </div>
-
-
     <table class="data-table">
         <thead>
             <tr>

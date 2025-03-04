@@ -2,24 +2,24 @@
 @section('title', 'Пользователи')
 
 @section('table')
+<div class="top-menu">
+    <form action="" method="GET">
+        <button type="submit" class="add-button">Создать</button>
+    </form>
+
+    <form id="bulk-delete-form" action="" method="POST">
+        @csrf
+        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <button type="submit" class="delete-button">Забанить выбранные</button>
+    </form>
+
+    <form id="bulk-delete-form" action="" method="POST">
+        @csrf
+        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <button type="submit" class="delete-button">Удалить выбранные</button>
+    </form>
+</div>
 <div class="table-container">
-    <div class="top-menu">
-        <form action="" method="GET">
-            <button type="submit" class="add-button">Создать</button>
-        </form>
-
-        <form id="bulk-delete-form" action="" method="POST">
-            @csrf
-            <input type="hidden" name="selected_ids" id="selected-ids" value="">
-            <button type="submit" class="delete-button">Забанить выбранные</button>
-        </form>
-
-        <form id="bulk-delete-form" action="" method="POST">
-            @csrf
-            <input type="hidden" name="selected_ids" id="selected-ids" value="">
-            <button type="submit" class="delete-button">Удалить выбранные</button>
-        </form>
-    </div>
     <table class="data-table">
         <thead>
             <tr>
@@ -53,6 +53,7 @@
         @endisset
         </tbody>
     </table>
+
 </div>
 
 @endsection
