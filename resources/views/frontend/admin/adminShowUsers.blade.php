@@ -9,13 +9,13 @@
 
     <form id="bulk-delete-form" action="" method="POST">
         @csrf
-        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <input type="hidden" name="selected_ids" data-input-type="users-ban" value="">
         <button type="submit" class="delete-button">Забанить выбранные</button>
     </form>
 
-    <form id="bulk-delete-form" action="" method="POST">
+    <form id="bulk-delete-form" action={{ route('admin.bulkUserDestroy') }} method="POST">
         @csrf
-        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <input type="hidden" name="selected_ids" data-input-type="users-delete" value="">
         <button type="submit" class="delete-button">Удалить выбранные</button>
     </form>
 </div>
@@ -35,7 +35,7 @@
         @isset($users)
             @foreach ($users as $user)
             <tr>
-                <td><input type="checkbox" class="location-checkbox" data-location-id="{{ $user->id }}"></td>
+                <td><input type="checkbox" class="bulk-checkbox" data-bulk-id="{{ $user->id }}"></td>
                 <td>{{ $user->id }}</td>
                 <td>{{ $user->login }}</td>
                 <td>{{ $user->email }}</td>
@@ -55,5 +55,4 @@
     </table>
 
 </div>
-
 @endsection

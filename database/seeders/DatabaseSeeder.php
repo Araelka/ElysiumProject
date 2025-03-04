@@ -14,14 +14,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // $this->call(ThemesTableSeeder::class);
-        // $this->call(RoleTableSeeder::class);
+        $this->call(RoleTableSeeder::class);
         
-        // User::create(['login' => 'admin', 
-        // 'email' => 'admin@ex.ex',
-        // 'password' => 'admin',
-        // 'role_id' => 1]);
+        User::create(['login' => 'admin', 
+        'email' => 'admin@ex.ex',
+        'password' => 'admin',
+        'role_id' => 1]);
 
-        User::factory(10)->create();
+        User::factory(20)->create();
 
     }
 }

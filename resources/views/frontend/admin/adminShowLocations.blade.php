@@ -10,7 +10,7 @@
 
     <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST">
         @csrf
-        <input type="hidden" name="selected_ids" id="selected-ids" value="">
+        <input type="hidden" name="selected_ids" data-input-type="locations" value="">
         <button type="submit" class="delete-button">Удалить выбранные</button>
     </form>
 </div>
@@ -29,7 +29,7 @@
         @isset($locations)
             @foreach ($locations as $location)
             <tr>
-                <td><input type="checkbox" class="location-checkbox" data-location-id="{{ $location->id }}"></td>
+                <td><input type="checkbox" class="bulk-checkbox" data-bulk-id="{{ $location->id }}"></td>
                 <td>{{ $location->id }}</td>
                 <td>{{ $location->name }}</td>
                 <td>{{ $location->posts_count }}</td>

@@ -129,9 +129,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ОБРАБОТЧИК ЧЕКБОКСОВ ДЛЯ МАССОВОГО УДАЛЕНИЯ
 document.addEventListener('DOMContentLoaded', function () {
-    const checkboxes = document.querySelectorAll('.location-checkbox');
+    const checkboxes = document.querySelectorAll('.bulk-checkbox');
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
-    const selectedIdsInput = document.getElementById('selected-ids');
+
+    // Функция для обновления значения скрытого поля
+    function updateSelectedIds() {
+        const selectedIds = Array.from(checkboxes)
+            .filter(function (checkbox) {
+                return checkbox.checked;
+            })
+            .map(function (checkbox) {
+                return checkbox.dataset.bulkId;
+            });
+
+        // Обновляем значение для всех форм с data-атрибутами
+        document.querySelectorAll('[data-input-type]').forEach(function (input) {
+            input.value = selectedIds.join(',');
+        });
+    }
 
     // Обработка выбора всех чекбоксов
     selectAllCheckbox.addEventListener('change', function () {
@@ -147,18 +162,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updateSelectedIds();
         });
     });
-
-    // Функция для обновления значения скрытого поля с выбранными ID
-    function updateSelectedIds() {
-        const selectedIds = Array.from(checkboxes)
-            .filter(function (checkbox) {
-                return checkbox.checked;
-            })
-            .map(function (checkbox) {
-                return checkbox.dataset.locationId;
-            });
-        selectedIdsInput.value = selectedIds.join(',');
-    }
 });
 
 // ОБРАБОТЧИК ПОИСКА

@@ -38,7 +38,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::delete('users/{id}/destroy', [AdminController::class, 'destroyUser'])->name('admin.destroyUser');
     Route::get('users/{id}/edit', [AdminController::class, 'showEditUserForm'])->name('admin.showUserEditForm');
     Route::put('users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.editUser');
-    Route::put('user/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('admin.resetPassword');
+    Route::put('user/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('admin.resetPassword'); 
+    Route::post('users/bulk-destroy', [AdminController::class, 'bulkUserDestroy'])->name('admin.bulkUserDestroy');
 
     Route::get('locations', [AdminController::class, 'showTableLocations'])->name('admin.showLocations');
     Route::delete('locations/{id}/destroy', [AdminController::class, 'destroyLocation'])->name('admin.destroyLocation');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,14 @@ class AuthController extends Controller
         } else {
             $field = 'login'; 
             $credentials['identifier'] = mb_strtolower($credentials['identifier']);
+        }
+
+        $user = User::where($field, $credentials['identifier'])->first();
+
+        if ($user && $user->is_banned) {
+            return back()->withErrors([
+                'identifier' => 'Ваш аккаунт заблокирован. Причина: ' . $user->ban_reason
+            ])->onlyInput('identifier');
         }
 
         if (Auth::attempt([$field => $credentials['identifier'], 'password' => $credentials['password']])){

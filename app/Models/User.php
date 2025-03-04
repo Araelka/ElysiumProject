@@ -21,7 +21,9 @@ class User extends Authenticatable
         'login',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'is_banned',
+        'ban_reason'
     ];
 
     public function setLoginAttribute ($value) {
@@ -46,6 +48,20 @@ class User extends Authenticatable
     public function isUser()
     {
         return $this->role_id === 4;
+    }
+
+    public function ban(string $reason='Наружение правил сообщества'){
+        $this->update([
+            'is_banned' => true,
+            'ban_reason' => $reason
+        ]);
+    }
+
+    public function unban(){
+        $this->update([
+            'is_banned' => false,
+            'ban_reason' => null
+        ]);
     }
 
     public function role(){

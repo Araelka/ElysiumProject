@@ -42,7 +42,7 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
         if ($user->role_id != 1) {
-            $user->delete();
+            $user->ban();
         }
 
         return redirect()->route('admin.showUsers');
@@ -73,6 +73,29 @@ class AdminController extends Controller
 
     }
 
+    public function bulkUserDestroy (Request $request) {
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'selected_ids' => ['required', 'string'], 
+        ]);
+
+        $selectedIds = explode(',', $validated['selected_ids']);
+
+        $idsArray = array_filter($selectedIds, 'is_numeric');
+
+        if (empty($idsArray)) {
+            return redirect()->back()->withErrors('Не выбраны элементы для удаления');
+        }
+
+        User::whereIn('id', $idsArray)->delete();
+
+        return redirect()->back();
+    }
+
     public function resetPassword (Request $request, $id) {
 
         if (!auth()->user()->isAdmin()) {
@@ -96,7 +119,7 @@ class AdminController extends Controller
         $searchTerm = $request->query('search');
         
         $locations = Location::when($searchTerm, function ($query) use ($searchTerm) {
-            $query->whereRaw('UPPER(name) LIKE ?', ['%' . mb_strtoupper($searchTerm) . '%']);
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
         })->withCount('posts')->get();
 
         return view('frontend.admin.adminShowLocations', compact('locations'));
@@ -144,12 +167,20 @@ class AdminController extends Controller
         if (!auth()->user()->isAdmin()) {
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
+        
+        $validated = $request->validate([
+            'selected_ids' => ['required', 'string'], 
+        ]);
 
-        $selectedIds = $request->input('selected_ids');
-        if (!empty($selectedIds)){
-            $idsArray = explode(',', $selectedIds);
-            Location::whereIn('id', $idsArray)->delete();
+        $selectedIds = explode(',', $validated['selected_ids']);
+
+        $idsArray = array_filter($selectedIds, 'is_numeric');
+
+        if (empty($idsArray)) {
+            return redirect()->back()->withErrors('Не выбраны элементы для удаления');
         }
+
+        Location::whereIn('id', $idsArray)->delete();
 
         return redirect()->back();
     }

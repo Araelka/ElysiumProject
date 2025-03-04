@@ -18,13 +18,15 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('role_id')->default(4)->constrained()->onDelete('cascade');
+            $table->boolean('is_banned')->default(false);
+            $table->text('ban_reason')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
-            $table->string('login')->primary();
+            $table->string('login');
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
