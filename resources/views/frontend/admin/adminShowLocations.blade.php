@@ -3,14 +3,13 @@
 @section('table')
 
 
-<div class="top-menu">
+<div class="top-menu-right">
     <form action={{ route('admin.showLocationCreateForm') }} method="GET">
         <button type="submit" class="add-button">Создать</button>
     </form>
-
-    <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST">
+    <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST" data-action="delete">
         @csrf
-        <input type="hidden" name="selected_ids" data-input-type="locations" value="">
+        <input type="hidden" name="selected_ids" data-input-type="location-delete" value="">
         <button type="submit" class="delete-button">Удалить выбранные</button>
     </form>
 </div>
@@ -35,7 +34,7 @@
                 <td>{{ $location->posts_count }}</td>
                 <td>
                     <a href={{ route('admin.showLocationEditForm', $location->id) }} class="edit-button">Редактировать</a>
-                    <form action={{ route('admin.destroyLocation', $location->id) }} method="POST" style="display:inline;">
+                    <form action="{{ route('admin.destroyLocation', $location->id) }}" method="POST" class="single-delete-form" style="display:inline-block;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="delete-button">Удалить</button>
@@ -47,5 +46,7 @@
         </tbody>
     </table>
 </div>
-
+<div class="pagination-container">
+    {{ $locations->links('vendor.pagination.default') }}
+</div>
 @endsection

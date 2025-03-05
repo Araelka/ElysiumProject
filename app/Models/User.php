@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use DB;
 
 class User extends Authenticatable
 {
@@ -50,7 +51,7 @@ class User extends Authenticatable
         return $this->role_id === 4;
     }
 
-    public function ban(string $reason='Наружение правил сообщества'){
+    public function ban(string $reason='Нарушение правил сообщества'){
         $this->update([
             'is_banned' => true,
             'ban_reason' => $reason
@@ -62,6 +63,10 @@ class User extends Authenticatable
             'is_banned' => false,
             'ban_reason' => null
         ]);
+    }
+
+    public function terminateSessions(){
+        DB::table('sessions')->where('user_id', $this->id)->delete();
     }
 
     public function role(){

@@ -1,21 +1,37 @@
 @extends('frontend.admin.admin')
-@section('title', 'Редактирование пользователя: ' . $user->login)
+@section('title', 'Создание пользователя')
 @section('table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 <div class="button-container custom-button-container">
-    <form action={{ route('admin.editUser', $user->id) }} method="POST" class="data-table">
+    <form action={{ route('admin.createUser') }} method="POST" class="data-table">
         @csrf
-        @method('PUT')
         <div class="form-group">
             <label for="login">Логин:</label>
-            <input type="text" id="login" name="login" value="{{ $user->login }}" readonly>
+            <input type="text" id="login" name="login">
+            @error('login')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ $user->email }}">
+            <input type="email" id="email" name="email">
             @error('email')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password">
+            @error('password')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
+        </div>
+        <div class="form-group">
+            <label for="password_confirmation">Подтвердите пароль:</label>
+            <input type="password_confirmation" id="password_confirmation" name="password_confirmation">
+            @error('password_confirmation')
                 <span class="form__error">{{ $message }}</span>
             @enderror
         </div>
@@ -23,54 +39,21 @@
             <label for="role">Роль:</label>
             <select id="role" name="role_id">
                 @foreach ($roles as $role)
-                    <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}> 
-                        {{ $role->name }}
-                    </option>
+                    <option value="{{ $role->id }}">{{ $role->name }}</option>
                 @endforeach
             </select>
             @error('role_id')
                 <span class="form__error">{{ $message }}</span>
             @enderror
         </div>
-        @if ($user->is_banned)
-            <div class="form-group">
-                <label for="ban-reason">Причина бана:</label>
-                <input type="text" id="ban-reason" name="ban-reason" value="{{ $user->ban_reason }}" readonly>
-            </div>
-        @endif
+
         <div class="button-group">
             <div class="left-buttons">
-                <button type="submit" class="save-button">Сохранить изменения</button>
+                <button type="submit" class="save-button">Сохранить</button>
             </div>
-        </form>
-            <div class="right-buttons">
-                <form  action={{ route('admin.resetPassword', $user->id) }} method="POST" style="display:inline-block;">
-                    @csrf
-                    @method('PUT')
-                    <button type="submit" class="reset-password-button">Сбросить пароль</button>
-                </form>
-
-                @if ($user->is_banned) 
-                    <form action="{{ route('admin.userUnban', $user->id) }}" method="POST" class="single-unban-form" style="display:inline-block;">
-                        @csrf
-                        @method('PUT')
-                        <button type="submit" class="unban-button">Разбанить</button>
-                    </form>
-                @else
-                    <form action="{{ route('admin.userBan', $user->id) }}" method="POST" class="single-ban-form" style="display:inline-block;">
-                        @csrf
-                        @method('PUT')
-                        <button type="submit" class="ban-button" data-user-id="{{ $user->id }}">Забанить</button>
-                    </form>
-                @endif
-
-                <form action="{{ route('admin.destroyUser', $user->id) }}" method="POST" class="single-delete-form" style="display:inline-block;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="delete-button">Удалить</button>
-                </form>
             </div>
         </div>
+    </form>
 </div>
 
 {{-- Модальное окно для сброса пароля --}}

@@ -16,7 +16,23 @@
                         </ul>
                     </div>
                     <div class="search-container">
-                        <input type="text" class="search-input" placeholder="Поиск...">
+                        <form action="{{ url()->current() }}" method="GET" id="search-form">
+                            <input type="hidden" name="filter" value="{{ request('filter', 'all') }}">
+                            <div class="search-input-wrapper">
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    id="search-input" 
+                                    value="{{ request('search') }}" 
+                                    placeholder="Поиск..." 
+                                    class="search-input"
+                                >
+                                @if(request('search'))
+                                    <button type="button" id="clear-search" class="clear-search-button">×</button>
+                                @endif
+                            </div>
+                            <button type="submit" class="search-button">Найти</button>
+                        </form>
                     </div>
                 </div>
                 <!-- Основное содержимое (таблица) -->

@@ -110,6 +110,7 @@
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #f4d03f;
+    vertical-align: middle;
 }
 
 .data-table th {
@@ -132,12 +133,35 @@
     transition: color 0.3s ease;
 }
 
+.single-delete-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle; /* Выравнивание формы по центру */
+}
+
+
+.single-ban-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle; /* Выравнивание формы по центру */
+}
+
+.single-unban-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0px;
+    vertical-align: middle; /* Выравнивание формы по центру */
+}
 
 .data-table .edit-button:hover {
     text-decoration: underline;
 }
 
-.data-table .delete-button {
+.data-table .delete-button,
+.data-table .ban-button,
+.data-table .unban-button {
     background-color: #ff4d4d; /* Красный цвет */
     color: #fff; /* Белый текст */
     border-radius: 5px;
@@ -148,7 +172,20 @@
     transition: background-color 0.3s ease;
 }
 
-.data-table .delete-button:hover {
+
+.data-table .unban-button {
+    font-weight: bold;
+    vertical-align: middle;
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.data-table .unban-button:hover {
+    background-color: #ec7063;
+}
+
+.data-table .delete-button:hover,
+.data-table .ban-button:hover  {
     background-color: #cc0000; /* Темно-красный цвет при наведении */
 }
 
@@ -348,7 +385,9 @@
 
 .button-group .left-buttons .save-button,
 .button-group .right-buttons .reset-password-button,
-.button-group .right-buttons .delete-button {
+.button-group .right-buttons .delete-button,
+.button-group .right-buttons .ban-button,
+.button-group .right-buttons .unban-button {
     padding: 10px 20px;
     font-size: 18px;
     font-weight: bold;
@@ -359,12 +398,15 @@
     box-sizing: border-box;
 }
 
-.button-group .left-buttons .save-button {
+.button-group .left-buttons .save-button,
+.button-group .right-buttons .unban-button {
     background-color: #f4d03f;
     color: #1a1a40;
+    border: 2px solid #f4d03f00;
 }
 
-.button-group .left-buttons .save-button:hover {
+.button-group .left-buttons .save-button:hover,
+.button-group .right-buttons .unban-button:hover {
     background-color: #ec7063;
 }
 
@@ -379,13 +421,15 @@
     color: #1a1a40;
 }
 
-.button-group .right-buttons .delete-button {
+.button-group .right-buttons .delete-button,
+.button-group .right-buttons .ban-button {
     background-color: #ff4d4d;
     color: #fff;
     border: 2px solid #ffffff00;
 }
 
-.button-group .right-buttons .delete-button:hover {
+.button-group .right-buttons .delete-button:hover,
+.button-group .right-buttons .ban-button:hover {
     background-color: #cc0000;
 }
 
@@ -430,7 +474,8 @@
     color: #1a1a40;
 }
 
-.delete-button {
+.delete-button,
+.ban-button {
     background-color: #ff4d4d;
     color: #fff;
     border: 2px solid #ffffff00;
@@ -442,8 +487,139 @@
     transition: background-color 0.3s ease;
 }
 
+
+.delete-button:hover,
+.ban-button:hover {
+    background-color: #cc0000;
+}
+
 .top-menu {
-    display: flex; 
+    display: flex;
+    justify-content: space-between; /* Разделяем левую и правую части */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    gap: 10px; /* Расстояние между элементами */
+}
+
+.top-menu form {
+    display: inline-block; /* Формы отображаются как строчные элементы */
+    margin: 0px 0px 10px 0px; /* Убираем лишние маргины */
+    padding: 0; /* Убираем лишние паддинги */
+}
+
+.top-menu-left {
+    display: flex;
+    gap: 10px; /* Расстояние между кнопками */
+}
+
+.top-menu-right {
+    display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 10px; /* Расстояние между кнопками */
+}
+
+
+.top-menu-right form {
+    display: inline-block; /* Формы отображаются как строчные элементы */
+    margin: 0px 0px 10px 0px; /* Убираем лишние маргины */
+    padding: 0; /* Убираем лишние паддинги */
+}
+
+.filter-button {
+    background-color: transparent;
+    color: #f4d03f;
+    padding: 5px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-button.active {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.filter-button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination li {
+    list-style: none;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 8px 12px;
+    background-color: rgba(10, 14, 23, 0.9);
+    color: #f4d03f;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination li.active span {
+    background-color: #f4d03f; /* Ярко-жёлтый фон */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+.pagination li a:hover {
+    background-color: #ec7063; /* Розовый цвет при наведении */
+    color: #fff;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.clear-search-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #f4d03f;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-search-button:hover {
+    color: #ec7063;
+}
+
+.search-button {
+    background-color: f4d03f;
+    color: #1a1a40;
+    padding: 10px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #f4d03f00;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+}
+
+.search-button:hover {
+    background-color: #ec7063;
 }

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Str;
@@ -18,18 +20,32 @@ class AdminController extends Controller
     }
 
     public function showTableUser (Request $request) {
-        // $users = User::with('role')->get();
 
-        // return view('frontend.admin.adminShowUsers', ['users' => $users]);
-
+        $filter = $request->query('filter', 'all');
         $searchTerm = $request->query('search');
         $searchFields = ['login', 'email'];
 
-        $users = User::when($searchTerm, function ($query) use ($searchTerm, $searchFields) {
-            foreach ($searchFields as $field) {
-                $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
-            }
-        })->with('role')->get();
+        $query = User::query()->with('role')
+        ->when($filter === 'active', function ($query) {   
+            $query->where('is_banned', false);      
+        })->when($filter === 'banned', function ($query) {
+            $query->where('is_banned', true);
+        });
+
+        if ($searchTerm) {
+            $query = $query->where(function ($query) use ($searchTerm, $searchFields) {
+                foreach ($searchFields as $field) {
+                    $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                }
+                });
+        }
+
+        $users = $query->paginate(12);
+
+        $users->appends([
+            'filter' => $filter,
+            'search' => $searchTerm
+        ]);
 
         return view('frontend.admin.adminShowUsers', compact('users'));
     }
@@ -41,8 +57,9 @@ class AdminController extends Controller
         }
 
         $user = User::findOrFail($id);
-        if ($user->role_id != 1) {
-            $user->ban();
+
+        if ($user->id != 1) {
+            $user->delete();
         }
 
         return redirect()->route('admin.showUsers');
@@ -91,7 +108,11 @@ class AdminController extends Controller
             return redirect()->back()->withErrors('Не выбраны элементы для удаления');
         }
 
-        User::whereIn('id', $idsArray)->delete();
+        User::whereIn('id', $idsArray)->each(function($user){
+            if ($user->id != 1) {
+                $user->delete();
+            }
+        });
 
         return redirect()->back();
     }
@@ -117,8 +138,46 @@ class AdminController extends Controller
         }
 
         User::whereIn('id', $idsArray)->get()->each(function($user) use ($banReason) {
-            $user->ban($banReason);
+            if ($user->id != 1 && !$user->is_banned){
+                $user->terminateSessions();
+                $user->ban($banReason);
+            }
         });
+
+        return redirect()->back();
+    }
+
+    public function userBan(Request $request, $id) {
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'ban_reason' => ['nullable', 'string']
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $banReason = $validated['ban_reason'] ?? 'Нарушение правил сообщества';
+
+        if ($user->id != 1 && !$user->is_banned) {
+            $user->terminateSessions();
+            $user->ban($banReason);
+        }
+
+        return redirect()->back();
+    }
+
+    public function userUnban($id) {
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $user = User::findOrFail($id);
+
+        if ($user->is_banned){
+            $user->unban();
+        }
 
         return redirect()->back();
     }
@@ -137,17 +196,43 @@ class AdminController extends Controller
         return redirect()->back()->with('newPassword', $newPassword);
     }
 
+    public function showCreateUserForm (){
+
+        $roles = Role::all();
+
+        return view('frontend.admin.adminCreateUser', compact('roles'));
+    }
+
+    public function createUser (RegisterRequest $request) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        User::create([
+            'login' => $request->input('login'),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'role_id' => $request->input('role_id')
+        ]);
+
+        return redirect()->route('admin.showUsers');
+    }
+
     public function showTableLocations (Request $request) {
-
-        // $locations = Location::withCount('posts')->get();
-
-        // return view('frontend.admin.adminShowLocations', ['locations' => $locations]);
 
         $searchTerm = $request->query('search');
         
-        $locations = Location::when($searchTerm, function ($query) use ($searchTerm) {
+        $query = Location::when($searchTerm, function ($query) use ($searchTerm) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
-        })->withCount('posts')->get();
+        })->withCount('posts');
+
+        $locations = $query->paginate(12);
+
+        $locations->appends([
+            'search' => $searchTerm
+        ]);
+
 
         return view('frontend.admin.adminShowLocations', compact('locations'));
     }

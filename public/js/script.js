@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const banReasonInput = document.getElementById('ban-reason');
 
     let currentForm = null;
+    let currentUserId = null; // Для хранения ID пользователя при бане конкретного пользователя
 
     // Функция для открытия модального окна удаления
     function openDeleteModal(event) {
@@ -117,11 +118,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function openBanModal(event) {
         event.preventDefault();
 
-        // Находим скрытое поле для бана по data-input-type
-        const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
-        if (!selectedIdsInput || !selectedIdsInput.value) {
-            alert('Не выбраны пользователи для бана');
-            return;
+        // Проверяем, является ли это баном конкретного пользователя
+        const banButton = event.target.closest('.ban-button');
+        if (banButton && banButton.dataset.userId) {
+            // Бан конкретного пользователя
+            currentUserId = banButton.dataset.userId; // Сохраняем ID пользователя
+        } else {
+            // Массовый бан
+            const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+            if (!selectedIdsInput || !selectedIdsInput.value) {
+                alert('Не выбраны пользователи для бана');
+                return;
+            }
         }
 
         banModal.style.display = 'block';
@@ -131,10 +139,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function closeBanModal() {
         banModal.style.display = 'none';
         banReasonInput.value = ''; // Очищаем поле причины бана
+        currentUserId = null; // Сбрасываем ID пользователя
     }
 
     // Обработчик события для всех кнопок отправки форм
-    document.querySelectorAll('.delete-button').forEach(button => {
+    document.querySelectorAll('.delete-button, .ban-button').forEach(button => {
         button.addEventListener('click', function (event) {
             event.preventDefault();
 
@@ -146,6 +155,22 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (action === 'delete') {
                 openDeleteModal(event);
             }
+        });
+    });
+
+    // Добавляем обработчик для кнопок бана отдельных пользователей
+    document.querySelectorAll('.single-ban-form .ban-button').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            openBanModal(event);
+        });
+    });
+
+    // Добавляем обработчик для кнопок удаления одного элемента
+    document.querySelectorAll('.single-delete-form .delete-button').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            openDeleteModal(event);
         });
     });
 
@@ -164,28 +189,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Обработчик события для кнопки подтверждения бана
     confirmBanButton.addEventListener('click', function () {
-        const reason = banReasonInput.value.trim();
+        let reason = banReasonInput.value.trim(); // Получаем значение из поля ввода
+
+        // Если поле пустое, отправляем null
         if (!reason) {
-            alert('Укажите причину бана');
-            return;
+            reason = null;
         }
 
-        // Находим скрытое поле для бана по data-input-type
-        const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
-        if (!selectedIdsInput || !selectedIdsInput.value) {
-            alert('Не выбраны пользователи для бана');
-            return;
+        if (currentUserId) {
+            // Бан конкретного пользователя
+            const banForm = document.querySelector(`.single-ban-form button[data-user-id="${currentUserId}"]`).closest('form');
+
+            // Добавляем причину бана в форму как скрытое поле
+            const hiddenReasonInput = document.createElement('input');
+            hiddenReasonInput.type = 'hidden';
+            hiddenReasonInput.name = 'ban_reason';
+            hiddenReasonInput.value = reason;
+
+            banForm.appendChild(hiddenReasonInput);
+            banForm.submit(); // Отправляем форму
+        } else {
+            // Массовый бан
+            const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+            if (!selectedIdsInput || !selectedIdsInput.value) {
+                alert('Не выбраны пользователи для бана');
+                return;
+            }
+
+            // Добавляем причину бана в форму как скрытое поле
+            const hiddenReasonInput = document.createElement('input');
+            hiddenReasonInput.type = 'hidden';
+            hiddenReasonInput.name = 'ban_reason';
+            hiddenReasonInput.value = reason;
+
+            const banForm = document.querySelector('#bulk-ban-form');
+            banForm.appendChild(hiddenReasonInput);
+            banForm.submit(); // Отправляем форму
         }
 
-        // Добавляем причину бана в форму как скрытое поле
-        const hiddenReasonInput = document.createElement('input');
-        hiddenReasonInput.type = 'hidden';
-        hiddenReasonInput.name = 'ban_reason';
-        hiddenReasonInput.value = reason;
-
-        const banForm = document.querySelector('#bulk-ban-form');
-        banForm.appendChild(hiddenReasonInput);
-        banForm.submit(); // Отправляем форму
+        closeBanModal();
     });
 
     // Обработчик события для кнопки отмены и крестика (бан)
@@ -193,7 +235,6 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', closeBanModal);
     });
 });
-
 
 // ОБРАБОТЧИК ЧЕКБОКСОВ ДЛЯ МАССОВОГО УДАЛЕНИЯ
 document.addEventListener('DOMContentLoaded', function () {
@@ -235,39 +276,42 @@ document.addEventListener('DOMContentLoaded', function () {
 // ОБРАБОТЧИК ПОИСКА
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.querySelector('.search-input');
-    const tableSelectionLinks = document.querySelectorAll('.table-link');
+    const clearSearchButton = document.querySelector('.clear-search-button');
 
+    // Обработчик для нажатия Enter в поле поиска
     searchInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Предотвращаем стандартное поведение при нажатии Enter
 
             const searchTerm = event.target.value.trim();
+            const currentUrl = new URL(window.location.href);
+
             if (searchTerm.length > 0) {
-                // Получаем текущую выбранную таблицу
-                let currentTableRoute = '';
-                tableSelectionLinks.forEach(function (link) {
-                    if (link.classList.contains('active')) {
-                        currentTableRoute = link.getAttribute('href');
-                    }
-                });
-
-                // Добавляем параметр поиска к URL текущей таблицы
-                const searchUrl = new URL(currentTableRoute);
-                searchUrl.searchParams.set('search', searchTerm);
-
-                // Перенаправляем пользователя на страницу с результатами поиска
-                window.location.href = searchUrl.toString();
+                // Добавляем параметр search в URL
+                currentUrl.searchParams.set('search', searchTerm);
             } else {
-                // Если строка поиска пустая, перенаправляем пользователя на текущую страницу без параметра поиска
-                let currentTableRoute = '';
-                tableSelectionLinks.forEach(function (link) {
-                    if (link.classList.contains('active')) {
-                        currentTableRoute = link.getAttribute('href');
-                    }
-                });
-                window.location.href = currentTableRoute;
+                // Если строка поиска пустая, удаляем параметр search
+                currentUrl.searchParams.delete('search');
             }
+
+            // Перенаправляем пользователя на обновленный URL
+            window.location.href = currentUrl.toString();
         }
     });
+
+    // Обработчик для кнопки "очистки" (крестик)
+    if (clearSearchButton) {
+        clearSearchButton.addEventListener('click', function () {
+            // Очищаем поле поиска
+            searchInput.value = '';
+
+            // Удаляем параметр search из URL
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('search');
+
+            // Перенаправляем пользователя на обновленный URL
+            window.location.href = currentUrl.toString();
+        });
+    }
 });
 

@@ -20,7 +20,7 @@
             </div>
         </form>
             <div class="right-buttons">
-                <form action="{{ route('admin.destroyLocation', $location->id) }}" method="POST" style="display:inline-block;">
+                <form action="{{ route('admin.destroyLocation', $location->id) }}" method="POST" class="single-delete-form" style="display:inline-block;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="delete-button">Удалить</button>
