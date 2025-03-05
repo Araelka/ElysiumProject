@@ -8,6 +8,7 @@
         </div>
         <ul class="navbar__menu" id="main-menu" role="menu" aria-hidden="true">
             <li><a href="{{ route('homePage') }}" class="navbar__link">Главная</a></li>
+            <li><a href="" class="navbar__link">Вики</a></li>
             <li><a href="" class="navbar__link">Карта</a></li>
             <li><a href="" class="navbar__link">О нас</a></li>
             <li><a href="" class="navbar__link">Другое</a></li>

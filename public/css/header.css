@@ -195,6 +195,10 @@ body {
     text-decoration: none;
 }
 
+.navbar__user-menu form {
+    margin: 0px;
+}
+
 /* Стили для имени пользователя */
 .navbar__user-name {
     font-size: 16px; /* Размер текста */
