@@ -5,8 +5,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
-use PhpParser\Node\Expr\AssignOp\Pow;
 
 
 Route::middleware('guest')->group(function(){
@@ -29,6 +29,8 @@ Route::middleware(['auth', 'player'])->group(function(){
 
     Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('post.editShow');
     Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
+
+    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
