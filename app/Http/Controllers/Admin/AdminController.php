@@ -40,7 +40,7 @@ class AdminController extends Controller
                 });
         }
 
-        $users = $query->paginate(12);
+        $users = $query->paginate(20);
 
         $users->appends([
             'filter' => $filter,
