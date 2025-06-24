@@ -271,3 +271,104 @@
     font-size: 14px;
     color: #ec7063; /* Красный цвет текста */
 }
+
+
+
+
+
+/* Страница тем */
+.theme-container {
+    max-height: calc(100vh - 300px); /* Убираем высоту меню и пагинации */
+    overflow-y: auto;
+}
+
+.theme-container::-webkit-scrollbar {
+    width: 2px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.theme-container::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.theme-container::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
+
+.theme-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.theme-item {
+    flex: 0 0 calc(25% - 15px); /* 4 в строку */
+    max-width: calc(25% - 15px);
+}
+.theme-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Отступ между карточками */
+}
+
+.theme-col {
+    flex: 0 0 25%; /* 4 колонки в ряд */
+    max-width: 25%;
+    padding: 0;
+}
+
+.theme-card {
+    background-color: rgba(10, 14, 23, 0.9); /* Темный фон */
+    border: 2px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border-radius: 10px; /* Скругленные углы */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень */
+    padding: 15px; /* Внутренние отступы */
+    display: flex; /* Flexbox для выравнивания */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    transition: transform 0.3s ease; /* Анимация при наведении */
+    height: auto; /* Автоматическая высота */
+}
+
+.theme-card:hover {
+    /* transform: scale(1.05); */
+    border-color: #ec7063;
+}
+
+/* Содержимое карточки */
+.theme-card-content {
+    flex-grow: 1; /* Занимает всё доступное пространство */
+}
+
+.theme-card-title {
+    color: #f4d03f; /* Ярко-жёлтый текст */
+    font-size: 18px;
+    margin: 0; /* Убираем стандартные отступы */
+    white-space: nowrap; /* Запрещаем перенос текста */
+    overflow: hidden; /* Скрываем текст, который не помещается */
+    text-overflow: ellipsis; /* Добавляем многоточие для длинного текста */
+}
+
+/* Изображение */
+.theme-card-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin-left: 10px;
+}
+
+.theme-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Корректное масштабирование изображения */
+    border-radius: 10px; /* Скругленные углы */
+}
+
+.footer-pagination {
+    position: relative;
+    text-align: center;
+    margin-top: auto; /* Если внутри flex */
+}

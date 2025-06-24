@@ -15,12 +15,16 @@ Route::middleware('guest')->group(function(){
 
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login']);
+
+    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 });
 
 Route::middleware('auth')->group(function(){
     Route::get('/', [PostController::class, 'index'])->name('homePage');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 });
 
 Route::middleware(['auth', 'player'])->group(function(){
@@ -30,7 +34,8 @@ Route::middleware(['auth', 'player'])->group(function(){
     Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('post.editShow');
     Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
 
-    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
+    Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
+    Route::post('wiki/theme/create', [ThemeController::class, 'CreateTheme'])->name('wiki.createTheme');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {

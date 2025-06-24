@@ -1,9 +1,13 @@
-@extends('frontend.admin.admin')
-@section('title', 'Создание локации')
+@extends('frontend.wiki.index')
+@section('title', 'Создание темы')
 @section('table')
 
+
+<h3>Создание темы</h3>
+
+
 <div class="button-container custom-button-container">
-    <form action={{ route('admin.createLocation') }} method="POST" class="data-table">
+    <form action={{ route('wiki.createTheme') }} method="POST" class="data-table">
         @csrf
         <div class="form-group">
             <label for="name">Наименование:</label>
