@@ -372,3 +372,74 @@
     text-align: center;
     margin-top: auto; /* Если внутри flex */
 }
+
+/* Новый класс для горизонтального размещения */
+.form-group-flex {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Расстояние между левой и правой частью */
+}
+
+/* Левая часть — загрузка изображения */
+.flex-left {
+    flex: 1;
+    text-align: left;
+}
+
+/* Правая часть — поле ввода */
+.flex-right {
+    flex: 2;
+}
+
+/* Стиль для красивой кнопки загрузки */
+.custom-file-upload {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #f4d03f;
+    color: #1a1a40 !important;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: #ec7063;
+}
+
+.hidden-input {
+    display: none;
+}
+
+/* Стили для предпросмотра изображения */
+.image-preview {
+    position: relative;
+    border: 2px dashed #f4d03f; /* Пунктирная рамка */
+    border-radius: 5px;
+    text-align: center;
+    background-color: rgba(10, 14, 23, 0.8); /* Тёмный фон */
+    color: #f4d03f; /* Ярко-жёлтый текст */
+    height: 200px; /* Фиксированная высота */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Обрезаем избыточное изображение */
+}
+
+#preview-image {
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    object-fit: scale-down; /* Корректное масштабирование изображения */
+    width: 100%;
+    height: 100%;
+}
+
+.placeholder {
+    display: block;
+    font-size: 16px;
+    opacity: 0.7; /* Слегка прозрачный текст */
+    text-align: center;
+    line-height: 200px; /* Выравнивание по вертикали */
+}
+
+

@@ -315,3 +315,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+document.getElementById('image').addEventListener('change', function(event) {
+    const input = event.target;
+    const previewImage = document.getElementById('preview-image');
+    const placeholderText = document.getElementById('placeholder-text');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block'; // Показываем изображение
+            placeholderText.style.display = 'none'; // Скрываем текстовую подсказку
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewImage.src = '#';
+        previewImage.style.display = 'none'; // Скрываем изображение
+        placeholderText.style.display = 'block'; // Показываем текстовую подсказку
+    }
+});
+
