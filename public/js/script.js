@@ -325,15 +325,15 @@ document.getElementById('image').addEventListener('change', function(event) {
 
         reader.onload = function(e) {
             previewImage.src = e.target.result;
-            previewImage.style.display = 'block'; // Показываем изображение
-            placeholderText.style.display = 'none'; // Скрываем текстовую подсказку
+            previewImage.style.display = 'block';
+            placeholderText.style.display = 'none';
         };
 
         reader.readAsDataURL(input.files[0]);
     } else {
         previewImage.src = '#';
-        previewImage.style.display = 'none'; // Скрываем изображение
-        placeholderText.style.display = 'block'; // Показываем текстовую подсказку
+        previewImage.style.display = 'none';
+        placeholderText.style.display = 'block';
     }
 });
 

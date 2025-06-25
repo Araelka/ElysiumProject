@@ -8,38 +8,42 @@
     <form action="{{ route('wiki.createTheme') }}" method="POST" enctype="multipart/form-data" class="data-table">
         @csrf
 
-        <!-- Горизонтальный блок: слева - кнопка загрузки, справа - поле ввода -->
+        <!-- Горизонтальный блок: слева - предпросмотр, справа - поля ввода -->
         <div class="form-group flex-row form-group-flex">
-            <!-- Слева: кнопка загрузки -->
+            <!-- Слева: предпросмотр изображения -->
             <div class="flex-left">
-                <label for="">Изображение:</label>
-                <div class="image-preview" style="margin-bottom: 10px">
-                    <img id="preview-image" src="#" alt="Предпросмотр изображения" style="display: none; max-width: 100%; max-height: 200px;" />
-                    <div id="placeholder-text" class="placeholder">Нажмите "Загрузить изображение"</div>
+                <div class="image-preview">
+                    <img id="preview-image" src="#"/>
+                    <div id="placeholder-text" class="placeholder">Предпросмотр изображение</div>
                 </div>
-                <label for="image" class="custom-file-upload">
-                    Загрузить изображение
-                </label>
-                <input type="file" id="image" name="image" accept="image/*" class="hidden-input">
-                @error('image')
-                    <span class="form__error">{{ $message }}</span>
-                @enderror
             </div>
 
-            <!-- Справа: поле ввода -->
+            <!-- Справа: поля ввода и кнопки -->
             <div class="flex-right">
-                <label for="name">Наименование:</label>
-                <input type="text" id="name" name="name" required>
-                @error('name')
-                    <span class="form__error">{{ $message }}</span>
-                @enderror
-            </div>
-        </div>
+                <!-- Поле ввода названия -->
+                <div class="form-group-theme-labbe">
+                    <label for="name">Наименование:</label>
+                    <input type="text" id="name" name="name" required>
+                    @error('name')
+                        <span class="form__error">{{ $message }}</span>
+                    @enderror
+                </div>
 
-        <!-- Кнопка сохранить -->
-        <div class="button-group">
-            <div class="left-buttons">
-                <button type="submit" class="save-button">Сохранить</button>
+                <!-- Кнопка загрузки изображения -->
+                <div class="form-group-theme">
+                    <label for="image" class="custom-file-upload">
+                        Загрузить изображение
+                    </label>
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden-input">
+                    @error('image')
+                        <span class="form__error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Кнопка сохранить -->
+                <div class="form-group-theme-batton">
+                    <button type="submit" class="save-button">Сохранить</button>
+                </div>
             </div>
         </div>
     </form>

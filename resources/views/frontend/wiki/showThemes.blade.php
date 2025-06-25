@@ -8,11 +8,17 @@
             @foreach ($themes as $theme)
                 <div class="theme-item">
                     <a href="" class="theme-card d-flex align-items-center justify-content-between" style="text-decoration: none; color: inherit;">
+                        @if (Auth::user()->isEditor())
+                            <button class="delete-theme-button" data-id="{{ $theme->id }}">×</button>
+                        @endif
+
                         <div class="theme-card-content">
                             <h5 class="theme-card-title">{{ $theme->name }}</h5>
                         </div>
                         <div class="theme-card-image">
-                            <img src="{{ asset($theme->image) }}" alt="{{ $theme->title }}">
+                            @if ($theme->article->images->isNotEmpty())
+                                <img src="{{ asset('storage/' . $theme->article->images->first()->path) }}" alt="Изображение" class="img-fluid">
+                            @endif
                         </div>
                     </a>
                 </div>

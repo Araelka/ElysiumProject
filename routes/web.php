@@ -28,14 +28,17 @@ Route::middleware('auth')->group(function(){
 });
 
 Route::middleware(['auth', 'player'])->group(function(){
+    Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
+    Route::post('wiki/theme/create', [ThemeController::class, 'CreateTheme'])->name('wiki.createTheme');
+    Route::delete('wiki/theme/{id}/destroy', [ThemeController::class, 'destroy'])->name('wiki.destroyTheme');
+});
+
+Route::middleware(['auth', 'player'])->group(function(){
     Route::post('publish', [PostController::class, 'store'])->name('post.publish');
     Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('post.destroy');
 
     Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('post.editShow');
     Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
-
-    Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
-    Route::post('wiki/theme/create', [ThemeController::class, 'CreateTheme'])->name('wiki.createTheme');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {

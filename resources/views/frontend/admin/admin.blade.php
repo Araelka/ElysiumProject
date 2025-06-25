@@ -13,7 +13,6 @@
                         <ul class="table-list d-flex">
                             <li><a href={{ route('admin.showUsers') }} class="table-link {{ request()->routeIs('admin.showUsers') ? 'active' : '' }}">Пользователи</a></li>
                             <li><a href="{{ route('admin.showLocations') }}" class="table-link {{ request()->routeIs('admin.showLocations') ? 'active' : '' }}">Локации</a></li>
-                            <li><a href="{{ route('admin.showLocations') }}" class="table-link {{ request()->routeIs('admin.showLocations') ? 'active' : '' }}">Темы</a></li>
                         </ul>
                     </div>
                     <div class="search-container">
