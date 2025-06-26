@@ -7,9 +7,13 @@
         @isset($themes)
             @foreach ($themes as $theme)
                 <div class="theme-item">
-                    <a href="" class="theme-card d-flex align-items-center justify-content-between" style="text-decoration: none; color: inherit;">
+                    <a href={{ route('wiki.article.index', $theme->article->id) }} class="theme-card d-flex align-items-center justify-content-between" style="text-decoration: none; color: inherit;">
                         @if (Auth::user()->isEditor())
-                            <button class="delete-theme-button" data-id="{{ $theme->id }}">×</button>
+                            <form action="{{ route('wiki.destroyTheme', $theme->id) }}" method="POST" class="delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button class="delete-theme-button" data-id="{{ $theme->id }}">×</button>
+                            </form>
                         @endif
 
                         <div class="theme-card-content">

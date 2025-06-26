@@ -35,7 +35,7 @@
                                 <h4 style="padding-left: 5px">{{ $post->user->login }}</h4>
                                 @auth
                                     @if (auth()->id() == $post->user_id) 
-                                    <a href={{ route('post.editShow', $post->id) }} class="edit-post-button" style="transform: rotate(90deg);">&#9998</a>
+                                    <a href={{ route('post.editShow', $post->id) }} class="edit-post-button" style="transform: rotate(0deg);">✎</a>
                                     @endif
                                     @if (auth()->id() == $post->user_id || Auth::user()->isEditor())
                                         <form action={{ route('post.destroy', $post->id) }} method="POST">

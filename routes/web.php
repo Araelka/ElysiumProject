@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MainController;
@@ -25,6 +26,7 @@ Route::middleware('auth')->group(function(){
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
+    Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
 });
 
 Route::middleware(['auth', 'player'])->group(function(){

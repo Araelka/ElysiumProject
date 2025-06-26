@@ -43,59 +43,6 @@
     </div>
 </div>
 
-<!-- Модальное окно для подтверждения удаления -->
-<div id="confirm-delete-modal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Вы уверены, что хотите удалить эту тему?</p>
-        <form id="delete-form" method="POST">
-            @csrf
-            @method('DELETE')
-        </form>
-        <button id="confirm-delete">Удалить</button>
-        <button id="cancel-delete">Отмена</button>
-    </div>
-</div>
 
-<script>
-    const modal = document.getElementById("confirm-delete-modal");
-    const deleteButtons = document.querySelectorAll(".delete-theme-button");
-    const closeBtn = document.querySelector(".close");
-    const cancelBtn = document.getElementById("cancel-delete");
-    const confirmDeleteBtn = document.getElementById("confirm-delete");
-    const deleteForm = document.getElementById("delete-form");
-
-    function openModal(themeId) {
-        modal.style.display = "block";
-        deleteForm.setAttribute("action", `/wiki/delete/${themeId}`);
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    deleteButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const themeId = button.getAttribute("data-id");
-            openModal(themeId);
-        });
-    });
-
-    closeBtn.addEventListener("click", closeModal);
-    cancelBtn.addEventListener("click", closeModal);
-
-    window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    // Отправляем форму ТОЛЬКО по клику на "Удалить"
-    confirmDeleteBtn.addEventListener("click", function (e) {
-        e.preventDefault(); // Останавливаем стандартное поведение кнопки
-        closeModal(); // Закрываем модальное окно
-        deleteForm.submit(); // Принудительно отправляем форму
-    });
-</script>
 
 @endsection
