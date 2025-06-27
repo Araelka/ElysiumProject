@@ -29,10 +29,12 @@ Route::middleware('auth')->group(function(){
     Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
 });
 
-Route::middleware(['auth', 'player'])->group(function(){
+Route::middleware(['auth', 'editor'])->group(function(){
     Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
     Route::post('wiki/theme/create', [ThemeController::class, 'CreateTheme'])->name('wiki.createTheme');
     Route::delete('wiki/theme/{id}/destroy', [ThemeController::class, 'destroy'])->name('wiki.destroyTheme');
+    Route::get('wiki/article/edit/{id}', [ArticleController::class, 'showEditTitleForm'])->name('wiki.showEditArticleTitle');
+    Route::put('wiki/article/edit/{id}', [ThemeController::class, 'editTheme'])->name('wiki.editArticleTitle');
 });
 
 Route::middleware(['auth', 'player'])->group(function(){

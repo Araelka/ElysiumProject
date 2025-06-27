@@ -61,6 +61,29 @@ class ThemeController extends Controller
         return redirect()->route('wiki.index');
     }
 
+    public function editTheme(Request $request, $id){
+        if (!auth()->user()->isEditor()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+        $validate = $request->validate([
+            'name' => ['required', 'max:255', 'unique:themes']
+        ]);
+
+
+        $theme = Theme::findOrFail($id);
+        $theme->update([
+            'name' => $validate['name']
+        ]);
+
+        $article = Article::findOrFail($theme->article->id);
+        $article->update([
+            'title' => $validate['name']
+        ]);
+
+
+        return redirect()->route('wiki.article.index', $theme->article->id);
+    }
+
     public function destroy ($id) {
         
          if (!auth()->user()->isEditor()) {

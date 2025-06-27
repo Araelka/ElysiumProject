@@ -6,14 +6,22 @@
 <div class="article-container">
     <!-- Блок заголовка -->
     <div class="article-header d-flex justify-content-between align-items-center mb-3">
-    <!-- Заголовок статьи -->
+
+    @if (Request::is('wiki/article/edit/*'))
+    @yield('editTitle')
+    @else
+     <!-- Заголовок статьи -->
     <h2 class="article-title mb-0">{{ $article->title }}</h2>
 
     <!-- Кнопка редактирования названия -->
     @if (Auth::user()->isEditor())
-        <a href="" class="edit-title-button">✎</a>
+        <a href={{ route('wiki.showEditArticleTitle', $article->id) }} class="edit-title-button">✎</a>
+    @endif
     @endif
     </div>
+
+
+
 
         
 
@@ -25,7 +33,8 @@
             @if (Auth::user()->isEditor())
                 <a href="" class="edit-content-button">Редактировать</a>
             @endif
-            <p class="article-content-p">{!! nl2br(e($article->content)) !!}</p>
+            @yield('article-content')
+            {{-- <p class="article-content-p">{!! nl2br(e($article->content)) !!}</p> --}}
         </div>
 
         <!-- Изображение справа -->
