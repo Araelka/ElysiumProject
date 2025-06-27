@@ -2,37 +2,44 @@
 @section('title', $article->title)
 @section('table')
 
-<div class="theme-container">
+
+<div class="article-container">
+    <!-- Блок заголовка -->
     <div class="article-header d-flex justify-content-between align-items-center mb-3">
-        <!-- Заголовок статьи -->
-        <h2 class="article-title">{{ $article->title }}</h2>
+    <!-- Заголовок статьи -->
+    <h2 class="article-title mb-0">{{ $article->title }}</h2>
 
-        <!-- Кнопка редактирования названия темы -->
-        @if (Auth::user()->isEditor())
-            <a href="" class="edit-title-button">Редактировать название</a>
-        @endif
+    <!-- Кнопка редактирования названия -->
+    @if (Auth::user()->isEditor())
+        <a href="" class="edit-title-button">✎</a>
+    @endif
     </div>
 
+        
+
+    <!-- Основной контент -->
     <div class="article-body d-flex">
-        <!-- Основной текст статьи -->
+            <!-- Содержание статьи -->
         <div class="article-content flex-grow-1">
-            <!-- Кнопка редактирования содержания статьи -->
+            <!-- Кнопка редактирования статьи -->
             @if (Auth::user()->isEditor())
-                <a href="" class="edit-content-button">Редактировать содержание</a>
+                <a href="" class="edit-content-button">Редактировать</a>
             @endif
-            
-            <p>{!! nl2br(e($article->content)) !!}</p>
+            <p class="article-content-p">{!! nl2br(e($article->content)) !!}</p>
         </div>
 
-        <!-- Изображение справа сверху -->
-        <div class="article-image ml-4">
+        <!-- Изображение справа -->
+        <div class="article-image mr-4">
             @if ($article->images->isNotEmpty())
-                <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded">
+                <div class="image-frame">
+                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" >
+                </div>
             @else
-                <p>Нет изображений</p>
+                <div class="no-image-placeholder">Нет изображения</div>
             @endif
         </div>
     </div>
+</div>
 </div>
 
 @endsection

@@ -45,7 +45,7 @@ class ThemeController extends Controller
         $article = new Article();
         $article->theme_id = $theme->id;
         $article->title = $validated['name'];
-        $article->content = '';
+        $article->content = "";
         $article->save();
 
         if ($request->hasFile('image')) {
