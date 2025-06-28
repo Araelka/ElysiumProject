@@ -31,10 +31,13 @@
         <div class="article-content flex-grow-1">
             <!-- Кнопка редактирования статьи -->
             @if (Auth::user()->isEditor())
-                <a href="" class="edit-content-button">Редактировать</a>
+                <a href={{ route('wiki.showEditArticleContent', $article->id) }} class="edit-content-button">Редактировать</a>
             @endif
-            @yield('article-content')
-            {{-- <p class="article-content-p">{!! nl2br(e($article->content)) !!}</p> --}}
+            @if (Request::is('wiki/article/edit/content/*'))
+                @yield('article-content')
+            @else
+                <p class="article-content-p">{!! nl2br($article->content) !!}</p>
+            @endif
         </div>
 
         <!-- Изображение справа -->

@@ -4,7 +4,7 @@
 <div class="markdown-editor-container">
     <div class="editor-header d-flex justify-content-between align-items-center mb-3">
         <h2>Редактирование статьи</h2>
-        <form action="" method="POST">
+        <form action={{ route('wiki.editArticleContent', $article->id) }} method="POST">
             @csrf
             @method('PUT')
             <button type="submit" class="save-button">Сохранить</button>
