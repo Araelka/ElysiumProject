@@ -30,7 +30,7 @@
             <!-- Содержание статьи -->
         <div class="article-content flex-grow-1">
             <!-- Кнопка редактирования статьи -->
-            @if (Auth::user()->isEditor())
+            @if (Auth::user()->isEditor() && Request::is('wiki/article/*')) 
                 <a href={{ route('wiki.showEditArticleContent', $article->id) }} class="edit-content-button">Редактировать</a>
             @endif
             @if (Request::is('wiki/article/edit/content/*'))
