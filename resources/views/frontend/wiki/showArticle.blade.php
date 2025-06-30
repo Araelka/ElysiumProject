@@ -7,7 +7,7 @@
     <!-- Блок заголовка -->
     <div class="article-header d-flex justify-content-between align-items-center mb-3">
 
-    @if (Request::is('wiki/article/edit/*'))
+    @if (Request::is('wiki/article/edit/title/*'))
     @yield('editTitle')
     @else
      <!-- Заголовок статьи -->
@@ -30,18 +30,23 @@
             <!-- Содержание статьи -->
         <div class="article-content flex-grow-1">
             <!-- Кнопка редактирования статьи -->
-            @if (Auth::user()->isEditor() && Request::is('wiki/article/*')) 
+            @if (Auth::user()->isEditor() && !Request::is('wiki/article/edit/content/*')) 
                 <a href={{ route('wiki.showEditArticleContent', $article->id) }} class="edit-content-button">Редактировать</a>
             @endif
             @if (Request::is('wiki/article/edit/content/*'))
                 @yield('article-content')
             @else
-                <p class="article-content-p">{!! nl2br($article->content) !!}</p>
+                @if ($article->images->isNotEmpty())
+                {{-- <div class="image-frame"> --}}
+                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" style="object-fit: cover; width: 300px; height: 300px;" align="left">
+                {{-- </div> --}}
+                @endif
+                    <p class="article-content-p">{!! nl2br($article->content) !!}</p>
             @endif
         </div>
 
         <!-- Изображение справа -->
-        <div class="article-image mr-4">
+        {{-- <div class="article-image mr-4">
             @if ($article->images->isNotEmpty())
                 <div class="image-frame">
                     <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" >
@@ -49,7 +54,7 @@
             @else
                 <div class="no-image-placeholder">Нет изображения</div>
             @endif
-        </div>
+        </div> --}}
     </div>
 </div>
 </div>

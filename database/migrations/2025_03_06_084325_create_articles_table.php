@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('theme_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }

@@ -33,8 +33,8 @@ Route::middleware(['auth', 'editor'])->group(function(){
     Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
     Route::post('wiki/theme/create', [ThemeController::class, 'CreateTheme'])->name('wiki.createTheme');
     Route::delete('wiki/theme/{id}/destroy', [ThemeController::class, 'destroy'])->name('wiki.destroyTheme');
-    Route::get('wiki/article/edit/{id}', [ArticleController::class, 'showEditTitleForm'])->name('wiki.showEditArticleTitle');
-    Route::put('wiki/article/edit/{id}', [ThemeController::class, 'editTheme'])->name('wiki.editArticleTitle');
+    Route::get('wiki/article/edit/title/{id}', [ArticleController::class, 'showEditTitleForm'])->name('wiki.showEditArticleTitle');
+    Route::put('wiki/article/edit/title/{id}', [ThemeController::class, 'editTheme'])->name('wiki.editArticleTitle');
     Route::get('wiki/article/edit/content/{id}', [ArticleController::class, 'showEditArticleContent'])->name('wiki.showEditArticleContent');
     Route::put('wiki/article/edit/content/{id}', [ArticleController::class, 'editArticleContent'])->name('wiki.editArticleContent');
 });
