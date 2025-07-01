@@ -11,7 +11,7 @@
     @yield('editTitle')
     @else
      <!-- Заголовок статьи -->
-    <h2 class="article-title mb-0">{{ $article->title }}</h2>
+    <h2 class="article-title mb-0">{{ $article->theme->name }}</h2>
 
     <!-- Кнопка редактирования названия -->
     @if (Auth::user()->isEditor())
@@ -36,11 +36,11 @@
             @if (Request::is('wiki/article/edit/content/*'))
                 @yield('article-content')
             @else
-                @if ($article->images->isNotEmpty())
-                {{-- <div class="image-frame"> --}}
-                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" style="object-fit: cover; width: 300px; height: 300px;" align="left">
-                {{-- </div> --}}
-                @endif
+                {{-- @if ($article->images->isNotEmpty())
+                <div class="image-frame">
+                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" style="object-fit: cover; width: 300px; height: 300px; padding-right: 5px;" align="left">
+                </div>
+                @endif --}}
                     <p class="article-content-p">{!! nl2br($article->content) !!}</p>
             @endif
         </div>

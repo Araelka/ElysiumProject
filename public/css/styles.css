@@ -350,10 +350,10 @@
     color: #f4d03f; /* Ярко-жёлтый текст */
     font-size: 18px;
     margin: 0; /* Убираем стандартные отступы */
-    /* white-space: nowrap;  */
+    white-space: nowrap; 
     overflow: hidden; /* Скрываем текст, который не помещается */
     text-overflow: ellipsis; /* Добавляем многоточие для длинного текста */
-    /* max-width: calc(100% - 10px); */
+    /* max-width: calc(100% - 50px); */
 }
 
 /* Изображение */

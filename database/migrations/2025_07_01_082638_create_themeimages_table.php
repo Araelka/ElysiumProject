@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('themes', function (Blueprint $table) {
+        Schema::create('theme_images', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->boolean('visibility')->default(true);
+            $table->foreignId('theme_id')->constrained()->onDelete('cascade');
+            $table->string('path');
+            $table->string('description')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('themes');
+        Schema::dropIfExists('themeimages');
     }
 };

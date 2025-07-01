@@ -11,9 +11,16 @@ class Theme extends Model
 
     public $timestamps = false; 
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'visibility'
+    ];
 
     public function article (){
         return $this->hasOne(Article::class);
+    }
+
+    public function images(){
+        return $this->hasMany(ThemeImage::class);
     }
 }

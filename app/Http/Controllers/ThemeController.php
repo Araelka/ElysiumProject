@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\Theme;
+use App\Models\ThemeImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use function PHPUnit\Framework\returnArgument;
@@ -17,7 +18,7 @@ class ThemeController extends Controller
         
         $query = Theme::when($searchTerm, function ($query) use ($searchTerm) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
-        })->whereHas('article')->with(['article.images' => function ($query) {
+        })->with(['article.images' => function ($query) {
            $query->orderBy('id', 'asc')->take(1);
        }]);
 
@@ -31,8 +32,8 @@ class ThemeController extends Controller
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            \Log::info('File MIME type:', ['mime' => $image->getMimeType()]);
         }
+
         $validated = $request->validate([
             'name' => ['required', 'unique:themes', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
@@ -44,15 +45,14 @@ class ThemeController extends Controller
 
         $article = new Article();
         $article->theme_id = $theme->id;
-        $article->title = $validated['name'];
         $article->content = "";
         $article->save();
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
 
-            $image = new ArticleImage();
-            $image->article_id = $article->id;
+            $image = new ThemeImage();
+            $image->theme_id = $theme->id;
             $image->path = $imagePath;
             $image->description = 'Изображение для темы "' . $theme->name . '"';
             $image->save();
@@ -73,11 +73,6 @@ class ThemeController extends Controller
         $theme = Theme::findOrFail($id);
         $theme->update([
             'name' => $validate['name']
-        ]);
-
-        $article = Article::findOrFail($theme->article->id);
-        $article->update([
-            'title' => $validate['name']
         ]);
 
 

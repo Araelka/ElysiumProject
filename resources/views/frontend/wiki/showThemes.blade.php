@@ -20,8 +20,8 @@
                             <h5 class="theme-card-title">{{ $theme->name }}</h5>
                         </div>
                         <div class="theme-card-image">
-                            @if ($theme->article->images->isNotEmpty())
-                                <img src="{{ asset('storage/' . $theme->article->images->first()->path) }}" alt="Изображение" class="img-fluid">
+                            @if ($theme->images->isNotEmpty())
+                                <img src="{{ asset('storage/' . $theme->images->first()->path) }}" alt="Изображение" class="img-fluid">
                             @endif
                         </div>
                     </a>
