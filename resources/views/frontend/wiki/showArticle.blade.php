@@ -1,5 +1,5 @@
 @extends('frontend.wiki.index')
-@section('title', $article->title)
+@section('title', $article->theme->name)
 @section('table')
 
 

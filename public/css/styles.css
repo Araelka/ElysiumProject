@@ -520,8 +520,9 @@ input[type="text"]:focus {
 }
 
 .theme-link {
+    background-color: #f4d03f; 
     text-decoration: none;
-    color: #f4d03f;
+    color: #1a1a40;
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
@@ -536,15 +537,14 @@ input[type="text"]:focus {
 }
 
 .theme-link:hover {
-    background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
-    color: #1a1a40; /* Тёмный текст */
+    background-color: #ec7063; /* Ярко-жёлтый фон при наведении */
 }
 
 .theme-selection-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 15px;
+    padding: 15px 0px;
 }
 
 .theme-list {
@@ -804,5 +804,62 @@ input[type="text"]:focus {
 .toolbar-button:hover {
     background-color: #f4d03f;
     color: #1a1a40;
+}
+
+/* Стиль для кнопки добавления изображения */
+.add-image-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background-color: rgba(10, 14, 23, 0.9);
+    border: 2px dashed #f4d03f;
+    border-radius: 10px;
+    color: #f4d03f;
+    font-size: 36px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.image-upload-form {
+    margin: 0px;
+}
+
+.add-image-button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+    /* border-color: #ec7063; */
+}
+
+.hidden-input {
+    display: none; /* Скрываем input[type="file"] */
+}
+
+.hidden-submit-button {
+    display: none;
+}
+
+.visibility-button {
+    background: none;
+    position: absolute;
+    border: none;
+    cursor: pointer;
+    top: 0px;
+    left: 0px;
+    /* z-index: 1; */
+    transition: color 0.3s ease;
+}
+
+
+.visibility-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.visibility-icon:hover {
+    transform: scale(1.1);
 }
 

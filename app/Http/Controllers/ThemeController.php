@@ -28,7 +28,7 @@ class ThemeController extends Controller
         return view('frontend.wiki.showThemes', compact('themes'));
     }
 
-    public function CreateTheme (Request $request){
+    public function createTheme (Request $request){
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -79,6 +79,38 @@ class ThemeController extends Controller
         return redirect()->route('wiki.article.index', $theme->article->id);
     }
 
+    public function uploadImage (Request $request, $id) {
+        // dd($request);
+        if (!auth()->user()->isEditor()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
+
+            $image = new ThemeImage();
+            $image->theme_id = $id;
+            $image->path = $imagePath;
+            // $image->description = 'Изображение для темы "' . $theme->name . '"';
+            $image->save();
+        }
+
+        return redirect()->back();
+    }
+
+    public function toggleVisibility($id) {
+        $theme = Theme::findOrFail($id);
+
+        $theme->visibility = !$theme->visibility;
+        $theme->save();
+
+        return redirect()->back();
+    }
+
     public function destroy ($id) {
         
          if (!auth()->user()->isEditor()) {
@@ -110,6 +142,7 @@ class ThemeController extends Controller
     public function showCreateThemeForm() {
         return view('frontend.wiki.showTheme');
     }
+
 
 
     
