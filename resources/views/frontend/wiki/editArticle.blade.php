@@ -8,8 +8,8 @@
         <button class="toolbar-button" onclick="insertMarkdown('<h3>', '</h3>', 'Подзаголовок')">Подзаголовок</button>
         <button class="toolbar-button" onclick="insertMarkdown('<strong>', '</strong>', 'Полужирный текст')"><b>B</b></button>
         <button class="toolbar-button" onclick="insertMarkdown('<i>', '</i>', 'Курсив')"><i>I</i></button>
-        <button class="toolbar-button" onclick="insertMarkdown('[', '](', 'https://example.com)',  'Ссылка')">Ссылка</button>
-        <button class="toolbar-button" onclick="insertMarkdown('![', '](', 'https://placehold.co/600x400)',  'Альтернативный текст')">Изображение</button>
+        <button class="toolbar-button" onclick="insertMarkdown('<a href=адрес>', '</a>', 'Ссылка',  'Ссылка')">Ссылка</button>
+        <button class="toolbar-button" onclick="insertMarkdown('<img src=', '>', 'адрес',  'Альтернативный текст')">Изображение</button>
         <button class="toolbar-button" onclick="insertMarkdown('- ', ' ', 'Элемент списка')">Список</button>
     </div>
 
