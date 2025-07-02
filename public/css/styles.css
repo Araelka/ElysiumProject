@@ -350,10 +350,11 @@
     color: #f4d03f; /* Ярко-жёлтый текст */
     font-size: 18px;
     margin: 0; /* Убираем стандартные отступы */
-    white-space: nowrap; 
+    /* white-space: nowrap;  */
     overflow: hidden; /* Скрываем текст, который не помещается */
     text-overflow: ellipsis; /* Добавляем многоточие для длинного текста */
     /* max-width: calc(100% - 50px); */
+    max-height: 80px;
 }
 
 /* Изображение */
@@ -823,6 +824,28 @@ input[type="text"]:focus {
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.change-image-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background-color: rgba(10, 14, 23, 0.9);
+    border: 2px dashed #f4d03f;
+    border-radius: 10px;
+    color: #f4d03f;
+    font-size: 36px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.change-image-button:hover {
+    color: #1a1a40;
+    border-color: #ec7063;
+}
+
+
 .image-upload-form {
     margin: 0px;
 }
@@ -846,7 +869,7 @@ input[type="text"]:focus {
     position: absolute;
     border: none;
     cursor: pointer;
-    top: 0px;
+    top: 5px;
     left: 0px;
     /* z-index: 1; */
     transition: color 0.3s ease;

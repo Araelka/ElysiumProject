@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('themes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->boolean('visibility')->default(true);
+            $table->boolean('visibility')->default(false);
         });
     }
 

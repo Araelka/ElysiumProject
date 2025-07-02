@@ -18,7 +18,7 @@ class ThemeController extends Controller
         
         $query = Theme::when($searchTerm, function ($query) use ($searchTerm) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
-        })->with(['article.images' => function ($query) {
+        })->with(['images' => function ($query) {
            $query->orderBy('id', 'asc')->take(1);
        }]);
 
@@ -89,13 +89,25 @@ class ThemeController extends Controller
             'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
         ]);
 
+        $theme = Theme::findOrFail($id);
+
+        if ($theme->images) {
+            foreach ($theme->images as $image) {
+                if (Storage::disk('public')->exists($image->path)) {
+                    Storage::disk('public')->delete($image->path);
+                }
+                $image->delete();
+            }
+        }
+
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
 
             $image = new ThemeImage();
             $image->theme_id = $id;
             $image->path = $imagePath;
-            // $image->description = 'Изображение для темы "' . $theme->name . '"';
+            $image->description = 'Изображение для темы "' . $theme->name . '"';
             $image->save();
         }
 
@@ -103,6 +115,10 @@ class ThemeController extends Controller
     }
 
     public function toggleVisibility($id) {
+        if (!auth()->user()->isEditor()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $theme = Theme::findOrFail($id);
 
         $theme->visibility = !$theme->visibility;
@@ -119,7 +135,16 @@ class ThemeController extends Controller
 
         $theme = Theme::findOrFail($id);
 
-        if ($theme->article && $theme->article->images) {
+        if ($theme->images) {
+            foreach ($theme->images as $image) {
+                if (Storage::disk('public')->exists($image->path)) {
+                    Storage::disk('public')->delete($image->path);
+                }
+                $image->delete();
+            }
+        }
+
+        if ($theme->article->images) {
             foreach ($theme->article->images as $image) {
                 if (Storage::disk('public')->exists($image->path)) {
                     Storage::disk('public')->delete($image->path);
@@ -127,6 +152,7 @@ class ThemeController extends Controller
                 $image->delete();
             }
         }
+        
 
         if ($theme->article) {
             $theme->article->delete();

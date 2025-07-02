@@ -6,7 +6,9 @@
     <div class="theme-grid">
         @isset($themes)
             @foreach ($themes as $theme)
-                    
+                @if (!Auth::user()->isEditor() && !$theme->visibility)
+                    @continue
+                @else
                 <div class="theme-item">
                     <a href={{ route('wiki.article.index', $theme->article->id) }} class="theme-card d-flex align-items-center justify-content-between" style="text-decoration: none; color: inherit;">
                         
@@ -17,20 +19,18 @@
                                 @method('PUT')
                                 <button type="submit" class="visibility-button" title="{{ $theme->visibility ? 'Скрыть тему' : 'Показать тему' }}">
                                     @if ($theme->visibility)
-                                        <!-- Иконка "Глазик" -->
-                                        <svg class="visibility-icon visible" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                            <path fill="#f4d03f" d="M12 9c-1.654 0-3 1.346-3 3s1.346 3 3 3 3-1.346 3-3-1.346-3-3-3m0-2c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5m0-2C6.477 4 2 8.477 2 13s4.477 9 10 9 10-4.477 10-9S17.523 4 12 4z"/>
+                                        <svg class="visibility-icon visible" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" fill="#f4d03f" clip-rule="evenodd" d="M8 13.078c4.418 0 8-5 8-5s-3.582-5-8-5-8 5-8 5 3.582 5 8 5zm0-2a3 3 0 100-6 3 3 0 000 6zm0-1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#000"></path>
                                         </svg>
                                     @else
-                                        <!-- Иконка "Перечёркнутый глазик" -->
-                                        <svg class="visibility-icon hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                            <path fill="#ec7063" d="M12 9c-1.654 0-3 1.346-3 3s1.346 3 3 3 3-1.346 3-3-1.346-3-3-3m0-2c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5m0-2C6.477 4 2 8.477 2 13s4.477 9 10 9 10-4.477 10-9S17.523 4 12 4zm-4 10h10v-2H8v2zm5-7l-5 5 1.414 1.414L11 13.828l-1.414-1.414L8 15l5-5-5-5-1.414 1.414L11 6.172l1.414 1.414L16 5l-5 5z"/>
+                                        <svg class="visibility-icon hidden" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" fill="#ec7063" d="M15.406 1.125l-3.229 3.229C14.47 5.834 16 7.969 16 7.969s-3.582 5-8 5c-1.244 0-2.422-.397-3.472-.966l-3.372 3.372-.707-.707 3.2-3.2C1.451 9.997 0 7.969 0 7.969s3.582-5 8-5c1.17 0 2.28.351 3.282.867L14.7.418l.707.707zM8 4.969c.61 0 1.179.182 1.653.496L8.546 6.57a1.5 1.5 0 00-1.943 1.943L5.495 9.622A3 3 0 018 4.968zm-.742 4.304l-1.08 1.08a3 3 0 004.205-4.205l-1.079 1.08a1.5 1.5 0 01-2.046 2.046z" fill="#000"></path>
                                         </svg>
                                     @endif
                                 </button>
                             </form>
                         @endif
-                        
+             
                         @if (Auth::user()->isEditor())
                             <form action="{{ route('wiki.destroyTheme', $theme->id) }}" method="POST" class="delete-form">
                                 @csrf
@@ -45,7 +45,18 @@
                         <div class="theme-card-image">
 
                             @if ($theme->images->isNotEmpty())
-                                <img src="{{ asset('storage/' . $theme->images->first()->path) }}" alt="Изображение" class="img-fluid">
+                                @if (Auth::user()->isEditor())
+                                    <form action={{ route('wiki.uploadImage', $theme->id) }} method="POST" enctype="multipart/form-data" class="image-upload-form">
+                                        @csrf
+                                        <label for="upload-image-{{ $theme->id }}" class="add-image-button">
+                                            <img src="{{ asset('storage/' . $theme->images->first()->path) }}" alt="Изображение" class="img-fluid">
+                                        </label>
+                                        <input type="file" id="upload-image-{{ $theme->id }}" name="image" class="hidden-input" accept="image/*">
+                                        <button type="submit" class="hidden-submit-button">Загрузить</button>
+                                    </form>
+                                @else
+                                    <img src="{{ asset('storage/' . $theme->images->first()->path) }}" alt="Изображение" class="img-fluid">
+                                @endif
                             @else
                                 @if (Auth::user()->isEditor())
                                     <!-- Кнопка добавления изображения -->
@@ -60,7 +71,7 @@
                         </div>
                     </a>
                 </div>
-
+                @endif
             @endforeach
         @endisset
     </div>
