@@ -36,27 +36,29 @@
             @if (Request::is('wiki/article/edit/content/*'))
                 @yield('article-content')
             @else
-                {{-- @if ($article->images->isNotEmpty())
-                <div class="image-frame">
-                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" style="object-fit: cover; width: 300px; height: 300px; padding-right: 5px;" align="left">
-                </div>
-                @endif --}}
-                    <p class="article-content-p">{!! nl2br($article->content) !!}</p>
+            
+                    <p>{!! $article->content_html !!}</p>
+                    
+                    <!-- Блок для галереи -->
+                    @if ($article->images->isNotEmpty())
+                    <div class="gallery-block mt-4">
+                        <h3 class="gallery-title">Галерея</h3>
+                        <hr class="divider">
+                        <div class="gallery-images d-flex flex-wrap gap-3">
+                            <!-- Пример вывода изображений -->
+                                @foreach ($article->images as $image)
+                                    <div class="gallery-image">
+                                        <img src="{{ asset('storage/' . $image->path) }}" alt="Изображение" class="img-fluid rounded">
+                                    </div>
+                                @endforeach
+                        </div>
+                    </div>
+                    @endif
             @endif
         </div>
-
-        <!-- Изображение справа -->
-        {{-- <div class="article-image mr-4">
-            @if ($article->images->isNotEmpty())
-                <div class="image-frame">
-                    <img src="{{ asset('storage/' . $article->images->first()->path) }}" alt="Изображение" class="img-fluid rounded" >
-                </div>
-            @else
-                <div class="no-image-placeholder">Нет изображения</div>
-            @endif
-        </div> --}}
     </div>
 </div>
 </div>
+
 
 @endsection

@@ -3,12 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Services\MarkdownService;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+    protected $markdownService;
+
+    public function __construct(MarkdownService $markdownService) {
+        $this->markdownService = $markdownService;
+    }
+
     public function index($id)  {
         $article = Article::with('images')->findOrFail($id);
+
+        $article->content_html = $this->markdownService->convertToHtml($article->content);
 
         return view('frontend.wiki.showArticle', compact('article'));
     }

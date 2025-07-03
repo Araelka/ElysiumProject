@@ -665,19 +665,55 @@ input[type="text"]:focus {
     font-size: 16px;
     line-height: 1.6;
     margin-top: 10px;
+    margin-right: 10px;
 }
 
 
-.article-content-p {
+.article-content p {
     margin-top: 0px;
     margin-bottom: 0px;
+
+    white-space: pre-wrap; /* Сохраняет пробелы и переносы строк */
+    word-wrap: break-word; /* Переносит длинные слова */
 }
 
-.article-content-p  img{
+
+
+.article-content  img{
     width: 300px;
     height: 300px;
     object-fit: cover;
+    float: left;
+    padding-right: 25px;
 }
+
+.article-content h2{
+    color: #f4d03f;
+    margin: 0px;
+    padding: 0px;
+}
+
+.article-content h3{
+    margin: 0px;
+    padding: 0px;
+    color: #f4d03f;
+}
+
+.article-content hr{
+    border: none;
+    border-top: 2px solid #f4d03f; /* Ярко-жёлтая линия */
+    margin: 0px;
+    padding: 10px 0px 0px 0px;
+}
+
+.article-content ol{
+    margin: 0px;
+}
+
+.article-content ul{
+    margin: 0px;
+}
+
 
 /* Страница статей */
 .article-container {
@@ -886,3 +922,60 @@ input[type="text"]:focus {
     transform: scale(1.1);
 }
 
+
+/* Блок галереи */
+.gallery-block {
+    margin-top: 20px;
+}
+
+/* Заголовок галереи */
+.gallery-title {
+    /* color: #f4d03f; */
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Горизонтальная черта */
+.gallery-divider {
+    border: none;
+    border-top: 2px solid #f4d03f; /* Ярко-жёлтая линия */
+    margin-bottom: 20px;
+}
+
+
+/* Контейнер изображений */
+.gallery-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Расстояние между изображениями */
+}
+
+/* Стиль для каждого изображения */
+.gallery-image {
+    width: calc(25% - 15px); /* 4 изображения в строке */
+    max-width: 150px; /* Максимальная ширина изображения */
+    height: auto;
+    position: relative;
+}
+
+.gallery-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень для глубины */
+    transition: transform 0.3s ease;
+}
+
+.gallery-image img:hover {
+    transform: scale(1.05); /* Легкое увеличение при наведении */
+}
+
+/* Сообщение об отсутствии изображений */
+.no-images {
+    color: #ec7063; /* Розовый текст */
+    font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
+}
