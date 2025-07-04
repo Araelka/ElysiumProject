@@ -18,9 +18,8 @@ class MarkdownService
     {
         $content = $markdown;
 
-        $content = preg_replace('/^\r\n/m', "  \n", $content);
+        $content = preg_replace('/<br>/m', "\n&nbsp;\n", $content);
 
-        // dd($content);
         return $this->parsedown->text($content);
     }
 }

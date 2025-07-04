@@ -10,9 +10,10 @@
         <button class="toolbar-button" onclick="insertMarkdown('*', '*', 'Курсив')"><i>I</i></button>
         <button class="toolbar-button" onclick="insertMarkdown('[', '](адрес)', 'Ссылка',  'Ссылка')">🔗 Ссылка</button>
         <button class="toolbar-button" onclick="insertMarkdown('![', '](адрес)',  'Альтернативный текст')">🖼️ Изображение</button>
-        <button class="toolbar-button" onclick="insertMarkdown('- ', '', 'Элемент списка')">📝 Список</button>
-        <button class="toolbar-button" onclick="insertMarkdown('1. ', '', 'Элемент нумерованного списка')">🔢 Нумерованный список</button>
+        <button class="toolbar-button" onclick="insertMarkdown('- ', '', 'Элемент списка\n')">📝 Список</button>
+        <button class="toolbar-button" onclick="insertMarkdown('1. ', '', 'Элемент нумерованного списка\n')">🔢 Нумерованный список</button>
         <button class="toolbar-button" onclick="insertMarkdown('---', ' ', '')">― Линия</button>
+        <button class="toolbar-button" onclick="insertMarkdown('<br>', '', '')">Пропуск</button>
     </div>
 
     <form action={{ route('wiki.editArticleContent', $article->id) }} method="POST">
@@ -23,7 +24,7 @@
     <div class="editor-body d-flex">
         <!-- Левая панель: Markdown-ввод -->
         <div class="editor-input flex-grow-1 mr-4">
-            <textarea id="markdown-input" name="content" class="markdown-textarea">{{ e($article->content) }}</textarea>
+            <textarea id="markdown-input" name="content" class="markdown-textarea">{{ $article->content }}</textarea>
         </div>
     </div>
 

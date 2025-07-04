@@ -45,10 +45,22 @@ class ArticleController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
+        $text = $request->input('content');
+
+        $text = preg_replace('/(?:\s*<(br|p)\s*\/?>\s*|\s+|)+$/i', '', $text);
+
+        $text = rtrim($text, " \t\n\r\0\x0B");
+
+
+        $text = preg_replace('/^\s+|\s+\r\n$/um', '', $text);
+
+        $text = rtrim($text, " \t\n\r\0\x0B");
+        
+
         $article = Article::findOrFail($id);
 
         $article->update([
-            'content' => $request->input('content')
+            'content' => $text
         ]);
 
         return redirect()->route('wiki.article.index', $article->id);
