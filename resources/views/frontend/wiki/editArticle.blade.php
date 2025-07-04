@@ -10,8 +10,8 @@
         <button class="toolbar-button" onclick="insertMarkdown('*', '*', 'Курсив')"><i>I</i></button>
         <button class="toolbar-button" onclick="insertMarkdown('[', '](адрес)', 'Ссылка',  'Ссылка')">🔗 Ссылка</button>
         <button class="toolbar-button" onclick="insertMarkdown('![', '](адрес)',  'Альтернативный текст')">🖼️ Изображение</button>
-        <button class="toolbar-button" onclick="insertMarkdown('- ', '', 'Элемент списка\n')">📝 Список</button>
-        <button class="toolbar-button" onclick="insertMarkdown('1. ', '', 'Элемент нумерованного списка\n')">🔢 Нумерованный список</button>
+        <button class="toolbar-button" onclick="insertMarkdown('- ', '\r\n', 'Элемент списка')">📝 Список</button>
+        <button class="toolbar-button" onclick="insertMarkdown('1. ', ' \n', 'Элемент нумерованного списка')">🔢 Нумерованный список</button>
         <button class="toolbar-button" onclick="insertMarkdown('---', ' ', '')">― Линия</button>
         <button class="toolbar-button" onclick="insertMarkdown('<br>', '', '')">Пропуск</button>
     </div>
