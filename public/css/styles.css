@@ -684,7 +684,6 @@ input[type="text"]:focus {
     height: 300px;
     object-fit: cover;
     float: left;
-    padding-right: 25px;
 }
 
 .article-content h2{

@@ -47,27 +47,17 @@ class ArticleController extends Controller
 
         $text = $request->input('content');
 
-        /* $text = preg_replace('/(?:\s*<(br|p)\s*\/?>\s*|\s+|)+$/i', '', $text);
+        $text = preg_replace('/(\r?\n){3,}/m', "\n\n", $text);
+
+        $text = preg_replace('/^[ \t]+(?=\S)/m', '', $text);
+        
+        $text = preg_replace('/(?:\s*<(br|p)\s*\/?>\s*|\s+|)+$/i', '', $text);
 
         $text = rtrim($text, " \t\n\r\0\x0B");
         
-        $text = preg_replace('/^\s+|\s+\r\n$/um', '', $text);
+        // $text = preg_replace('/^\s+|\s+\r\n$/um', '', $text);
 
-
-        
-        $text = rtrim($text, " \t\n\r\0\x0B"); */
-
-        $text = preg_replace('/(\r?\n){3,}/m', "\n\n", $text);
-
-        // $text = preg_replace('/^\s+|\s+$/m', '', $text);
-
-        // dd($text);
-
-        $text = preg_replace('/^[ \t]+(?=\S)/m', '', $text);
-
-        // dd($text);
-        
-
+        $text = rtrim($text, " \t\n\r\0\x0B"); 
 
         $article = Article::findOrFail($id);
 
