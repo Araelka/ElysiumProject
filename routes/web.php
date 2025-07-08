@@ -44,6 +44,8 @@ Route::middleware(['auth', 'editor'])->group(function(){
 
     Route::get('wiki/article/edit/content/{id}', [ArticleController::class, 'showEditArticleContent'])->name('wiki.showEditArticleContent');
     Route::put('wiki/article/edit/content/{id}', [ArticleController::class, 'editArticleContent'])->name('wiki.editArticleContent');
+
+    Route::post('wiki/article/edit/content/{id}', [ArticleController::class, 'uploadImage'])->name('wiki.uploadArticleImage');
 });
 
 Route::middleware(['auth', 'player'])->group(function(){

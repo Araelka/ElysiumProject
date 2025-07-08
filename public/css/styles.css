@@ -665,7 +665,7 @@ input[type="text"]:focus {
     font-size: 16px;
     line-height: 1.6;
     margin-top: 10px;
-    margin-right: 10px;
+    margin-right: 2px;
 }
 
 
@@ -680,10 +680,9 @@ input[type="text"]:focus {
 
 
 .article-content  img{
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    float: left;
+    max-width: 100%;
+    /* object-fit: cover; */
+    /* float: left; */
 }
 
 .article-content h2{
@@ -963,7 +962,6 @@ input[type="text"]:focus {
     height: auto;
     object-fit: cover;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень для глубины */
     transition: transform 0.3s ease;
 }
 
@@ -978,3 +976,24 @@ input[type="text"]:focus {
     text-align: center;
     margin-top: 10px;
 }
+
+#image-upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-content-img {
+    background-color: rgba(10, 14, 23, 0.9); /* Тот же фон, что и у основного контента */
+    color: #fff; /* Белый текст */
+    margin: 7% auto;
+    padding: 20px;
+    border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border-radius: 10px; /* Скругленные углы */
+    width: 30%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень */
+    position: relative;
+}
+
+

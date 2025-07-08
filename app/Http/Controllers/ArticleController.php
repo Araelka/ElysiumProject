@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleImage;
 use App\Services\MarkdownService;
 use Illuminate\Http\Request;
+use Log;
 
 class ArticleController extends Controller
 {
@@ -15,7 +17,7 @@ class ArticleController extends Controller
     }
 
     public function index($id)  {
-        $article = Article::with('images')->findOrFail($id);
+        $article = Article::findOrFail($id);
 
         $article->content_html = $this->markdownService->convertToHtml($article->content);
 
@@ -55,8 +57,6 @@ class ArticleController extends Controller
 
         $text = rtrim($text, " \t\n\r\0\x0B");
         
-        // $text = preg_replace('/^\s+|\s+\r\n$/um', '', $text);
-
         $text = rtrim($text, " \t\n\r\0\x0B"); 
 
         $article = Article::findOrFail($id);
@@ -66,5 +66,49 @@ class ArticleController extends Controller
         ]);
 
         return redirect()->route('wiki.article.index', $article->id);
+    }
+    
+    public function uploadImage (Request $request, $id) {
+        // dd($request);
+        if (!auth()->user()->isEditor()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $validated = $request->validate([
+            'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
+        ]);
+
+        
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+
+            $fileHash = md5_file($file->getPathname());
+
+            $existingFile = ArticleImage::where('file_hash', $fileHash )->first();
+
+
+            if ($existingFile){
+                $url = asset('storage/' . $existingFile->path);
+                return response()->json(['url' => $url]);
+            }
+
+            $fileContent = file_get_contents($file->getPathname());
+
+            $hash = md5($fileContent);
+
+            $fileName = $hash . '.' . $file->getClientOriginalExtension();
+
+            $imagePath = $file->store('images', 'public');
+
+            $image = new ArticleImage();
+            $image->path = $imagePath;
+            $image->file_hash = $hash;
+            $image->save();
+
+            $url = asset('storage/' . $imagePath);
+
+            return response()->json(['url' => $url]);
+        }
     }
 }

@@ -9,9 +9,8 @@ class ArticleImage extends Model
     protected $table = 'article_images';
     
     protected $fillable =[
-        'article_id',
         'path',
-        'description'
+        'file_hash'
     ];
 
     public function article(){

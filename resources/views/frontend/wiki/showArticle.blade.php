@@ -38,22 +38,7 @@
             @else
             
                     <p>{!! $article->content_html !!}</p>
-                    
-                    <!-- Блок для галереи -->
-                    @if ($article->images->isNotEmpty())
-                    <div class="gallery-block mt-4">
-                        <h3 class="gallery-title">Галерея</h3>
-                        <hr class="divider">
-                        <div class="gallery-images d-flex flex-wrap gap-3">
-                            <!-- Пример вывода изображений -->
-                                @foreach ($article->images as $image)
-                                    <div class="gallery-image">
-                                        <img src="{{ asset('storage/' . $image->path) }}" alt="Изображение" class="img-fluid rounded">
-                                    </div>
-                                @endforeach
-                        </div>
-                    </div>
-                    @endif
+                   
             @endif
         </div>
     </div>
