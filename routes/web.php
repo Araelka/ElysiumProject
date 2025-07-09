@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ThemeController;
@@ -25,6 +26,8 @@ Route::middleware('guest')->group(function(){
 
 Route::middleware('auth')->group(function(){
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('characters', [CharacterController::class, 'index'])->name('characters.index');
 });
 
 Route::middleware(['auth', 'editor'])->group(function(){

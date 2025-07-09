@@ -32,7 +32,7 @@
                     @if (Auth::user()->isAdmin())
                         <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
                     @endif
-                    <li><a href="" class="navbar__link">Персонажи</a></li>
+                    <li><a href={{ route('characters.index') }} class="navbar__link">Персонажи</a></li>
                     <li><a href="" class="navbar__link">Настройки</a></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
@@ -57,7 +57,7 @@
                         @if (Auth::user()->isAdmin())
                             <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
                         @endif
-                        <li><a href="" class="navbar__link">Персонажи</a></li>
+                        <li><a href={{ route('characters.index') }} class="navbar__link">Персонажи</a></li>
                         <li><a href="" class="navbar__link">Настройки</a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
