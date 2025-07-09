@@ -68,8 +68,8 @@
             <div class="form-group">
                 <label for="image-align">Выравнивание:</label>
                 <select id="image-align" name="align">
-                    <option value="left">Слева</option>
                     <option value="center">По центру</option>
+                    <option value="left">Слева</option>
                     <option value="right">Справа</option>
                 </select>
             </div>

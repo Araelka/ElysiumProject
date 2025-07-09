@@ -21,26 +21,40 @@ class MarkdownService
         $content = $markdown;
 
         $content = preg_replace_callback('/!\[(.*?)\]\((.*?)\)\{(.+?)\}/', function ($matches) {
+            static $idCounter = 0; 
+
             $altText = $matches[1];
             $imageSrc = $matches[2];
             $params = $matches[3];
 
-            $this->tempParams[$imageSrc] = $params;
+            $uniqueId = 'img-' . $idCounter++;
+            $this->tempParams[$uniqueId] = [
+                'src' => $imageSrc,
+                'params' => $params,
+            ];
 
-            return "![{$altText}]({$imageSrc})";
+            $imagesWithId = $imageSrc . '?id=' . $uniqueId;
+
+            return "![{$altText}]({$imagesWithId})";
         }, $markdown);
-
-        // dd($this->tempParams);
 
         $content = preg_replace('/<br>/m', "\n&nbsp;\n", $content);
 
         $content = $this->parsedown->text($content);
 
         $content = preg_replace_callback('/<img\s+src="([^"]+)"\s+alt="([^"]+)"\s*\/?>/', function ($matches) {
-            $imageSrc = htmlspecialchars_decode($matches[1], ENT_QUOTES);
+            $fullSrc = htmlspecialchars_decode($matches[1], ENT_QUOTES);
             $altText = htmlspecialchars_decode($matches[2], ENT_QUOTES);
 
-            $params = $this->tempParams[$imageSrc] ?? '';
+            $query = parse_url($fullSrc, PHP_URL_QUERY);
+            parse_str($query, $queryParams);
+            $uniqueId = $queryParams['id'] ?? null;
+
+            if (!$uniqueId || !isset($this->tempParams[$uniqueId])) {
+                return "<img src=\"{$fullSrc}\" alt=\"{$altText}\">";
+            }
+
+            $params = $this->tempParams[$uniqueId]['params'] ?? '';
             $attributes = [];
             if ($params) {
                 preg_match_all('/(\w+)=([\'"]?)([^\'"\s]+)\2/', $params, $paramMatches, PREG_SET_ORDER);
@@ -52,14 +66,22 @@ class MarkdownService
             $attrString = '';
             foreach ($attributes as $key => $value) {
                 if ($key === 'align') {
-                    $attrString .= " style=\"float: $value;\"";
+                    $padding = '';
+                    if ($value === 'left') {
+                        $padding = 'padding-right: 10px';
+                    }
+                    else if ($value === 'right') {
+                        $padding = 'padding-left: 10px';
+                    }
+                    $attrString .= " style=\"float: $value; $padding\"";
                 } else {
                     $attrString .= " $key=\"$value\"";
                 }
             }
 
-            return "<img src=\"$imageSrc\" alt=\"$altText\"$attrString>";
+            return "<img src=\"{$fullSrc}\" alt=\"{$altText}\"$attrString>";
         }, $content);
+   
 
         return $content;
     }

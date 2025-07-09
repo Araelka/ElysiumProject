@@ -15,12 +15,17 @@ class ThemeController extends Controller
     public function index(Request $request) {
 
         $searchTerm = $request->query('search');
-        
+    
+
         $query = Theme::when($searchTerm, function ($query) use ($searchTerm) {
-            $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%'])
+            ->orWhereHas('article', function ($query) use ($searchTerm) {
+                $query->whereRaw('LOWER(content) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+            });
         })->with(['images' => function ($query) {
            $query->orderBy('id', 'asc')->take(1);
        }]);
+
 
 
         $themes = $query->paginate(20);
@@ -144,14 +149,6 @@ class ThemeController extends Controller
             }
         }
 
-        if ($theme->article->images) {
-            foreach ($theme->article->images as $image) {
-                if (Storage::disk('public')->exists($image->path)) {
-                    Storage::disk('public')->delete($image->path);
-                }
-                $image->delete();
-            }
-        }
         
 
         if ($theme->article) {

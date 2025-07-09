@@ -6,13 +6,13 @@
     <div class="theme-grid">
         @isset($themes)
             @foreach ($themes as $theme)
-                @if (!Auth::user()->isEditor() && !$theme->visibility)
+                @if (Auth::check() && !Auth::user()->isEditor() && !$theme->visibility)
                     @continue
                 @else
                 <div class="theme-item">
                     <a href={{ route('wiki.article.index', $theme->article->id) }} class="theme-card d-flex align-items-center justify-content-between" style="text-decoration: none; color: inherit;">
                         
-                        @if (Auth::user()->isEditor())
+                        @if (Auth::check() && Auth::user()->isEditor())
                              <!-- Иконка видимости -->
                             <form action={{ route('wiki.toggleVisibility', $theme->id) }} method="POST" class="visibility-form">
                                 @csrf
@@ -31,7 +31,7 @@
                             </form>
                         @endif
              
-                        @if (Auth::user()->isEditor())
+                        @if (Auth::check() && Auth::user()->isEditor())
                             <form action="{{ route('wiki.destroyTheme', $theme->id) }}" method="POST" class="delete-form">
                                 @csrf
                                 @method('DELETE')
@@ -45,7 +45,7 @@
                         <div class="theme-card-image">
 
                             @if ($theme->images->isNotEmpty())
-                                @if (Auth::user()->isEditor())
+                                @if (Auth::check() && Auth::user()->isEditor())
                                     <form action={{ route('wiki.uploadImage', $theme->id) }} method="POST" enctype="multipart/form-data" class="image-upload-form">
                                         @csrf
                                         <label for="upload-image-{{ $theme->id }}" class="add-image-button">
@@ -58,7 +58,7 @@
                                     <img src="{{ asset('storage/' . $theme->images->first()->path) }}" alt="Изображение" class="img-fluid">
                                 @endif
                             @else
-                                @if (Auth::user()->isEditor())
+                                @if (Auth::check() && Auth::user()->isEditor())
                                     <!-- Кнопка добавления изображения -->
                                     <form action={{ route('wiki.uploadImage', $theme->id) }} method="POST" enctype="multipart/form-data" class="image-upload-form">
                                         @csrf

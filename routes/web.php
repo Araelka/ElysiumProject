@@ -10,41 +10,34 @@ use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/', [PostController::class, 'index'])->name('homePage');
+
+Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
+Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
+
 Route::middleware('guest')->group(function(){
     Route::get('register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [RegisterController::class, 'register']);
 
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login']);
-
-    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 });
 
 Route::middleware('auth')->group(function(){
-    Route::get('/', [PostController::class, 'index'])->name('homePage');
-
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
-    Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
-    Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
 });
 
 Route::middleware(['auth', 'editor'])->group(function(){
     Route::get('wiki/theme/create', [ThemeController::class, 'showCreateThemeForm'])->name('wiki.showCreateThemeForm');
     Route::post('wiki/theme/create', [ThemeController::class, 'createTheme'])->name('wiki.createTheme');
-    
     Route::delete('wiki/theme/{id}/destroy', [ThemeController::class, 'destroy'])->name('wiki.destroyTheme');
-
     Route::post('wiki/theme/upload-image/{id}', [ThemeController::class,'uploadImage'])->name('wiki.uploadImage');
-
     Route::put('wiki/theme/toggle-visibility/{id}', [ThemeController::class, 'toggleVisibility'])->name('wiki.toggleVisibility');
 
     Route::get('wiki/article/edit/title/{id}', [ArticleController::class, 'showEditTitleForm'])->name('wiki.showEditArticleTitle');
     Route::put('wiki/article/edit/title/{id}', [ThemeController::class, 'editTheme'])->name('wiki.editArticleTitle');
-
     Route::get('wiki/article/edit/content/{id}', [ArticleController::class, 'showEditArticleContent'])->name('wiki.showEditArticleContent');
     Route::put('wiki/article/edit/content/{id}', [ArticleController::class, 'editArticleContent'])->name('wiki.editArticleContent');
-
     Route::post('wiki/article/edit/content/{id}', [ArticleController::class, 'uploadImage'])->name('wiki.uploadArticleImage');
 });
 

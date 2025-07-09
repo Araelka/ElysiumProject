@@ -10,7 +10,7 @@
                  @if (Request::is('wiki'))
                 <div class="theme-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="theme-selection d-flex align-items-center">
-                        @if (Auth::user()->isEditor())
+                        @if (Auth::check() && Auth::user()->isEditor())
                             <ul class="theme-list d-flex">
                             <li><a href={{ route('wiki.showCreateThemeForm') }} class="theme-link">Создать</a></li>
                             </ul>

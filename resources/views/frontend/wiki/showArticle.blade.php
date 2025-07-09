@@ -14,7 +14,7 @@
     <h2 class="article-title mb-0">{{ $article->theme->name }}</h2>
 
     <!-- Кнопка редактирования названия -->
-    @if (Auth::user()->isEditor())
+    @if (Auth::check() && Auth::user()->isEditor())
         <a href={{ route('wiki.showEditArticleTitle', $article->id) }} class="edit-title-button">✎</a>
     @endif
     @endif
@@ -30,7 +30,7 @@
             <!-- Содержание статьи -->
         <div class="article-content flex-grow-1">
             <!-- Кнопка редактирования статьи -->
-            @if (Auth::user()->isEditor() && !Request::is('wiki/article/edit/content/*')) 
+            @if (Auth::check() && Auth::user()->isEditor() && !Request::is('wiki/article/edit/content/*')) 
                 <a href={{ route('wiki.showEditArticleContent', $article->id) }} class="edit-content-button">Редактировать</a>
             @endif
             @if (Request::is('wiki/article/edit/content/*'))

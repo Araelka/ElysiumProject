@@ -28,7 +28,7 @@ class ArticleController extends Controller
         if (!auth()->user()->isEditor()){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
-        $article = Article::with('images')->findOrFail($id);
+        $article = Article::findOrFail($id);
 
         return view('frontend.wiki.editArticleTitle', compact('article'));
     }
