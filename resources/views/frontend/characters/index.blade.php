@@ -1,5 +1,6 @@
 @extends('frontend.layout.layout')
 @section('title', 'Персонажи')
+<link rel="stylesheet" href="{{ asset('css/character.css') }}">
 
 
 
@@ -25,12 +26,9 @@
                         <div class="form-layout">
                             <!-- Левый блок: Фото -->
                             <div class="photo-section">
-                                <div class="image-preview">
-                                    <img id="preview-image" src="{{ asset('images/placeholder.png') }}" alt="Фото персонажа" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                <div class="image-preview" onclick="document.getElementById('photo-upload').click()">
+                                    <img id="preview-image" src="#" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
                                 </div>
-                                <label for="photo-upload" class="custom-file-upload mt-2">
-                                    Загрузить фото
-                                </label>
                                 <input type="file" id="photo-upload" name="photo" class="hidden-input" accept="image/*" onchange="previewFile(this)">
                             </div>
 

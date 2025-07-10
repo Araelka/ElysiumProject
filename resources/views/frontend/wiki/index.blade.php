@@ -1,5 +1,6 @@
 @extends('frontend.layout.layout')
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/wiki.css') }}">
 @section('title', 'Вики')
 
 @section('content')
