@@ -358,6 +358,12 @@
     font-weight: bold;
 }
 
+.form-group label::-webkit-outer-spin-button,
+.form-group label::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
 .form-group input {
     width: 100%;
     padding: 10px;
@@ -368,6 +374,13 @@
     color: #fff;
     transition: border-color 0.3s ease;
 }
+
+.form-group input::-webkit-outer-spin-button,
+.form-group input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
 
 .form-group select {
     width: 100%;

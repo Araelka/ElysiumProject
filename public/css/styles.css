@@ -118,8 +118,8 @@
 
 .post {
     margin-bottom: 20px;
-    margin-left: 5px;
-    margin-right: 5px;
+    /* margin-left: 5px; */
+    margin-right: 2px;
     padding: 10px;
     border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
     border-radius: 5px;
@@ -1108,9 +1108,8 @@ textarea.form-control {
 
 input.form-control::-webkit-outer-spin-button,
 input.form-control::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
     -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    margin: 0; 
 }
 
 textarea.form-control {
