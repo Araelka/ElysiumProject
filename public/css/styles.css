@@ -1,5 +1,6 @@
-/* Стили для главной страницы */
-.home-page {
+/* ОСНОВЫНЕ СТИЛИ СТРАНИЦ */
+/* СТРАНИЦА С ДВУМЯ БЛОКАМИ */
+.double-page {
     min-height: calc(100vh - 60px); /* Вычитаем высоту меню */
     display: flex;
     justify-content: center;
@@ -53,27 +54,6 @@
     border-radius: 5px; /* Закругление полосы прокрутки */
 }
 
-.topics-list {
-    list-style: none;
-    padding: 0;
-}
-
-
-.topic-link {
-    text-decoration: none;
-    color: #f4d03f; /* Ярко-жёлтый текст */
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 5px;
-    display: block;
-    padding: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.topic-link:hover {
-    background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
-    color: #1a1a40; /* Тёмный текст */
-}
 
 .content {
     background-color: rgba(10, 14, 23, 0.9);
@@ -88,190 +68,200 @@
     max-height: 90%; /* Ограничиваем максимальную высоту */
 }
 
-.posts {
-    height: 100%; /* Занимает всю высоту блока */
-    overflow-y: auto; /* Добавляем вертикальную прокрутку */
-}
-
-.posts::-webkit-scrollbar {
-    width: 5px; /* Ширина полосы прокрутки */
-    border-radius: 5px; 
-}
-
-.posts::-webkit-scrollbar-track {
-    background: #00000000; /* Фон полосы прокрутки */
-    border-radius: 5px; 
-}
-
-.posts::-webkit-scrollbar-thumb {
-    background-color: #f4d03f; /* Цвет полосы прокрутки */
-    border-radius: 5px; /* Закругление полосы прокрутки */
-}
-
-.post-header {
+/* СТРАНИЦА С ОДНИМ БЛОГОМ */
+.main-page {
+    min-height: calc(100vh - 60px); /* Вычитаем высоту меню */
     display: flex;
-    justify-content: space-between; /* Размещаем заголовок и кнопку по краям */
-    align-items: center; /* Выравниваем элементы по центру */
-    margin-bottom: 0px; /* Отступ между заголовком и содержимым */
+    justify-content: center;
+    align-items: stretch; /* Растягиваем блоки на всю высоту */
+    overflow: hidden; /* Убираем общую прокрутку страницы */
 }
 
+.main-content {
+    background-color: rgba(10, 14, 23, 0.9);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%; /* Занимает всю ширину */
+    display: flex;
+    flex-direction: column;
+    justify-content: start; /* Выравнивание содержимого в начале блока */
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+    max-height: 90%; /* Ограничиваем максимальную высоту */
+}
 
-.post {
-    margin-bottom: 20px;
-    /* margin-left: 5px; */
-    margin-right: 2px;
+/* СТИЛЬ ПОИСКА */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+     height: 100%;
+}
+
+#search-form {
+    display: flex;
+    align-items: center; /* Выравнивание элементов формы */
+    gap: 10px; /* Расстояние между элементами формы */
+    margin: auto;
+}
+
+.search-input {
     padding: 10px;
-    border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Добавляем тень */
-}
-
-
-.post h4 {
-    margin-top: 0;
-    color: #f4d03f; /* Ярко-жёлтый заголовок */
-}
-
-.post-header h4 {
-    margin: 0; /* Убираем стандартные отступы у заголовка */
-    flex-grow: 1; /* Позволяет заголовку занимать доступное пространство */
-    color: #f4d03f; /* Ярко-жёлтый заголовок */
-}
-
-.post p {
-    color: #fff; /* Белый текст */
-}
-
-.post small {
-    color: #ec7063; /* Розовый цвет для автора */
-    font-size: 14px;
-}
-
-/* Стили для формы публикации постов */
-.post-form {
-    margin-top: 20px; /* Отступ сверху */
-}
-
-.post-content {
-    white-space: pre-wrap; /* Сохраняет пробелы и переносы строк */
-    word-wrap: break-word; /* Переносит длинные слова */
-}
-
-.post-form__group {
-    text-align: left;
-}
-
-.post-form__label {
     font-size: 16px;
-    color: #f4d03f; /* Ярко-жёлтый текст */
-    margin-bottom: 5px;
-}
-
-.post-form__input {
-    width: 100%;
-    min-height: 120px; /* Минимальная высота поля ввода */
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border: 2px solid #f4d03f;
     border-radius: 5px;
     background-color: transparent;
     color: #fff;
     transition: border-color 0.3s ease;
-    box-sizing: border-box;
-    resize: none;
-
-    overflow-y: auto; /* Добавляем вертикальную прокрутку */
 }
 
-.post-form__input::-webkit-scrollbar {
-    width: 5px; /* Ширина полосы прокрутки */
-    border-radius: 5px; 
-}
-
-.post-form__input::-webkit-scrollbar-track {
-    background: #00000000; /* Фон полосы прокрутки */
-    border-radius: 5px; 
-}
-
-.post-form__input::-webkit-scrollbar-thumb {
-    background-color: #f4d03f; /* Цвет полосы прокрутки */
-    border-radius: 5px; /* Закругление полосы прокрутки */
-}
-
-.post-form__input:focus {
+.search-input:focus {
     border-color: #ec7063; /* Розовая рамка при фокусе */
     outline: none;
 }
 
-.post-form__button {
+.search-input-wrapper {
+    position: relative;
     display: inline-block;
-    width: 100%;
-    padding: 12px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #1a1a40;
-    background-color: #f4d03f; /* Ярко-жёлтый фон */
+}
+
+.clear-search-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
     border: none;
+    color: #f4d03f;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-search-button:hover {
+    color: #ec7063;
+}
+
+.search-button {
+    background-color: f4d03f;
+    color: #1a1a40;
+    padding: 10px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #f4d03f00;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+
 }
 
-.post-form__button:hover {
-    background-color: #ec7063; /* Розовый фон при наведении */
-    transform: scale(1.02);
+.search-button:hover {
+    background-color: #ec7063;
 }
 
-.topic-link.active {
-    background-color: #f4d03f; /* Ярко-жёлтый фон */
-    color: #1a1a40; /* Тёмный текст */
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000; /* Высокий z-index для отображения поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8); /* Темный фон с прозрачностью */
+}
+
+.modal-content {
+    background-color: rgba(10, 14, 23, 0.9); /* Тот же фон, что и у основного контента */
+    color: #fff; /* Белый текст */
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border-radius: 10px; /* Скругленные углы */
+    width: 30%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень */
+    position: relative;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 1.5; /* Улучшим читаемость текста */
+}
+
+.close {
+    color: #f4d03f; /* Ярко-жёлтый цвет */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; /* Позиционируем крестик вне основного потока документа */
+    top: 0px; /* Поднимаем крестик на строчку выше */
+    right: 10px; /* Располагаем крестик справа */
+}
+
+.close:hover,
+.close:focus {
+    color: #ec7063; /* Розовый цвет при наведении */
+    text-decoration: none;
+}
+
+/* Стили для формы */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #f4d03f;
     font-weight: bold;
 }
 
-.post-header button {
-    background: none;
-    border: none;
-    color: #ec7063; /* Розовый цвет */
-    font-size: 24px;
-    cursor: pointer;
-    transition: color 0.3s ease;
+.form-group label::-webkit-outer-spin-button,
+.form-group label::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
 }
 
-.post-header button:hover {
-    color: #f4d03f; /* Ярко-жёлтый при наведении */
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
 }
 
-.post-header {
-    display: flex;
-    justify-content: space-between; /* Размещаем заголовок и кнопки по краям */
-    align-items: center; /* Выравниваем элементы по центру */
-    margin-bottom: 10px; /* Отступ между заголовком и содержимым */
-}
-
-.edit-post-button {
-    background: none;
-    border: none;
-    color: #f4d03f; /* Розовый цвет */
-    font-size: 18px;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    margin-right: 5px; /* Отступ справа от кнопки редактирования до кнопки удаления */
-}
-
-.edit-post-button:hover {
-    color: #ec7063; /* Ярко-жёлтый при наведении */
+.form-group input::-webkit-outer-spin-button,
+.form-group input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; 
 }
 
 
-/* Стиль для ошибок */
-.form__error {
-    display: block;
-    margin-top: 5px;
-    font-size: 14px;
-    color: #ec7063; /* Красный цвет текста */
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent; /* Темный фон */
+    color: #fff; /* Светлый текст */
+    transition: border-color 0.3s ease;
 }
 
+.form-group input:focus {
+    border-color: #ec7063;
+    outline: none;
+}
 
-
-
+.form-group select:focus {
+    background-color: rgba(10, 14, 23, 0.7); 
+    border-color: #ec7063;
+    outline: none;
+}

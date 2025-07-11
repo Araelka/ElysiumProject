@@ -1,13 +1,12 @@
 @extends('frontend.layout.layout')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 <link rel="stylesheet" href="{{ asset('css/wiki.css') }}">
 @section('title', 'Вики')
 
 @section('content')
-<div class="admin-page">
+<div class="main-page">
     <div class="container d-flex justify-content-center align-items-stretch"> 
         <div class="row w-100 h-100"> 
-            <div class="col-md-12 admin-content d-flex flex-column justify-content-start">
+            <div class="col-md-12 main-content d-flex flex-column justify-content-start">
                  @if (Request::is('wiki'))
                 <div class="theme-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="theme-selection d-flex align-items-center">

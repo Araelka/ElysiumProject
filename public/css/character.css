@@ -3,6 +3,7 @@
     margin-bottom: 20px;
 }
 
+
 /* Контейнер для фото и формы */
 .form-layout {
     display: flex; /* Размещаем фото и форму в строку */
@@ -13,15 +14,16 @@
 /* Стили для фото-секции */
 .photo-section {
     flex: 0 0 200px; /* Фиксированная ширина */
+    height: 286px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 }
 
 .image-preview {
-    width: 150px; 
-    height: 150px; 
+    width: 100%; 
+    height: 100%; 
     border: 2px dashed #f4d03f;
     border-radius: 10px;
     background-color: rgba(10, 14, 23, 0.7);
@@ -43,6 +45,14 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.placeholder {
+    color: #f4d03f;
+    font-size: 16px;
+    opacity: 0.7;
+    pointer-events: none;
+    text-align: center;
 }
 
 
@@ -81,17 +91,12 @@
     gap: 5px;
 }
 
-.form-label {
-    color: #f4d03f;
-    font-size: 16px;
-    font-weight: bold;
-}
 
 
 
-input.form-control,
-select.form-control,
-textarea.form-control {
+.form-control input,
+.form-control select,
+.form-control textarea {
     box-sizing: border-box;
     width: 100%;
     padding: 10px;
@@ -103,32 +108,32 @@ textarea.form-control {
     transition: border-color 0.3s ease;
 }
 
-input.form-control::-webkit-outer-spin-button,
-input.form-control::-webkit-inner-spin-button {
+.form-control input::-webkit-outer-spin-button,
+.form-control input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0; 
 }
 
-textarea.form-control {
+.form-control textarea {
     resize: none;
     height: 300px;
 }
 
-select.form-control:focus {
+.form-control select:focus {
     background-color: rgba(10, 14, 23, 0.7);
     border-color: #ec7063;
     outline: none;
 }
 
-input.form-control:focus,
-select.form-control:focus,
-textarea.form-control:focus {
+.form-control input:focus,
+.form-control select:focus,
+.form-control textarea:focus {
     border-color: #ec7063;
     outline: none;
 }
 
-.textarea.form-control  {
-    resize: vertical;
+.form-control textarea  {
+    resize: none;
     min-height: 100px;
 }
 

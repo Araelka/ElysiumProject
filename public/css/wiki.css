@@ -103,7 +103,8 @@
     margin-top: auto; /* Если внутри flex */
 }
 
-/* Стили для формы */
+
+
 .form-group-flex {
     display: flex;
     gap: 20px; /* Расстояние между левой и правой частью */

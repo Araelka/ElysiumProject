@@ -3,10 +3,10 @@
 @section('title', 'Админ-панель')
 
 @section('content')
-<div class="admin-page">
+<div class="main-page">
     <div class="container d-flex justify-content-center align-items-stretch"> 
         <div class="row w-100 h-100"> 
-            <div class="col-md-12 admin-content d-flex flex-column justify-content-start">
+            <div class="col-md-12 main-content d-flex flex-column justify-content-start">
                 <!-- Горизонтальный выбор таблицы и строка поиска -->
                 <div class="table-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="table-selection d-flex align-items-center">
