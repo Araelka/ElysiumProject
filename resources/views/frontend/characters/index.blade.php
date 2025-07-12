@@ -60,8 +60,18 @@
 
                                 <div class="form-control">
                                     <label for="nationality">Национальность:</label>
-                                    <input type="text" id="nationality" name="nationality"  placeholder="Введите национальность" required>
+                                    <select id="nationality" name="nationality"  required>
+                                        <option value="Graad">Граад</option>
+                                        <option value="Iilmaraa">Иилмараа</option>
+                                        <option value="Insulinde">Инсулинда</option>
+                                        <option value="Katla">Катла</option>
+                                        <option value="Mundi">Мунди</option>
+                                        <option value="Samara">Самара</option>
+                                        <option value="Semenine">Семенин</option>
+                                        <option value="Seol">Сеол</option>
+                                    </select>
                                 </div>
+
                             </div>
                         </div>
 
