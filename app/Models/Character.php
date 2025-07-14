@@ -21,4 +21,12 @@ class Character extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function attribute() {
+        return $this->hasMany(CharacterAttribute::class);
+    }
+
+    public function skills(){
+        return $this->hasMany(Skill::class);
+    }
 }
