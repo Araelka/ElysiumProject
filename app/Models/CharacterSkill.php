@@ -22,4 +22,20 @@ class CharacterSkill extends Model
     public function skill() {
         return $this->belongsTo(Skill::class);
     }
+
+    public function getMaxLevelAttribute(){
+        $attributLevel = $this->character()->attributes()
+            ->where('attribute_id', $this->skill->attribute_id)
+            ->value('level');
+
+        return 2 * $attributLevel;
+    }
+
+    public function getLevelAttribute(){
+        $attributLevel = $this->character()->attributes()
+            ->where('attribute_id', $this->skill->attribute_id)
+            ->value('level');
+
+        return min($attributLevel + $this->poins, 2 * $attributLevel);
+    }
 }

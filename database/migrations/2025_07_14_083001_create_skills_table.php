@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('attribute_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('max_point')->default(6);
             $table->string('image_path')->nullable();
             $table->timestamps();
         });

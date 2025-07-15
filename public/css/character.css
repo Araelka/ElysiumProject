@@ -1,8 +1,21 @@
 .character-form-container {
     padding: 20px 0px;
     margin-bottom: 20px;
+    overflow-y: auto;
 }
 
+.character-form-container::-webkit-scrollbar {
+    width: 2px; /* Ширина полосы прокрутки */
+}
+
+.character-form-container::-webkit-scrollbar-track {
+    background: #1a1a40; /* Фон полосы прокрутки */
+}
+
+.character-form-container::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
 
 /* Контейнер для фото и формы */
 .form-layout {
@@ -152,4 +165,67 @@
 
 .btn-primary:hover {
     background-color: #ec7063;
+}
+
+/* Стили для формы */
+.attribute, .skill {
+    border: 2px solid #f4d03f;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.skill-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.btn-secondary {
+    background-color: #f4d03f;
+    color: #1a1a40;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #ec7063;
+}
+
+.attributes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.attribute {
+    width: 150px;
+    height: 200px;
+}
+
+.slills{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.skill {
+    display: flex;
+    align-items: flex-end;
+    width: 150px;
+    height: 200px;
+}
+
+.skill-content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.skill-content-name {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

@@ -10,6 +10,7 @@ class Skill extends Model
     use HasFactory;
 
     protected $fillable = [
+        'attribute_id',
         'name',
         'description',
         'image_path'

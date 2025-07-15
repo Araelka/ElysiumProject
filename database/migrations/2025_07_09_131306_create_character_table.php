@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('age');
             $table->string('species');
             $table->text('biography');
+
+            $table->integer('total_points')->default(6);
             $table->timestamps();
         });
     }

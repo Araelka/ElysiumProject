@@ -19,7 +19,7 @@
             <!-- Основной контент (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
                 <div class="character-form-container">
-                    <form action="" method="POST"  enctype="multipart/form-data">
+                    <form action="" method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
                         @csrf
 
                         <!-- Блок: Фото и форма -->
@@ -80,6 +80,39 @@
                             <label for="biography">Биография:</label>
                             <textarea id="biography" name="biography"  rows="6" placeholder="Расскажите о персонаже..."></textarea>
                         </div>
+
+                        <div class="form-control" style="margin-top: 15px">
+                            <div class="attributes">
+                                @foreach ($attributes as $attribute)
+
+                                <div class="attribute mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>{{ $attribute->name }}</span>
+                                            <div>
+                                                <button type="button" class="btn btn-sm btn-secondary" onclick="decreaseAttribute('{{ $attribute->id }}')">-</button>
+                                                <span id="attribute-value-{{ $attribute->id }}">{{ $attribute->min_value }}</span>
+                                                <button type="button" class="btn btn-sm btn-secondary" onclick="increaseAttribute('{{ $attribute->id }}')">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <div class="slills">
+                                    @foreach ($attribute->skills as $skill)
+                                        <div class="skill">
+                                            <div class="skill-content">
+                                                <div class="d-flex justify-content-between align-items-center space-between">
+                                                    <div class="skill-content-name">
+                                                        <span>{{ $skill->name }}</span>
+                                                        <span id="attribute-value-{{ $attribute->id }}">{{ $attribute->min_value}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                                @endforeach
+                            </div>
 
                         <!-- Кнопка отправки формы -->
                         <div class="mt-4">

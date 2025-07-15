@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attribute_id')->constrained()->onDelete('cascade');
             $table->foreignId('character_id')->constrained()->onDelete('cascade');
-            $table->integer('points')->default(1);
+            $table->integer('points')->default(0);
+            $table->integer('level')->storedAs('points + 1');
             $table->timestamps();
         });
     }

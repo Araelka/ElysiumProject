@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
             'role_id' => 1
         ]);
 
+        $this->call(AttributeTableSeeder::class);
+        $this->call(SkillTableSeeder::class);
+
         // User::factory(20)->create();
 
     }

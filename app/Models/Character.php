@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use function PHPUnit\Framework\returnArgument;
 
 class Character extends Model
 {
@@ -15,18 +16,26 @@ class Character extends Model
         'gender',
         'age',
         'species',
-        'biography'
+        'biography',
     ];
 
     public function user(){
         return $this->belongsTo(User::class);
     }
 
-    public function attribute() {
+    public function attributes() {
         return $this->hasMany(CharacterAttribute::class);
     }
 
     public function skills(){
         return $this->hasMany(Skill::class);
+    }
+
+    public function getTotalSpentPoints(){
+        return $this->attributes->sum('points') + $this->skills->sum('points');
+    }
+
+    public function getAvailablePoints(){
+        return $this->total_points - $this->getTotalSpentPoints();
     }
 }
