@@ -14,11 +14,16 @@ return new class extends Migration
         Schema::create('characters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('firstName');
+            $table->string('secondName');
             $table->string('gender');
             $table->integer('age');
-            $table->string('species');
-            $table->text('biography');
+            $table->string('nationality');
+            $table->string('residentialAddress');
+            $table->string('activity');
+            $table->text('personality')->nullable();
+            $table->text('biography')->nullable();
+            $table->text('description')->nullable();
 
             $table->integer('total_points')->default(6);
             $table->timestamps();

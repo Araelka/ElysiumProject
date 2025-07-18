@@ -12,11 +12,16 @@ class Character extends Model
 
     protected $fillable = [
         'user_id',
-        'name',
+        'firstName',
+        'secondName',
         'gender',
         'age',
-        'species',
+        'nationality',
+        'residentialAddress',
+        'activity',
+        'personality',
         'biography',
+        'description'
     ];
 
     public function user(){
