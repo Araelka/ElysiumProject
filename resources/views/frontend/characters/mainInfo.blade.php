@@ -4,6 +4,7 @@
     <form action={{ route("characters.create") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
         @csrf
 
+    
         <!-- Блок: Фото и форма -->
         <div class="form-layout">
             <!-- Левый блок: Фото -->

@@ -4,7 +4,7 @@
 <form action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
 @csrf
 <div class="form-control" style="margin-top: 15px">
-    <label id={{ $characterId }}></label>
+    <input type="hidden" name="characterId" value="{{ $characterId }}">
     <div class="attributes">
         <div >
                 <div>
@@ -24,6 +24,7 @@
                     <div>
                         <button type="button" class="btn btn-sm btn-secondary" onclick="decreaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;"><</button>
                         <span id="attribute-value-{{ $attribute->id }}">{{ $attribute->min_value }}</span>
+                        <input type="hidden"  name="attributes[{{ $attribute->id }}]" id="hidden-attribute-value-{{ $attribute->id }}" value="{{ $attribute->min_value-1 }}">
                         <button type="button" class="btn btn-sm btn-secondary" onclick="increaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;">></button>
                     </div>
                 </div>
@@ -35,6 +36,7 @@
                     <div class="skill-content">
                                 <div class="skill-value-content">
                                     <span data-attribute-id="{{ $attribute->id }}" id="skill-value-{{ $skill->id }}"  class="skill-value">{{ $attribute->min_value}}</span>
+                                    <input type="hidden" name="skills[{{ $skill->id }}]"  value="0">
                                 </div>
 
                                 <div style="text-align: center;">
@@ -49,9 +51,10 @@
     </div>
 </div>
 
-<div class="mt-4" style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary">Далее</button>
+        <div class="mt-4" style="display: flex; justify-content: flex-end;">
+            <button type="submit" id="submit-button" class="btn btn-primary">Далее</button>
         </div>
+    
 </form>
                     
 
@@ -82,12 +85,14 @@
 
     function increaseAttribute(attributeId) {
     const attributeValue = document.getElementById(`attribute-value-${attributeId}`);
+    const hiddenAttributeValue = document.getElementById(`hidden-attribute-value-${attributeId}`);
     const skillValues = document.querySelectorAll(`[data-attribute-id="${attributeId}"]`);
     let currentValue = parseInt(attributeValue.textContent);
 
     const availablePoints = parseInt(document.getElementById('available-points').textContent);
     if (currentValue < 6 && availablePoints > 0) {
         attributeValue.textContent = currentValue + 1;
+        hiddenAttributeValue.value= currentValue;
         
         skillValues.forEach(skillValue => {
             const currentSkillValue = parseInt(skillValue.textContent);
@@ -102,11 +107,14 @@
 
     function decreaseAttribute(attributeId) {
         const attributeValue = document.getElementById(`attribute-value-${attributeId}`);
+        const hiddenAttributeValue = document.getElementById(`hidden-attribute-value-${attributeId}`);
         const skillValues = document.querySelectorAll(`[data-attribute-id="${attributeId}"]`);
         let currentValue = parseInt(attributeValue.textContent);
 
         if (currentValue > 1) {
             attributeValue.textContent = currentValue - 1;
+            hiddenAttributeValue.value = currentValue - 2;
+
             
             skillValues.forEach(skillValue => {
                 const currentSkillValue = parseInt(skillValue.textContent);

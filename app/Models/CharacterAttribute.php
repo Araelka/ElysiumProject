@@ -12,7 +12,7 @@ class CharacterAttribute extends Model
     protected $fillable = [
         'attribute_id',
         'character_id',
-        'level'
+        'points'
     ];
 
     public function attribute() {

@@ -33,11 +33,11 @@ class Character extends Model
     }
 
     public function skills(){
-        return $this->hasMany(Skill::class);
+        return $this->hasMany(CharacterSkill::class);
     }
 
     public function getTotalSpentPoints(){
-        return $this->attributes->sum('points') + $this->skills->sum('points');
+        return $this->attributes()->sum('points') + $this->skills()->sum('points');
     }
 
     public function getAvailablePoints(){
