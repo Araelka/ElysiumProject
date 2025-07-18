@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function(){
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('characters', [CharacterController::class, 'index'])->name('characters.index');
+    Route::post('character/create', [CharacterController::class, 'createMainInfo'])->name('characters.create');
+    Route::post('character/create/skills', [CharacterController::class, 'createSkills'])->name('characters.createSkills');
 });
 
 Route::middleware(['auth', 'editor'])->group(function(){

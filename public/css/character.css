@@ -8,10 +8,6 @@
     width: 2px; /* Ширина полосы прокрутки */
 }
 
-.character-form-container::-webkit-scrollbar-track {
-    background: #1a1a40; /* Фон полосы прокрутки */
-}
-
 .character-form-container::-webkit-scrollbar-thumb {
     background-color: #f4d03f; /* Цвет полосы прокрутки */
     border-radius: 5px; /* Закругление полосы прокрутки */
@@ -127,6 +123,15 @@
     margin: 0; 
 }
 
+.form-control textarea::-webkit-scrollbar {
+    width: 2px; /* Ширина полосы прокрутки */
+}
+
+.form-control textarea::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
+
 .form-control textarea {
     resize: none;
     height: 300px;
@@ -152,9 +157,10 @@
 
 /* Стиль кнопки отправки формы */
 .btn-primary {
+    margin-top: 10px;
     background-color: #f4d03f;
     color: #1a1a40;
-    padding: 12px 20px;
+    padding: 10px 20px;
     font-size: 18px;
     font-weight: bold;
     border: none;
@@ -168,10 +174,18 @@
 }
 
 /* Стили для формы */
-.attribute, .skill {
+.skill {
     border: 2px solid #f4d03f;
-    padding: 10px;
+    padding: 5px;
     border-radius: 5px;
+    display: flex;
+    align-items: flex-end;
+    width: 200px;
+    min-width: 120px;
+    max-width: 200px;
+    height: 240px;
+    min-height: 175px;
+    max-height: 240px;
 }
 
 .skill-image {
@@ -195,36 +209,47 @@
 .attributes {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
-.attribute {
-    width: 150px;
-    height: 200px;
+.attribute-content-name {
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .slills{
     display: flex;
     flex-direction: row;
     gap: 10px;
+    justify-content: space-between;
 }
 
-.skill {
-    display: flex;
-    align-items: flex-end;
-    width: 150px;
-    height: 200px;
-}
 
 .skill-content {
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.skill-value-content {
+    display: flex;
+    flex-direction: row;
     justify-content: flex-end;
 }
 
-.skill-content-name {
+.skill-value {
+    background: white;
+    padding: 5px;
+    color:#1a1a40;
+    font-size: 18px;
+}
+
+.point-value {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
