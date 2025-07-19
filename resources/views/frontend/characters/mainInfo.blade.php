@@ -26,24 +26,27 @@
                 <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
                     <div style="width: 50%">
                         <label for="firstName" class="form-label">Имя:</label>
-                        <input type="text" id="firstName" name="firstName" placeholder="Введите имя" required>
+                        <input type="text" id="firstName" name="firstName" placeholder="Введите имя" value='{{ old('firstName') }}' required>
                     </div>
 
                     <div style="width: 50%">
                         <label for="secondName" class="form-label">Фамилия:</label>
-                        <input type="text" id="secondName" name="secondName" placeholder="Введите фамилию" required>
+                        <input type="text" id="secondName" name="secondName" placeholder="Введите фамилию" value='{{ old('secondName') }}' required>
                     </div>
                     
                 </div>
 
                 <div class="form-control">
                     <label for="age" >Возраст:</label>
-                    <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" required>
+                    <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" value='{{ old('age') }}' required>
+                    @error('age')
+                        <span class="form__error">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="form-control">
                     <label for="gender">Пол:</label>
-                    <select id="gender" name="gender"  required>
+                    <select id="gender" name="gender" required>
                         <option value="Мужской">Мужской</option>
                         <option value="Женский">Женский</option>
                     </select>
@@ -68,18 +71,18 @@
 
         <div class="form-control" style="margin-top: 10px">
             <label for="residentialAddress" class="form-label">Адрес проживания:</label>
-            <input type="text" id="residentialAddress" name="residentialAddress" placeholder="Введите адрес проживания" required>
+            <input type="text" id="residentialAddress" name="residentialAddress" placeholder="Введите адрес проживания"  value='{{ old('residentialAddress') }}'  required>
         </div>
 
         <div class="form-control" style="margin-top: 10px">
             <label for="activity" class="form-label">Род деятельности:</label>
-            <input type="text" id="activity" name="activity" placeholder="Введите род деятельности" required>
+            <input type="text" id="activity" name="activity" placeholder="Введите род деятельности" value='{{ old('activity') }}'  required>
         </div>
 
          <!-- Характер -->
         <div class="form-control" style="margin-top: 10px">
             <label for="personality">Характер:</label>
-            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px" required></textarea>
+            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px" value='{{ old('personality') }}'  required></textarea>
         </div>
 
         {{-- <!-- Биография -->

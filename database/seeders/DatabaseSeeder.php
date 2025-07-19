@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             'role_id' => 1
         ]);
 
+        $this->call(CharacterStatusTableSeeder::class);
         $this->call(AttributeTableSeeder::class);
         $this->call(SkillTableSeeder::class);
 

@@ -16,14 +16,14 @@
 /* Контейнер для фото и формы */
 .form-layout {
     display: flex; /* Размещаем фото и форму в строку */
-    align-items: flex-start; /* Выравниваем по верхнему краю */
+    /* align-items: flex-start;  */
     gap: 20px; /* Расстояние между фото и формой */
 }
 
 /* Стили для фото-секции */
 .photo-section {
     flex: 0 0 200px; /* Фиксированная ширина */
-    height: 286px;
+    /* height: 286px; */
     display: flex;
     flex-direction: column;
     align-items: flex-start;

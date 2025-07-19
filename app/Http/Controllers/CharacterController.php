@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CharacterRequest;
 use App\Models\Attribute;
 use App\Models\Character;
 use App\Models\CharacterAttribute;
@@ -12,14 +13,17 @@ use Illuminate\Http\Request;
 class CharacterController extends Controller
 {
     public function index() {
-        $character = Character::findOrFail(9);
-        $skill = CharacterSkill::findOrFail(12);
-        dd($skill->getLevelAttribute());
+        // $character = Character::findOrFail(1);
+        // $skills = Skill::findOrFail(3);
+        // $characterA = CharacterAttribute::findOrFail(2);
+        // $skill = CharacterSkill::findOrFail($skills->id)->where('character_id', $character->id)->first();
+        // dd($character->status->name);
 
         return view('frontend.characters.mainInfo');
     }
 
-    public function createMainInfo(Request $request) {
+    public function createMainInfo(CharacterRequest $request) {
+
         $character = Character::create([
             'user_id' => auth()->user()->id,
             'firstName' => $request->input('firstName'),
@@ -29,7 +33,8 @@ class CharacterController extends Controller
             'nationality' => $request->input('nationality'),
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
-            'personality' => $request->input('personality')
+            'personality' => $request->input('personality'),
+            'status_id' => 1
         ]);
         
         $attributes = Attribute::with('skills')->get();

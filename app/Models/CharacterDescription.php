@@ -5,21 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterAttribute extends Model
+class CharacterDescription extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'attribute_id',
         'character_id',
-        'points'
+        'biography',
+        'description'
     ];
 
-    public function attribute() {
-        return $this->belongsTo(Attribute::class);
-    }
-
-    public function character() {
+    public function character(){
         return $this->belongsTo(Character::class);
     }
 }

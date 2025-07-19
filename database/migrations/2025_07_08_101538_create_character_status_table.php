@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('theme_images', function (Blueprint $table) {
+        Schema::create('character_statuses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('theme_id')->constrained()->onDelete('cascade');
-            $table->string('path');
-            $table->string('description')->nullable();
-            $table->timestamps();
+            $table->string('name');
         });
     }
 
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('theme_images');
+        Schema::dropIfExists('character_statuses');
     }
 };

@@ -265,3 +265,8 @@
     border-color: #ec7063;
     outline: none;
 }
+
+.form__error {
+    font-size: 14px;
+    color: #ec7063;
+}

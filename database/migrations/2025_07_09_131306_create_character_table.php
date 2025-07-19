@@ -21,11 +21,10 @@ return new class extends Migration
             $table->string('nationality');
             $table->string('residentialAddress');
             $table->string('activity');
-            $table->text('personality')->nullable();
-            $table->text('biography')->nullable();
-            $table->text('description')->nullable();
+            $table->text('personality');
+            $table->integer('available_points')->default(0);
 
-            $table->integer('total_points')->default(6);
+            $table->foreignId('status_id')->constrained('character_statuses')->onDelete('cascade');
             $table->timestamps();
         });
     }
