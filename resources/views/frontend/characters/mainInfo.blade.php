@@ -13,12 +13,18 @@
                     <label >Создание персонажа</label>
                 </div>
                 <div class="image-preview" onclick="document.getElementById('photo-upload').click()">
-                    <img id="preview-image" src="#" class="rounded-circle">
-                    <div id="placeholder-text" class="placeholder">Загрузить изображение</div>
+                    @if (session('temp_photo_path'))
+                        <img id="preview-image" src="{{ asset('storage/' . session('temp_photo_path')) }}" class="rounded-circle">
+                    @else
+                        <img id="preview-image" src="#" class="rounded-circle" style="display: none;">
+                    @endif
+                    <div id="placeholder-text" class="placeholder">
+                        {{ session('temp_photo_path') ? 'Изменить изображение' : 'Загрузить изображение' }}
+                    </div>
                 </div>
                 <input type="file" id="photo-upload" name="photo" class="hidden-input" accept="image/*" onchange="previewFile(this)">
                 <div class="mt-4">
-        </div>
+                </div>
             </div>
 
             <!-- Правый блок: Форма -->
@@ -36,39 +42,60 @@
                     
                 </div>
 
-                <div class="form-control">
-                    <label for="age" >Возраст:</label>
-                    <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" value='{{ old('age') }}' required>
-                    @error('age')
-                        <span class="form__error">{{ $message }}</span>
-                    @enderror
+                <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
+                    <div style="width: 50%">
+                        <label for="age" >Возраст:</label>
+                        <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" value='{{ old('age') }}' required>
+                        @error('age')
+                            <span class="form__error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div style="width: 50%">
+                        <label for="gender">Пол:</label>
+                        <select id="gender" name="gender" required>
+                            <option value="Мужской" {{ old('gender') === 'Мужской' ? 'selected' : '' }}>Мужской</option>
+                            <option value="Женский" {{ old('gender') === 'Женский' ? 'selected' : '' }}>Женский</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-control">
-                    <label for="gender">Пол:</label>
-                    <select id="gender" name="gender" required>
-                        <option value="Мужской">Мужской</option>
-                        <option value="Женский">Женский</option>
-                    </select>
+                <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
+                    <div style="width: 50%">
+                        <label for="age" >Рост:</label>
+                        <input type="number" id="height" name="height"  placeholder="Введите рост" min="0" value='{{ old('height') }}' required>
+                        @error('height')
+                            <span class="form__error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div style="width: 50%">
+                        <label for="age" >Вес:</label>
+                        <input type="number" id="weight" name="weight"  placeholder="Введите вес" min="0" value='{{ old('weight') }}' required>
+                        @error('weight')
+                            <span class="form__error">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="form-control">
                     <label for="nationality">Национальность:</label>
                     <select id="nationality" name="nationality"  required>
-                        <option value="Граад">Граад</option>
-                        <option value="Иилмараа">Иилмараа</option>
-                        <option value="Инсулинда">Инсулинда</option>
-                        <option value="Катла">Катла</option>
-                        <option value="Мунди">Мунди</option>
-                        <option value="Самара">Самара</option>
-                        <option value="Семенин">Семенин</option>
-                        <option value="Сеол">Сеол</option>
+                        <option value="Граад" {{ old('nationality') === 'Граад' ? 'selected' : '' }}>Граад</option>
+                        <option value="Иилмараа" {{ old('nationality') === 'Иилмараа' ? 'selected' : '' }}>Иилмараа</option>
+                        <option value="Инсулинда" {{ old('nationality') === 'Инсулинда' ? 'selected' : '' }}>Инсулинда</option>
+                        <option value="Катла" {{ old('nationality') === 'Катла' ? 'selected' : '' }}>Катла</option>
+                        <option value="Мунди" {{ old('nationality') === 'Мунди' ? 'selected' : '' }}>Мунди</option>
+                        <option value="Самара" {{ old('nationality') === 'Самара' ? 'selected' : '' }}>Самара</option>
+                        <option value="Семенин" {{ old('nationality') === 'Семенин' ? 'selected' : '' }}>Семенин</option>
+                        <option value="Сеол" {{ old('nationality') === 'Сеол' ? 'selected' : '' }}>Сеол</option>
                     </select>
                 </div>
 
             </div>
         </div>
 
+        <!-- Нижний блок -->
         <div class="form-control" style="margin-top: 10px">
             <label for="residentialAddress" class="form-label">Адрес проживания:</label>
             <input type="text" id="residentialAddress" name="residentialAddress" placeholder="Введите адрес проживания"  value='{{ old('residentialAddress') }}'  required>
@@ -79,10 +106,10 @@
             <input type="text" id="activity" name="activity" placeholder="Введите род деятельности" value='{{ old('activity') }}'  required>
         </div>
 
-         <!-- Характер -->
+        <!-- Характер -->
         <div class="form-control" style="margin-top: 10px">
             <label for="personality">Характер:</label>
-            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px" value='{{ old('personality') }}'  required></textarea>
+            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') }}</textarea>
         </div>
 
         {{-- <!-- Биография -->
@@ -116,24 +143,59 @@
             const reader = new FileReader();
 
             reader.onload = function (e) {
+                // Отображаем изображение
                 previewImage.src = e.target.result;
                 previewImage.style.display = 'block';
                 placeholderText.style.display = 'none';
-
-                // Добавляем обработчики для масштабирования и перемещения
-                setupImageInteractions(previewImage);
             };
 
             reader.onerror = function () {
                 alert('Ошибка при чтении файла.');
+                // Сбрасываем интерфейс
+                previewImage.src = '';
+                previewImage.style.display = 'none';
+                placeholderText.style.display = 'block';
             };
 
             reader.readAsDataURL(file);
         } else {
+            // Если файл не выбран, сбрасываем интерфейс
             previewImage.src = '';
             previewImage.style.display = 'none';
             placeholderText.style.display = 'block';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tempPhotoPath = "{{ session('temp_photo_path') }}";
+        const previewImage = document.getElementById('preview-image');
+        const placeholderText = document.getElementById('placeholder-text');
+
+        if (tempPhotoPath) {
+            // Если есть временный файл, отображаем его
+            previewImage.src = "{{ asset('storage/' . session('temp_photo_path')) }}";
+            previewImage.style.display = 'block';
+            placeholderText.style.display = 'none';
+        } else {
+            // Если временного файла нет, показываем placeholder
+            previewImage.style.display = 'none';
+            placeholderText.style.display = 'block';
+        }
+    });
+
+    window.addEventListener('beforeunload', function () {
+    const tempPhotoPath = "{{ session('temp_photo_path') }}";
+
+    if (tempPhotoPath) {
+        fetch('/delete-temp-file', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ path: tempPhotoPath }),
+        });
+    }
+});
 </script>
 @endsection

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('secondName');
             $table->string('gender');
             $table->integer('age');
+            $table->integer('height');
+            $table->integer('weight');
             $table->string('nationality');
             $table->string('residentialAddress');
             $table->string('activity');

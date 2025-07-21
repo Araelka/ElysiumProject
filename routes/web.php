@@ -9,12 +9,25 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 
 Route::get('/', [PostController::class, 'index'])->name('homePage');
 
 Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
+
+Route::post('/delete-temp-file', function (\Illuminate\Http\Request $request) {
+    $path = $request->input('path');
+
+    if ($path && Storage::disk('public')->exists($path)) {
+        Storage::disk('public')->delete($path);
+    }
+
+    Session::forget('temp_photo_path');
+
+    return response()->json(['success' => true]);
+})->name('delete.temp.file');
 
 Route::middleware('guest')->group(function(){
     Route::get('register', [RegisterController::class, 'showRegisterForm'])->name('register');

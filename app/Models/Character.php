@@ -16,6 +16,8 @@ class Character extends Model
         'secondName',
         'gender',
         'age',
+        'height',
+        'weight',
         'nationality',
         'residentialAddress',
         'activity',

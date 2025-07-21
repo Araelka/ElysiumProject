@@ -30,6 +30,8 @@ class CharacterController extends Controller
             'secondName' => $request->input('secondName'),
             'age' => $request->input('age'),
             'gender' => $request->input('gender'),
+            'height' => $request->input('height'),
+            'weight' => $request->input('weight'),
             'nationality' => $request->input('nationality'),
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
@@ -74,7 +76,9 @@ class CharacterController extends Controller
             ]);
         }
 
-        return view('frontend.index');
+        $characterId = $request->input('character_id');
+
+        return view('frontend.characters.description', compact('characterId'));
 
     }
 
