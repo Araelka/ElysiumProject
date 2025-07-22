@@ -77,18 +77,16 @@ class CharacterController extends Controller
 
     public function showCreateSkills($id){
 
-        // if(Character::findOrFail($id)){
-        //     return view('frontend.characters.mainInfo', compact('character')); 
-        // };
+        $characterId = $id;
+        if(Character::findOrFail($characterId)->attributes->first()){
+            $characterAttributes = CharacterAttribute::where('character_id', '=', $characterId)->get();
+            $characterSkills = CharacterSkill::where('character_id', '=', $characterId)->get();
+            $attributes = Attribute::with('skills')->get();
+            return view('frontend.characters.attributes', compact('attributes','characterAttributes', 'characterSkills', 'characterId')); 
+        };
 
-        // return view('frontend.characters.mainInfo'); 
 
         $attributes = Attribute::with('skills')->get();
-        $characterId = Character::findOrFail($id)->id;
-
-        if (CharacterSkill::where('character_id', '=', $characterId)->first()){
-            return redirect()->back()->withErrors('Навыки персонажа уже распределены');
-        }
 
         return view('frontend.characters.attributes', compact('attributes', 'characterId'));
     }
@@ -101,6 +99,7 @@ class CharacterController extends Controller
             'skills.*' => ['required', 'integer']
         ]);
 
+
         if (array_sum($validated['attributes']) > 6) {
             return redirect()->back()->withErrors('Превышен предел суммы количства очков');
         }
@@ -111,7 +110,7 @@ class CharacterController extends Controller
 
         $characterId = $request->input('characterId');
 
-        foreach ($validated['attributes'] as $id =>$attribute) {
+        foreach ($validated['attributes'] as $id => $attribute) {
             $characterAttribute = CharacterAttribute::create([
                 'character_id' => $characterId,
                 'attribute_id' => $id,
@@ -129,6 +128,13 @@ class CharacterController extends Controller
 
         return redirect()->route('characters.showCreateDescription', $characterId);;
 
+    }
+    
+    public function updateAttributes(Request $request){
+        $attributes = CharacterAttribute::where('character_id', '=', $request->input('characterId'))->get();
+        foreach ($attributes as $id => $attribute) {
+            dd($attribute);
+        }
     }
 
     public function showCreateDescription($id){

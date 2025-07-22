@@ -26,7 +26,7 @@
 
         <!-- Кнопка отправки формы -->
         <div class="mt-4" style="display: flex; justify-content: space-between;">
-            <a href="{{ route('characters.index', ['id' => $characterId]) }}" style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
+            <a href="{{ route('characters.showCreateSkills', ['id' => $characterId]) }}" style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
             <button type="submit" class="btn btn-primary">Отправить на проверку</button>
         </div>
 

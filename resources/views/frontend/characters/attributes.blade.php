@@ -1,9 +1,16 @@
 @extends('frontend.characters.indexCreate')
 
 @section('characterContent')
-<form id="character-form" action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
-@csrf
-<div class="form-control" style="margin-top: 15px">
+@isset($characterAttributes)
+    <form id="character-form" action={{ route('characters.updateSkills') }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+    @csrf
+    @method('PUT')
+@else
+    <form id="character-form" action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+    @csrf
+@endisset
+
+<div class="form-control" >
     <input type="hidden" name="characterId" value="{{ $characterId }}">
     <div class="attributes">
         <div >
@@ -13,7 +20,7 @@
                 </div>
         </div>
 
-        @foreach ($attributes as $attribute)
+        @foreach ($attributes as $id => $attribute)
         <div class="attribute mb-3">
                 <div class="attribute-content-name d-flex justify-content-between align-items-center">
                     <div>
@@ -23,8 +30,8 @@
 
                     <div>
                         <button type="button" class="btn btn-sm btn-secondary" onclick="decreaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;"><</button>
-                        <span id="attribute-value-{{ $attribute->id }}">{{ $attribute->min_value }}</span>
-                        <input type="hidden"  name="attributes[{{ $attribute->id }}]" id="hidden-attribute-value-{{ $attribute->id }}" value="{{ $attribute->min_value-1 }}">
+                        <span id="attribute-value-{{ $attribute->id }}">{{  $characterAttributes?->get($id)?->level ?? $attribute->min_value }}</span>
+                        <input type="hidden"  name="attributes[{{ $attribute->id }}]" id="hidden-attribute-value-{{ $attribute->id }}" value={{ $characterAttributes?->get($id)?->level-1 ?? $attribute->min_value-1 }}>
                         <button type="button" class="btn btn-sm btn-secondary" onclick="increaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;">></button>
                     </div>
                 </div>
@@ -36,7 +43,7 @@
                 <div class="skill" style="background-image: url({{ asset( $skill->image_path) }}); background-size: contain;">
                     <div class="skill-content">
                                 <div class="skill-value-content">
-                                    <span data-attribute-id="{{ $attribute->id }}" id="skill-value-{{ $skill->id }}"  class="skill-value">{{ $attribute->min_value}}</span>
+                                    <span data-attribute-id="{{ $attribute->id }}" id="skill-value-{{ $skill->id }}"  class="skill-value">{{$characterAttributes?->get($id)?->level ?? $attribute->min_value }}</span>
                                     <input type="hidden" name="skills[{{ $skill->id }}]"  value="0">
                                 </div>
 
@@ -142,9 +149,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        @foreach ($attributes as $attribute)
-            updateDiamonds('{{ $attribute->id }}', {{ $attribute->min_value }});
+        @foreach ($attributes as $id => $attribute)
+            updateDiamonds('{{ $attribute->id }}', {{ $characterAttributes?->get($id)?->level ?? $attribute->min_value }});
         @endforeach
+
+        updateAvailablePoints();
 
         // Обработка отправки формы
         const form = document.getElementById('character-form');
