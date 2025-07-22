@@ -192,6 +192,7 @@
     line-height: 1.5; /* Улучшим читаемость текста */
 }
 
+
 .close {
     color: #f4d03f; /* Ярко-жёлтый цвет */
     font-size: 28px;
@@ -266,7 +267,9 @@
     outline: none;
 }
 
+/* Стиль для ошибок */
 .form__error {
+    display: block;
     font-size: 14px;
-    color: #ec7063;
+    color: #ec7063; /* Красный цвет текста */
 }

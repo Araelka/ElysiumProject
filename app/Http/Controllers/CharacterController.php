@@ -6,6 +6,7 @@ use App\Http\Requests\CharacterRequest;
 use App\Models\Attribute;
 use App\Models\Character;
 use App\Models\CharacterAttribute;
+use App\Models\CharacterDescription;
 use App\Models\CharacterSkill;
 use App\Models\Skill;
 use Illuminate\Http\Request;
@@ -19,7 +20,19 @@ class CharacterController extends Controller
         // $skill = CharacterSkill::findOrFail($skills->id)->where('character_id', $character->id)->first();
         // dd($character->status->name);
 
+        // $characters = Character::where('user_id', '=', auth()->user()->id)->get();
+
         return view('frontend.characters.mainInfo');
+    }
+
+    public function showMainInfo(Request $request){
+        if($request->get('id')){
+            $character = Character::findOrFail($request->get('id'));
+
+            return view('frontend.characters.mainInfo', compact('character')); 
+        };
+
+        return view('frontend.characters.mainInfo'); 
     }
 
     public function createMainInfo(CharacterRequest $request) {
@@ -39,8 +52,43 @@ class CharacterController extends Controller
             'status_id' => 1
         ]);
         
+        return redirect()->route('characters.showCreateSkills', $character->id);
+    }
+
+    public function updateMainInfo(CharacterRequest $request){
+        $characterId = $request->input('characterId');
+        $character = Character::findOrFail($characterId);
+        $character->update([
+            'firstName' => $request->input('firstName'),
+            'secondName' => $request->input('secondName'),
+            'age' => $request->input('age'),
+            'gender' => $request->input('gender'),
+            'height' => $request->input('height'),
+            'weight' => $request->input('weight'),
+            'nationality' => $request->input('nationality'),
+            'residentialAddress' => $request->input('residentialAddress'),
+            'activity' => $request->input('activity'),
+            'personality' => $request->input('personality'),
+            'status_id' => 1
+        ]);
+
+        return redirect()->route('characters.showCreateSkills', $characterId);
+    }
+
+    public function showCreateSkills($id){
+
+        // if(Character::findOrFail($id)){
+        //     return view('frontend.characters.mainInfo', compact('character')); 
+        // };
+
+        // return view('frontend.characters.mainInfo'); 
+
         $attributes = Attribute::with('skills')->get();
-        $characterId = $character->id;
+        $characterId = Character::findOrFail($id)->id;
+
+        if (CharacterSkill::where('character_id', '=', $characterId)->first()){
+            return redirect()->back()->withErrors('Навыки персонажа уже распределены');
+        }
 
         return view('frontend.characters.attributes', compact('attributes', 'characterId'));
     }
@@ -61,9 +109,11 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('Превышен предел суммы количства очков');
         }
 
+        $characterId = $request->input('characterId');
+
         foreach ($validated['attributes'] as $id =>$attribute) {
             $characterAttribute = CharacterAttribute::create([
-                'character_id' => $request->input('characterId'),
+                'character_id' => $characterId,
                 'attribute_id' => $id,
                 'points' => $attribute
             ]);
@@ -71,15 +121,46 @@ class CharacterController extends Controller
 
         foreach ($validated['skills'] as $id => $skill) {
             $characterSkill = CharacterSkill::create([
-                'character_id' => $request->input('characterId'),
+                'character_id' => $characterId,
                 'skill_id' => $id
             ]);
         }
 
-        $characterId = $request->input('character_id');
 
-        return view('frontend.characters.description', compact('characterId'));
+        return redirect()->route('characters.showCreateDescription', $characterId);;
 
+    }
+
+    public function showCreateDescription($id){
+        $characterId = Character::findOrFail($id)->id;
+
+        if (CharacterDescription::where('character_id', '=', $characterId)->first()){
+            return redirect()->back();
+        }
+
+        return view('frontend.characters.description', compact( 'characterId'));
+    }
+
+    public function createDescription(Request $request) {
+        $validated = $request->validate([
+            'biography' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'headcounts' => ['string']
+        ]);
+
+        CharacterDescription::create([
+            'character_id' => $request->input('characterId'),
+            'biography' => $validated['biography'],
+            'description' => $validated['description'],
+            'headcounts' => $validated['headcounts']
+        ]);
+
+        $character = Character::findOrFail($request->input('characterId'));
+        $character->update([
+            'status_id' => 2
+        ]);
+
+        return view('frontend.characters.index');
     }
 
 }

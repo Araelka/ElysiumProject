@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('character_id')->constrained()->onDelete('cascade');
             $table->text('biography');
             $table->text('description');
+            $table->text('headcounts')->nullable();
             $table->timestamps();
         });
     }

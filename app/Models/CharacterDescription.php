@@ -9,10 +9,13 @@ class CharacterDescription extends Model
 {
     use HasFactory;
 
+    protected $table = 'character_description';
+
     protected $fillable = [
         'character_id',
         'biography',
-        'description'
+        'description',
+        'headcounts'
     ];
 
     public function character(){

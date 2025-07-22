@@ -173,6 +173,43 @@
     background-color: #ec7063;
 }
 
+
+/* Стили кнопок модального окна */
+.btn-accept {
+    margin-top: 10px;
+    background-color: #f4d03f;
+    color: #1a1a40;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-accept:hover {
+    background-color: #ec7063;
+}
+
+.btn-cancel {
+    margin-top: 10px;
+    background-color: transparent;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cancel:hover {
+    color: #1a1a40;
+    background-color: #f4d03f;
+}
+
 /* Стили для формы */
 .skill {
     border: 2px solid #f4d03f;

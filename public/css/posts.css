@@ -197,10 +197,3 @@
 }
 
 
-/* Стиль для ошибок */
-.form__error {
-    display: block;
-    margin-top: 5px;
-    font-size: 14px;
-    color: #ec7063; /* Красный цвет текста */
-}

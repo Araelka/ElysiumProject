@@ -19,113 +19,13 @@
             <!-- Основной контент (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
                 <div class="character-form-container">
-                    <form action="" method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
-                        @csrf
-
-                        <!-- Блок: Фото и форма -->
-                        <div class="form-layout">
-                            <!-- Левый блок: Фото -->
-                            <div class="photo-section">
-                                <div class="form-control">
-                                    <label >Создание персонажа</label>
-                                </div>
-                                <div class="image-preview" onclick="document.getElementById('photo-upload').click()">
-                                    <img id="preview-image" src="#" class="rounded-circle">
-                                    <div id="placeholder-text" class="placeholder">Загрузить изображение</div>
-                                </div>
-                                <input type="file" id="photo-upload" name="photo" class="hidden-input" accept="image/*" onchange="previewFile(this)">
-                                <div class="mt-4">
-                        </div>
-                            </div>
-
-                            <!-- Правый блок: Форма -->
-                            <div class="form-section">
-                                <div class="form-control">
-                                    <label for="name" class="form-label">Имя:</label>
-                                    <input type="text" id="name" name="name" placeholder="Введите имя" required>
-                                </div>
-
-                                <div class="form-control">
-                                    <label for="gender">Пол:</label>
-                                    <select id="gender" name="gender"  required>
-                                        <option value="male">Мужской</option>
-                                        <option value="female">Женский</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-control">
-                                    <label for="age" >Возраст:</label>
-                                    <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" required>
-                                </div>
-
-                                <div class="form-control">
-                                    <label for="nationality">Национальность:</label>
-                                    <select id="nationality" name="nationality"  required>
-                                        <option value="Graad">Граад</option>
-                                        <option value="Iilmaraa">Иилмараа</option>
-                                        <option value="Insulinde">Инсулинда</option>
-                                        <option value="Katla">Катла</option>
-                                        <option value="Mundi">Мунди</option>
-                                        <option value="Samara">Самара</option>
-                                        <option value="Semenine">Семенин</option>
-                                        <option value="Seol">Сеол</option>
-                                    </select>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- Биография -->
-                        <div class="form-control" style="margin-top: 15px">
-                            <label for="biography">Биография:</label>
-                            <textarea id="biography" name="biography"  rows="6" placeholder="Расскажите о персонаже..."></textarea>
-                        </div>
-
-                       {{-- @include('frontend.characters.attributes') --}}
-
-                        <!-- Кнопка отправки формы -->
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary custom-file-upload">Создать персонажа</button>
-                        </div>
-                    </form>
+                        
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    let isDragging = false;
-    let startX, startY, currentX = 0, currentY = 0, scale = 1;
 
-    function previewFile(input) {
-        const file = input.files[0];
-        const previewImage = document.getElementById('preview-image');
-        const placeholderText = document.getElementById('placeholder-text');
-
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                previewImage.src = e.target.result;
-                previewImage.style.display = 'block';
-                placeholderText.style.display = 'none';
-
-                // Добавляем обработчики для масштабирования и перемещения
-                setupImageInteractions(previewImage);
-            };
-
-            reader.onerror = function () {
-                alert('Ошибка при чтении файла.');
-            };
-
-            reader.readAsDataURL(file);
-        } else {
-            previewImage.src = '';
-            previewImage.style.display = 'none';
-            placeholderText.style.display = 'block';
-        }
-    }
-</script>
 @endsection
 

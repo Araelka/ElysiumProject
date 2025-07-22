@@ -1,8 +1,15 @@
 @extends('frontend.characters.indexCreate')
 
 @section('characterContent')
-    <form action={{ route("characters.create") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
-        @csrf
+    @isset($character)
+        <form action={{ route('characters.updateMainInfo') }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="characterId" value={{ $character->id }}>
+    @else
+        <form action={{ route("characters.createMainInfo") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+            @csrf
+    @endisset
 
     
         <!-- Блок: Фото и форма -->
@@ -32,12 +39,18 @@
                 <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
                     <div style="width: 50%">
                         <label for="firstName" class="form-label">Имя:</label>
-                        <input type="text" id="firstName" name="firstName" placeholder="Введите имя" value='{{ old('firstName') }}' required>
+                        <input type="text" id="firstName" name="firstName" placeholder="Введите имя" value='{{ old('firstName') ?? $character->firstName ?? '' }}' required>
+                        @error('firstName')
+                            <span class="form__error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div style="width: 50%">
                         <label for="secondName" class="form-label">Фамилия:</label>
-                        <input type="text" id="secondName" name="secondName" placeholder="Введите фамилию" value='{{ old('secondName') }}' required>
+                        <input type="text" id="secondName" name="secondName" placeholder="Введите фамилию" value='{{ old('secondName') ?? $character->secondName ?? '' }}' required>
+                        @error('secondName')
+                            <span class="form__error">{{ $message }}</span>
+                        @enderror
                     </div>
                     
                 </div>
@@ -45,7 +58,7 @@
                 <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
                     <div style="width: 50%">
                         <label for="age" >Возраст:</label>
-                        <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" value='{{ old('age') }}' required>
+                        <input type="number" id="age" name="age"  placeholder="Введите возраст" min="0" value='{{ old('age') ?? $character->age ?? ''}}' required>
                         @error('age')
                             <span class="form__error">{{ $message }}</span>
                         @enderror
@@ -54,8 +67,8 @@
                     <div style="width: 50%">
                         <label for="gender">Пол:</label>
                         <select id="gender" name="gender" required>
-                            <option value="Мужской" {{ old('gender') === 'Мужской' ? 'selected' : '' }}>Мужской</option>
-                            <option value="Женский" {{ old('gender') === 'Женский' ? 'selected' : '' }}>Женский</option>
+                            <option value="Мужской" {{ (old('gender') ?? $character->gender ?? '') === 'Мужской' ? 'selected' : '' }}>Мужской</option>
+                            <option value="Женский" {{ (old('gender') ?? $character->gender ?? '') === 'Женский' ? 'selected' : '' }}>Женский</option>
                         </select>
                     </div>
                 </div>
@@ -63,7 +76,7 @@
                 <div class="form-control" style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
                     <div style="width: 50%">
                         <label for="age" >Рост:</label>
-                        <input type="number" id="height" name="height"  placeholder="Введите рост" min="0" value='{{ old('height') }}' required>
+                        <input type="number" id="height" name="height"  placeholder="Введите рост" min="0" value='{{ old('height') ?? $character->height ?? ''}}' required>
                         @error('height')
                             <span class="form__error">{{ $message }}</span>
                         @enderror
@@ -71,7 +84,7 @@
 
                     <div style="width: 50%">
                         <label for="age" >Вес:</label>
-                        <input type="number" id="weight" name="weight"  placeholder="Введите вес" min="0" value='{{ old('weight') }}' required>
+                        <input type="number" id="weight" name="weight"  placeholder="Введите вес" min="0" value='{{ old('weight') ?? $character->weight ?? ''}}' required>
                         @error('weight')
                             <span class="form__error">{{ $message }}</span>
                         @enderror
@@ -81,14 +94,14 @@
                 <div class="form-control">
                     <label for="nationality">Национальность:</label>
                     <select id="nationality" name="nationality"  required>
-                        <option value="Граад" {{ old('nationality') === 'Граад' ? 'selected' : '' }}>Граад</option>
-                        <option value="Иилмараа" {{ old('nationality') === 'Иилмараа' ? 'selected' : '' }}>Иилмараа</option>
-                        <option value="Инсулинда" {{ old('nationality') === 'Инсулинда' ? 'selected' : '' }}>Инсулинда</option>
-                        <option value="Катла" {{ old('nationality') === 'Катла' ? 'selected' : '' }}>Катла</option>
-                        <option value="Мунди" {{ old('nationality') === 'Мунди' ? 'selected' : '' }}>Мунди</option>
-                        <option value="Самара" {{ old('nationality') === 'Самара' ? 'selected' : '' }}>Самара</option>
-                        <option value="Семенин" {{ old('nationality') === 'Семенин' ? 'selected' : '' }}>Семенин</option>
-                        <option value="Сеол" {{ old('nationality') === 'Сеол' ? 'selected' : '' }}>Сеол</option>
+                        <option value="Граад" {{ (old('nationality') ?? $character->nationality ?? '') === 'Граад' ? 'selected' : '' }}>Граад</option>
+                        <option value="Иилмараа" {{ (old('nationality') ?? $character->nationality ?? '') === 'Иилмараа' ? 'selected' : '' }}>Иилмараа</option>
+                        <option value="Инсулинда" {{ (old('nationality') ?? $character->nationality ?? '') === 'Инсулинда' ? 'selected' : '' }}>Инсулинда</option>
+                        <option value="Катла" {{ (old('nationality') ?? $character->nationality ?? '') === 'Катла' ? 'selected' : '' }}>Катла</option>
+                        <option value="Мунди" {{ (old('nationality') ?? $character->nationality ?? '') === 'Мунди' ? 'selected' : '' }}>Мунди</option>
+                        <option value="Самара" {{ (old('nationality') ?? $character->nationality ?? '') === 'Самара' ? 'selected' : '' }}>Самара</option>
+                        <option value="Семенин" {{ (old('nationality') ?? $character->nationality ?? '') === 'Семенин' ? 'selected' : '' }}>Семенин</option>
+                        <option value="Сеол" {{ (old('nationality') ?? $character->nationality ?? '') === 'Сеол' ? 'selected' : '' }}>Сеол</option>
                     </select>
                 </div>
 
@@ -98,31 +111,28 @@
         <!-- Нижний блок -->
         <div class="form-control" style="margin-top: 10px">
             <label for="residentialAddress" class="form-label">Адрес проживания:</label>
-            <input type="text" id="residentialAddress" name="residentialAddress" placeholder="Введите адрес проживания"  value='{{ old('residentialAddress') }}'  required>
+            <input type="text" id="residentialAddress" name="residentialAddress" placeholder="Введите адрес проживания"  value='{{ old('residentialAddress') ?? $character->residentialAddress ?? ''}}'  required>
+            @error('residentialAddress')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
         </div>
 
         <div class="form-control" style="margin-top: 10px">
             <label for="activity" class="form-label">Род деятельности:</label>
-            <input type="text" id="activity" name="activity" placeholder="Введите род деятельности" value='{{ old('activity') }}'  required>
+            <input type="text" id="activity" name="activity" placeholder="Введите род деятельности" value='{{ old('activity') ?? $character->activity ?? ''}}'  required>
+            @error('activity')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
         </div>
 
         <!-- Характер -->
         <div class="form-control" style="margin-top: 10px">
             <label for="personality">Характер:</label>
-            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') }}</textarea>
+            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') ?? $character->personality ?? ''}}</textarea>
+            @error('personality')
+                <span class="form__error">{{ $message }}</span>
+            @enderror
         </div>
-
-        {{-- <!-- Биография -->
-        <div class="form-control" style="margin-top: 10px">
-            <label for="biography">Биография:</label>
-            <textarea id="biography" name="biography"  rows="6" placeholder="Расскажите о персонаже..." required></textarea>
-        </div>
-
-        <!-- Описание -->
-        <div class="form-control" style="margin-top: 10px">
-            <label for="description">Описание:</label>
-            <textarea id="description" name="description"  rows="6" placeholder="Опишите персонажа..." required></textarea>
-        </div> --}}
 
         <!-- Кнопка отправки формы -->
         <div class="mt-4" style="display: flex; justify-content: flex-end;">

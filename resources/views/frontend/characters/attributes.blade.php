@@ -1,7 +1,7 @@
 @extends('frontend.characters.indexCreate')
 
 @section('characterContent')
-<form action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+<form id="character-form" action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
 @csrf
 <div class="form-control" style="margin-top: 15px">
     <input type="hidden" name="characterId" value="{{ $characterId }}">
@@ -29,6 +29,7 @@
                     </div>
                 </div>
         </div>
+    
 
         <div class="slills">
             @foreach ($attribute->skills as $skill) 
@@ -50,12 +51,25 @@
         @endforeach
     </div>
 </div>
-
-        <div class="mt-4" style="display: flex; justify-content: flex-end;">
+        <div class="mt-4" style="display: flex; justify-content: space-between;">
+            <a href="{{ route('characters.index', ['id' => $characterId]) }}" style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
             <button type="submit" id="submit-button" class="btn btn-primary">Далее</button>
-        </div>
-    
+        </div>  
 </form>
+
+
+
+<!-- Модальное окно -->
+<div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+        <p>У вас остались неиспользованные очки: <span id="remaining-points"></span>.</p>
+        <p>Вы уверены, что хотите продолжить?</p>
+        <div >
+            <button id="confirm-submit" class="btn btn-accept">Да, сохранить</button>
+            <button id="cancel-submit" class="btn btn-cancel">Отмена</button>
+        </div>
+    </div>
+</div>
                     
 
 <script>
@@ -131,6 +145,36 @@
         @foreach ($attributes as $attribute)
             updateDiamonds('{{ $attribute->id }}', {{ $attribute->min_value }});
         @endforeach
+
+        // Обработка отправки формы
+        const form = document.getElementById('character-form');
+        const modal = document.getElementById('confirmation-modal');
+        const remainingPointsSpan = document.getElementById('remaining-points');
+        const confirmSubmitButton = document.getElementById('confirm-submit');
+        const cancelSubmitButton = document.getElementById('cancel-submit');
+
+        form.addEventListener('submit', (event) => {
+            const availablePoints = parseInt(document.getElementById('available-points').textContent);
+
+            if (availablePoints > 0) {
+                event.preventDefault(); // Отменяем отправку формы
+
+                // Показываем модальное окно
+                remainingPointsSpan.textContent = availablePoints;
+                modal.style.display = 'block';
+
+                // Подтверждение отправки
+                confirmSubmitButton.onclick = () => {
+                    modal.style.display = 'none';
+                    form.submit(); // Принудительно отправляем форму
+                };
+
+                // Отмена отправки
+                cancelSubmitButton.onclick = () => {
+                    modal.style.display = 'none';
+                };
+            }
+        });
     });
 </script>
 @endsection
