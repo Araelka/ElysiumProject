@@ -36,8 +36,8 @@ Route::middleware('auth')->group(function(){
         Route::post('create/info', [CharacterController::class, 'createMainInfo'])->name('createMainInfo');
         Route::put('update/info', [CharacterController::class, 'updateMainInfo'])->name('updateMainInfo');
         Route::get('create/{id}/skills', [CharacterController::class, 'showCreateSkills'])->name('showCreateSkills');
-        Route::post('create/skills', [CharacterController::class, 'createSkills'])->name('createSkills');
-        Route::put('update/skills', [CharacterController::class, 'updateAttributes'])->name('updateSkills');
+        Route::post('create/{id}/skills', [CharacterController::class, 'createSkills'])->name('createSkills');
+        Route::put('update/{id}/skills', [CharacterController::class, 'updateAttributes'])->name('updateAttributes');
         Route::get('create/{id}/description', [CharacterController::class, 'showCreateDescription'])->name('showCreateDescription');
         Route::post('create/description', [CharacterController::class, 'createDescription'])->name('createDescription');
     });

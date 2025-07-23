@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 
 class CharacterController extends Controller
 {
+    protected function isUser($id) {
+        if (auth()->user()->id != Character::findOrFail($id)->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
+        }
+    }
+
     public function index() {
         // $character = Character::findOrFail(1);
         // $skills = Skill::findOrFail(3);
@@ -28,6 +34,10 @@ class CharacterController extends Controller
     public function showMainInfo(Request $request){
         if($request->get('id')){
             $character = Character::findOrFail($request->get('id'));
+            
+            if (auth()->user()->id != $character->user_id){
+                return redirect()->back()->withErrors('Недостаточно прав');
+            }
 
             return view('frontend.characters.mainInfo', compact('character')); 
         };
@@ -58,6 +68,11 @@ class CharacterController extends Controller
     public function updateMainInfo(CharacterRequest $request){
         $characterId = $request->input('characterId');
         $character = Character::findOrFail($characterId);
+
+        if (auth()->user()->id != $character->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
+        }
+
         $character->update([
             'firstName' => $request->input('firstName'),
             'secondName' => $request->input('secondName'),
@@ -72,26 +87,34 @@ class CharacterController extends Controller
             'status_id' => 1
         ]);
 
+
         return redirect()->route('characters.showCreateSkills', $characterId);
     }
 
     public function showCreateSkills($id){
 
+        if (auth()->user()->id != Character::findOrFail($id)->user_id) {
+            return redirect()->back()->withErrors('Недостаточно прав');
+        }
+
         $characterId = $id;
+        $attributes = Attribute::with('skills')->get();
+
         if(Character::findOrFail($characterId)->attributes->first()){
             $characterAttributes = CharacterAttribute::where('character_id', '=', $characterId)->get();
-            $characterSkills = CharacterSkill::where('character_id', '=', $characterId)->get();
-            $attributes = Attribute::with('skills')->get();
-            return view('frontend.characters.attributes', compact('attributes','characterAttributes', 'characterSkills', 'characterId')); 
+
+            return view('frontend.characters.attributes', compact('attributes','characterAttributes', 'characterId')); 
         };
-
-
-        $attributes = Attribute::with('skills')->get();
 
         return view('frontend.characters.attributes', compact('attributes', 'characterId'));
     }
 
-    public function createSkills(Request $request){
+    public function createSkills($id, Request $request){
+
+        if (auth()->user()->id != Character::findOrFail($id)->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
+        }
+
         $validated = $request->validate([
             'attributes' => ['required', 'array'],
             'attributes.*' => ['required' ,'integer', 'min:0', 'max:6'],
@@ -108,7 +131,7 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('Превышен предел суммы количства очков');
         }
 
-        $characterId = $request->input('characterId');
+        $characterId = $id;
 
         foreach ($validated['attributes'] as $id => $attribute) {
             $characterAttribute = CharacterAttribute::create([
@@ -130,18 +153,49 @@ class CharacterController extends Controller
 
     }
     
-    public function updateAttributes(Request $request){
-        $attributes = CharacterAttribute::where('character_id', '=', $request->input('characterId'))->get();
-        foreach ($attributes as $id => $attribute) {
-            dd($attribute);
+    public function updateAttributes($id, Request $request){
+
+        if (auth()->user()->id != Character::findOrFail($id)->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
         }
+
+        $validated = $request->validate([
+            'attributes' => ['required', 'array'],
+            'attributes.*' => ['required' ,'integer', 'min:0', 'max:6']
+        ]);
+
+        if (array_sum($validated['attributes']) > 6) {
+            return redirect()->back()->withErrors('Превышен предел суммы количства очков');
+        }
+        
+        $characterId = $id;
+
+        foreach ($validated['attributes'] as $id => $attribute) {
+            $characterAttribute = CharacterAttribute::where('character_id', '=', $characterId)->where('attribute_id', '=', $id)->first();
+            $characterAttribute->update([
+                'points' => $attribute
+            ]);
+        }
+
+
+        return redirect()->route('characters.showCreateDescription', $characterId);
     }
 
     public function showCreateDescription($id){
-        $characterId = Character::findOrFail($id)->id;
+
+        if (auth()->user()->id != Character::findOrFail($id)->user_id) {
+            return redirect()->back()->withErrors('Недостаточно прав');
+        }
+
+        $characterId = $id;
 
         if (CharacterDescription::where('character_id', '=', $characterId)->first()){
-            return redirect()->back();
+            $characterDescripron = CharacterDescription::where('character_id', '=', $id)->first();
+            if  (auth()->user()->id != $characterDescripron->character->user_id){
+                return redirect()->back()->withErrors('Недостаточно прав');
+            }
+
+            return view('frontend.characters.description', compact( 'characterId', 'characterDescripron')); 
         }
 
         return view('frontend.characters.description', compact( 'characterId'));
@@ -151,8 +205,9 @@ class CharacterController extends Controller
         $validated = $request->validate([
             'biography' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'headcounts' => ['string']
+            'headcounts' => ['nullable' ,'string']
         ]);
+
 
         CharacterDescription::create([
             'character_id' => $request->input('characterId'),

@@ -2,11 +2,11 @@
 
 @section('characterContent')
 @isset($characterAttributes)
-    <form id="character-form" action={{ route('characters.updateSkills') }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+    <form id="character-form" action={{ route('characters.updateAttributes', $characterId) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
     @csrf
     @method('PUT')
 @else
-    <form id="character-form" action={{ route("characters.createSkills") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+    <form id="character-form" action={{ route("characters.createSkills", $characterId) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
     @csrf
 @endisset
 
@@ -31,7 +31,7 @@
                     <div>
                         <button type="button" class="btn btn-sm btn-secondary" onclick="decreaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;"><</button>
                         <span id="attribute-value-{{ $attribute->id }}">{{  $characterAttributes?->get($id)?->level ?? $attribute->min_value }}</span>
-                        <input type="hidden"  name="attributes[{{ $attribute->id }}]" id="hidden-attribute-value-{{ $attribute->id }}" value={{ $characterAttributes?->get($id)?->level-1 ?? $attribute->min_value-1 }}>
+                        <input type="hidden"  name="attributes[{{ $attribute->id }}]" id="hidden-attribute-value-{{ $attribute->id }}" value={{ ($characterAttributes?->get($id)?->level ?? $attribute->min_value)-1 }}>
                         <button type="button" class="btn btn-sm btn-secondary" onclick="increaseAttribute('{{ $attribute->id }}')" style="font-size: 20px;">></button>
                     </div>
                 </div>
@@ -47,7 +47,8 @@
                                     <input type="hidden" name="skills[{{ $skill->id }}]"  value="0">
                                 </div>
 
-                                <div style="text-align: center;">
+                                <div style="text-align: center; display: flex; flex-direction: column;">
+                                    <label id="skill-level-{{ $skill->id }}"></label>
                                     <label style="word-wrap: break-word; "><strong>{{ $skill->name }}</strong></label>
                                 </div>
                     </div>
@@ -69,8 +70,8 @@
 <!-- Модальное окно -->
 <div id="confirmation-modal" class="modal">
     <div class="modal-content">
-        <p>У вас остались неиспользованные очки: <span id="remaining-points"></span>.</p>
         <p>Вы уверены, что хотите продолжить?</p>
+        <p>У вас остались неиспользованные очки: <span id="remaining-points"></span>.</p>
         <div >
             <button id="confirm-submit" class="btn btn-accept">Да, сохранить</button>
             <button id="cancel-submit" class="btn btn-cancel">Отмена</button>
@@ -102,6 +103,19 @@
             diamond.textContent = '♦';
             diamondsContainer.appendChild(diamond);
         }
+
+        const skillValues = document.querySelectorAll(`[data-attribute-id="${attributeId}"]`);
+        skillValues.forEach(skillValue => {
+            const skillId = skillValue.parentElement.parentElement.querySelector('label').id;
+            const diamondsSkillContainer = document.getElementById(skillId);
+            diamondsSkillContainer.innerHTML = '';
+            
+            for (let i = 0; i < value; i++) {
+                const diamondSkill = document.createElement('label');
+                diamondSkill.textContent = '◊';
+                diamondsSkillContainer.appendChild(diamondSkill); 
+            }
+        })
     }
 
     function increaseAttribute(attributeId) {
