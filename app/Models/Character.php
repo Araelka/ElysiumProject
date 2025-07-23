@@ -11,6 +11,7 @@ class Character extends Model
     use HasFactory;
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'firstName',
         'secondName',

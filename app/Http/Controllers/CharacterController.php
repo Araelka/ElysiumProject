@@ -10,6 +10,8 @@ use App\Models\CharacterDescription;
 use App\Models\CharacterSkill;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 
 class CharacterController extends Controller
 {
@@ -40,7 +42,9 @@ class CharacterController extends Controller
                 return redirect()->back()->withErrors('Недостаточно прав');
             }
 
-            return view('frontend.characters.mainInfo', compact('character')); 
+            $encryptedId = Crypt::encrypt($character->id);
+
+            return view('frontend.characters.mainInfo', compact('character', 'encryptedId')); 
         };
 
         return view('frontend.characters.mainInfo'); 
@@ -49,6 +53,7 @@ class CharacterController extends Controller
     public function createMainInfo(CharacterRequest $request) {
 
         $character = Character::create([
+            'uuid' => Str::uuid(),
             'user_id' => auth()->user()->id,
             'firstName' => $request->input('firstName'),
             'secondName' => $request->input('secondName'),
@@ -63,10 +68,10 @@ class CharacterController extends Controller
             'status_id' => 1
         ]);
         
-        return redirect()->route('characters.showCreateSkills', $character->id);
+        return redirect()->route('characters.showCreateSkills', $character->uuid);
     }
 
-    public function updateMainInfo(CharacterRequest $request){
+    public function updateMainInfo($id, CharacterRequest $request){
         $characterId = $request->input('characterId');
         $character = Character::findOrFail($characterId);
 
@@ -93,16 +98,16 @@ class CharacterController extends Controller
     }
 
     public function showCreateSkills($id){
-
-        if (auth()->user()->id != Character::findOrFail($id)->user_id) {
+        $characterId = $id;
+        
+        if (auth()->user()->id != Character::where('uuid', $characterId)->first()->user_id) {
             return redirect()->back()->withErrors('Недостаточно прав');
         }
 
-        $characterId = $id;
         $attributes = Attribute::with('skills')->get();
 
-        if(Character::findOrFail($characterId)->attributes->first()){
-            $characterAttributes = CharacterAttribute::where('character_id', '=', $characterId)->get();
+        if(Character::where('uuid', $characterId)->first()->attributes->first()){
+            $characterAttributes = CharacterAttribute::where('character_id',  $characterId)->get();
 
             return view('frontend.characters.attributes', compact('attributes','characterAttributes', 'characterId')); 
         };
@@ -172,7 +177,7 @@ class CharacterController extends Controller
         $characterId = $id;
 
         foreach ($validated['attributes'] as $id => $attribute) {
-            $characterAttribute = CharacterAttribute::where('character_id', '=', $characterId)->where('attribute_id', '=', $id)->first();
+            $characterAttribute = CharacterAttribute::where('character_id',  $characterId)->where('attribute_id',  $id)->first();
             $characterAttribute->update([
                 'points' => $attribute
             ]);
@@ -191,7 +196,7 @@ class CharacterController extends Controller
         $characterId = $id;
 
         if (CharacterDescription::where('character_id', '=', $characterId)->first()){
-            $characterDescripron = CharacterDescription::where('character_id', '=', $id)->first();
+            $characterDescripron = CharacterDescription::where('character_id',  $id)->first();
             if  (auth()->user()->id != $characterDescripron->character->user_id){
                 return redirect()->back()->withErrors('Недостаточно прав');
             }
