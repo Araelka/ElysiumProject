@@ -2,7 +2,7 @@
 
 @section('characterContent')
     @isset($character)
-        <form action={{ route('characters.updateMainInfo') }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+        <form action={{ route('characters.updateMainInfo', $character->id) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
             @csrf
             @method('PUT')
             <input type="hidden" name="characterId" value={{ $character->id }}>

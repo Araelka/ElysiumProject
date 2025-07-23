@@ -11,7 +11,6 @@
 @endisset
 
 <div class="form-control" >
-    <input type="hidden" name="characterId" value="{{ $characterId }}">
     <div class="attributes">
         <div >
                 <div>
@@ -60,7 +59,7 @@
     </div>
 </div>
         <div class="mt-4" style="display: flex; justify-content: space-between;">
-            <a href="{{ route('characters.index', ['id' => $characterId]) }}" style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
+            <a href={{ route('characters.showMainInfo', $characterId) }} style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
             <button type="submit" id="submit-button" class="btn btn-primary">Далее</button>
         </div>  
 </form>

@@ -19,7 +19,7 @@ class CharacterController extends Controller
         }
     }
 
-    public function index() {
+    public function index($id= null) {
         // $character = Character::findOrFail(1);
         // $skills = Skill::findOrFail(3);
         // $characterA = CharacterAttribute::findOrFail(2);
@@ -28,12 +28,13 @@ class CharacterController extends Controller
 
         // $characters = Character::where('user_id', '=', auth()->user()->id)->get();
 
+
         return view('frontend.characters.mainInfo');
     }
 
-    public function showMainInfo(Request $request){
-        if($request->get('id')){
-            $character = Character::findOrFail($request->get('id'));
+    public function showMainInfo($id = null){
+        if($id != null){
+            $character = Character::findOrFail($id);
             
             if (auth()->user()->id != $character->user_id){
                 return redirect()->back()->withErrors('Недостаточно прав');
