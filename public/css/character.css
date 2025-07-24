@@ -56,6 +56,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top;
     border-radius: 10px;
 }
 
@@ -334,6 +335,31 @@
 
 .topic-link:hover {
     border-color: #ec7063; /* Ярко-жёлтый фон при наведении */
+}
+
+
+.topic-link.active {
+    background-color: #f4d03f; 
+    border-color: #f4d03f;
+    color: #1a1a40; 
+    font-weight: bold;
+}
+
+.topic-link-button {
+    position: relative;
+    text-decoration: none;
+    color: #1a1a40; 
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    background-color: #f4d03f;
+    display: block;
+    padding: 10px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.topic-link-button:hover {
+    background-color: #ec7063;
 }
 
 .character-name {

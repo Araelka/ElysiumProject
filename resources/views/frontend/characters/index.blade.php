@@ -1,5 +1,10 @@
 @extends('frontend.layout.layout')
-@section('title', 'Персонажи')
+@if ($selectedCharacter)
+    @section('title',  $selectedCharacter->firstName . ' ' . $selectedCharacter->secondName )
+@else
+    @section('title', 'Персонажи')
+@endif
+
 <link rel="stylesheet" href="{{ asset('css/character.css') }}">
 
 
@@ -24,7 +29,7 @@
                             </a>
                         </li>
                     @endforeach
-                    <a href={{ route('characters.showMainInfo') }} class="topic-link">Создать персонажа</a>
+                    <a href={{ route('characters.showMainInfo') }} class="topic-link-button">Создать персонажа</a>
                 </ul>
             </div>
 
