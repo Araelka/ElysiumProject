@@ -31,21 +31,20 @@ Route::middleware('auth')->group(function(){
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::prefix('characters')->name('characters.')->group(function(){
-        // Route::get('/', [CharacterController::class, 'index'])->name('index');
+        Route::get('/', [CharacterController::class, 'index'])->name('index');
 
-        Route::get('create/mainInfo', [CharacterController::class, 'showMainInfo'])->name('index');
-
-        Route::get('create/{id}/mainInfo', [CharacterController::class, 'showMainInfo'])->name('showMainInfo');
+        Route::get('create/mainInfo/{id?}', [CharacterController::class, 'showMainInfo'])->name('showMainInfo');
         Route::post('create/mainInfo', [CharacterController::class, 'createMainInfo'])->name('createMainInfo');
-        Route::put('update/{id}/info', [CharacterController::class, 'updateMainInfo'])->name('updateMainInfo');
+        Route::put('update/info/{id}', [CharacterController::class, 'updateMainInfo'])->name('updateMainInfo');
 
         Route::get('create/skills/{id}', [CharacterController::class, 'showCreateSkills'])->name('showCreateSkills');
 
-        Route::post('create/{id}/skills', [CharacterController::class, 'createSkills'])->name('createSkills');
-        Route::put('update/{id}/skills', [CharacterController::class, 'updateAttributes'])->name('updateAttributes');
+        Route::post('create/skills/{id}', [CharacterController::class, 'createSkills'])->name('createSkills');
+        Route::put('update/skills/{id}', [CharacterController::class, 'updateAttributes'])->name('updateAttributes');
 
-        Route::get('create/{id}/description', [CharacterController::class, 'showCreateDescription'])->name('showCreateDescription');
-        Route::post('create/description', [CharacterController::class, 'createDescription'])->name('createDescription');
+        Route::get('create/description/{id}', [CharacterController::class, 'showCreateDescription'])->name('showCreateDescription');
+        Route::post('create/description/{id}', [CharacterController::class, 'createDescription'])->name('createDescription');
+        Route::put('update/description/{id}', [CharacterController::class, 'updateDescription'])->name('updateDescription');
     });
 
     

@@ -23,7 +23,7 @@ class PostController extends Controller
 
         $posts = $this->selectPostsByLocation($selectedLocationId);
 
-        return view('frontend/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation]);
+        return view('frontend/post/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation]);
     }
 
     private function selectPostsByLocation ($selectedLocationId) {

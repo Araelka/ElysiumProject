@@ -2,10 +2,9 @@
 
 @section('characterContent')
     @isset($character)
-        <form action={{ route('characters.updateMainInfo', $character->id) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+        <form action={{ route('characters.updateMainInfo', $character->uuid) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
             @csrf
             @method('PUT')
-            <input type="hidden" name="characterId" value={{ $character->id }}>
     @else
         <form action={{ route("characters.createMainInfo") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
             @csrf
@@ -29,9 +28,7 @@
                         {{ session('temp_photo_path') ? 'Изменить изображение' : 'Загрузить изображение' }}
                     </div>
                 </div>
-                <input type="file" id="photo-upload" name="photo" class="hidden-input" accept="image/*" onchange="previewFile(this)">
-                <div class="mt-4">
-                </div>
+                <input type="file" id="photo-upload" name="image" class="hidden-input" accept="image/*" onchange="previewFile(this)">
             </div>
 
             <!-- Правый блок: Форма -->

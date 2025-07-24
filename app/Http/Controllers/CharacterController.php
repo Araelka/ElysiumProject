@@ -7,6 +7,7 @@ use App\Models\Attribute;
 use App\Models\Character;
 use App\Models\CharacterAttribute;
 use App\Models\CharacterDescription;
+use App\Models\CharacterImage;
 use App\Models\CharacterSkill;
 use App\Models\Skill;
 use Illuminate\Http\Request;
@@ -15,13 +16,8 @@ use Illuminate\Support\Str;
 
 class CharacterController extends Controller
 {
-    protected function isUser($id) {
-        if (auth()->user()->id != Character::findOrFail($id)->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
-        }
-    }
 
-    public function index($id= null) {
+    public function index(Request $request) {
         // $character = Character::findOrFail(1);
         // $skills = Skill::findOrFail(3);
         // $characterA = CharacterAttribute::findOrFail(2);
@@ -30,21 +26,25 @@ class CharacterController extends Controller
 
         // $characters = Character::where('user_id', '=', auth()->user()->id)->get();
 
+        $selectedCharacterId = $request->query('character_id');
 
-        return view('frontend.characters.mainInfo');
+        $selectedCharacter = Character::find($selectedCharacterId);
+
+
+        $characters = Character::where('user_id', auth()->user()->id)->get();
+
+        return view('frontend.characters.index', compact('characters', 'selectedCharacter'));
     }
 
-    public function showMainInfo($id = null){
-        if($id != null){
-            $character = Character::findOrFail($id);
+    public function showMainInfo($uuid = null){
+        if($uuid != null){
+            $character = Character::where('uuid', $uuid)->first();
             
             if (auth()->user()->id != $character->user_id){
                 return redirect()->back()->withErrors('Недостаточно прав');
             }
 
-            $encryptedId = Crypt::encrypt($character->id);
-
-            return view('frontend.characters.mainInfo', compact('character', 'encryptedId')); 
+            return view('frontend.characters.mainInfo', compact('character')); 
         };
 
         return view('frontend.characters.mainInfo'); 
@@ -67,13 +67,29 @@ class CharacterController extends Controller
             'personality' => $request->input('personality'),
             'status_id' => 1
         ]);
+
+        if ($request->hasFile('image')) {
+            $folderPath = "images/character/{$character->uuid}";
+            $imagePath = $request->file('image')->store($folderPath, 'public');
+
+            $file = $request->file('image');
+
+            $fileContent = file_get_contents($file->getPathname());
+
+            $hash = md5($fileContent);
+
+            $image = CharacterImage::create([
+                'character_id' => $character->id,
+                'path' => $imagePath,
+                'file_hash' => $hash
+            ]);
+        }
         
         return redirect()->route('characters.showCreateSkills', $character->uuid);
     }
 
-    public function updateMainInfo($id, CharacterRequest $request){
-        $characterId = $request->input('characterId');
-        $character = Character::findOrFail($characterId);
+    public function updateMainInfo($uuid, CharacterRequest $request){
+        $character = Character::where('uuid', $uuid)->first();
 
         if (auth()->user()->id != $character->user_id){
             return redirect()->back()->withErrors('Недостаточно прав');    
@@ -93,21 +109,24 @@ class CharacterController extends Controller
             'status_id' => 1
         ]);
 
+        $characterId = $uuid;
 
         return redirect()->route('characters.showCreateSkills', $characterId);
     }
 
-    public function showCreateSkills($id){
-        $characterId = $id;
-        
-        if (auth()->user()->id != Character::where('uuid', $characterId)->first()->user_id) {
+    public function showCreateSkills($uuid){   
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
             return redirect()->back()->withErrors('Недостаточно прав');
         }
 
         $attributes = Attribute::with('skills')->get();
+        $characterId = $uuid;
 
-        if(Character::where('uuid', $characterId)->first()->attributes->first()){
+        if(Character::where('uuid', $uuid)->first()->attributes->first()){
+            $characterId = Character::where('uuid', $uuid)->first()->attributes->first()->character_id;
             $characterAttributes = CharacterAttribute::where('character_id',  $characterId)->get();
+            $characterId = $uuid;
 
             return view('frontend.characters.attributes', compact('attributes','characterAttributes', 'characterId')); 
         };
@@ -115,9 +134,9 @@ class CharacterController extends Controller
         return view('frontend.characters.attributes', compact('attributes', 'characterId'));
     }
 
-    public function createSkills($id, Request $request){
+    public function createSkills($uuid, Request $request){
 
-        if (auth()->user()->id != Character::findOrFail($id)->user_id){
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
             return redirect()->back()->withErrors('Недостаточно прав');    
         }
 
@@ -137,7 +156,7 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('Превышен предел суммы количства очков');
         }
 
-        $characterId = $id;
+        $characterId = Character::where('uuid', $uuid)->first()->id;
 
         foreach ($validated['attributes'] as $id => $attribute) {
             $characterAttribute = CharacterAttribute::create([
@@ -155,13 +174,13 @@ class CharacterController extends Controller
         }
 
 
-        return redirect()->route('characters.showCreateDescription', $characterId);;
+        return redirect()->route('characters.showCreateDescription', $uuid);;
 
     }
     
-    public function updateAttributes($id, Request $request){
+    public function updateAttributes($uuid, Request $request){
 
-        if (auth()->user()->id != Character::findOrFail($id)->user_id){
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
             return redirect()->back()->withErrors('Недостаточно прав');    
         }
 
@@ -174,60 +193,99 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('Превышен предел суммы количства очков');
         }
         
-        $characterId = $id;
+        $characterId = Character::where('uuid', $uuid)->first()->id;
 
         foreach ($validated['attributes'] as $id => $attribute) {
             $characterAttribute = CharacterAttribute::where('character_id',  $characterId)->where('attribute_id',  $id)->first();
             $characterAttribute->update([
                 'points' => $attribute
             ]);
-        }
+        } 
 
+        $characterId = $uuid;
 
         return redirect()->route('characters.showCreateDescription', $characterId);
     }
 
-    public function showCreateDescription($id){
+    public function showCreateDescription($uuid){
 
-        if (auth()->user()->id != Character::findOrFail($id)->user_id) {
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
             return redirect()->back()->withErrors('Недостаточно прав');
         }
 
-        $characterId = $id;
+        $characterId = Character::where('uuid', $uuid)->first()->id;
 
-        if (CharacterDescription::where('character_id', '=', $characterId)->first()){
-            $characterDescripron = CharacterDescription::where('character_id',  $id)->first();
+        if (CharacterDescription::where('character_id',  $characterId)->first()){
+            $characterDescripron = CharacterDescription::where('character_id',  $characterId)->first();
             if  (auth()->user()->id != $characterDescripron->character->user_id){
                 return redirect()->back()->withErrors('Недостаточно прав');
             }
 
+            $characterId = $uuid;
+
             return view('frontend.characters.description', compact( 'characterId', 'characterDescripron')); 
         }
+
+        $characterId = $uuid;
 
         return view('frontend.characters.description', compact( 'characterId'));
     }
 
-    public function createDescription(Request $request) {
+    public function createDescription($uuid ,Request $request) {
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
+        }
+
         $validated = $request->validate([
             'biography' => ['required', 'string'],
             'description' => ['required', 'string'],
             'headcounts' => ['nullable' ,'string']
         ]);
 
-
+        $characterId = Character::where('uuid', $uuid)->first()->id;
         CharacterDescription::create([
-            'character_id' => $request->input('characterId'),
+            'character_id' => $characterId,
             'biography' => $validated['biography'],
             'description' => $validated['description'],
             'headcounts' => $validated['headcounts']
         ]);
 
-        $character = Character::findOrFail($request->input('characterId'));
+        $character = Character::findOrFail($characterId);
         $character->update([
             'status_id' => 2
         ]);
 
-        return view('frontend.characters.index');
+        return redirect()->route('characters.index');
+    }
+
+    public function updateDescription($uuid, Request $request){
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
+            return redirect()->back()->withErrors('Недостаточно прав');    
+        }
+
+        $validated = $request->validate([
+            'biography' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'headcounts' => ['nullable' ,'string']
+        ]);
+
+        $character = Character::where('uuid', $uuid)->first();
+        $characterId = $character->id;
+
+        $characterDescription = CharacterDescription::findOrFail($characterId);
+        $characterDescription->update([
+            'biography' => $validated['biography'],
+            'description' => $validated['description'],
+            'headcounts' => $validated['headcounts']
+        ]);
+
+        $character->update([
+            'status_id' => 2
+        ]);
+
+        return redirect()->route('characters.index');
     }
 
 }

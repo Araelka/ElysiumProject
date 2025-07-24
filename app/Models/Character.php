@@ -39,11 +39,15 @@ class Character extends Model
     }
     
     public function description() {
-        return $this->belongsTo(CharacterDescription::class);
+        return CharacterDescription::where('character_id', $this->id)->first();
     }
 
     public function status(){
         return $this->belongsTo(CharacterStatus::class);
+    }
+
+    public function images(){
+        return $this->hasMany(CharacterImage::class);
     }
 
     public function preparing(){

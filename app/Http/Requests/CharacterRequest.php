@@ -86,15 +86,21 @@ class CharacterRequest extends FormRequest
                 'image',
                 'mimes:png,jpeg,jpg,webp',
                 'max:4056'
-            ]
+            ],
+
+            'image' => [
+                'nullable', 
+                'image', 
+                'mimes:png,jpeg,jpg,webp', 
+                'max:2048']
         ];
     }
 
 
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator) {
-        if ($this->hasFile('photo')) {
-            $tempPath = $this->file('photo')->store('temp', 'public');
+        if ($this->hasFile('image')) {
+            $tempPath = $this->file('image')->store('temp', 'public');
             session(['temp_photo_path' => $tempPath]);
         }    
 

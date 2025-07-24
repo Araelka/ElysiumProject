@@ -99,11 +99,12 @@
         // Добавляем нужное количество ромбиков
         for (let i = 0; i < value; i++) {
             const diamond = document.createElement('label');
-            diamond.textContent = '♦';
+            diamond.textContent = '◆';
             diamondsContainer.appendChild(diamond);
         }
 
         const skillValues = document.querySelectorAll(`[data-attribute-id="${attributeId}"]`);
+        console.log(skillValues);
         skillValues.forEach(skillValue => {
             const skillId = skillValue.parentElement.parentElement.querySelector('label').id;
             const diamondsSkillContainer = document.getElementById(skillId);
@@ -111,7 +112,7 @@
             
             for (let i = 0; i < value; i++) {
                 const diamondSkill = document.createElement('label');
-                diamondSkill.textContent = '◊';
+                diamondSkill.textContent = '◇';
                 diamondsSkillContainer.appendChild(diamondSkill); 
             }
         })

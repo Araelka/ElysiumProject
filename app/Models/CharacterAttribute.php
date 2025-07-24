@@ -22,4 +22,14 @@ class CharacterAttribute extends Model
     public function character() {
         return $this->belongsTo(Character::class);
     }
+
+    public function skills(){
+        $skills = Skill::where('attribute_id', $this->attribute_id)->get();
+        $characterSkills = [];
+        foreach ($skills as $skill) {
+            $characterSkills[] = CharacterSkill::where('skill_id', $skill->id)->first();
+        }
+
+        return $characterSkills;
+    }
 }

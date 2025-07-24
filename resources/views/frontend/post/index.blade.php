@@ -1,11 +1,12 @@
 @extends('frontend.layout.layout')
+<link rel="stylesheet" href="{{ asset('css/posts.css') }}">
 @if ($selectedLocation) 
 @section('title', $selectedLocation->name)
 @endif
 
 
 @section('content')
-<div class="home-page">
+<div class="double-page">
     <div class="container d-flex justify-content-center align-items-stretch"> 
         <div class="row w-100 h-100"> 
             <div class="col-md-2 sidebar d-flex flex-column justify-content-start">
