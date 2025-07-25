@@ -19,12 +19,14 @@
                     <label >Создание персонажа</label>
                 </div>
                 <div class="image-preview" style="width: 200px; height: 265px; ;" onclick="document.getElementById('photo-upload').click()">
-                    @if ($character->images->first())
-                        <img id="preview-image" src="{{ asset('storage/' . $character->images->first()->path) }}" class="rounded-circle">
-                        <div id="placeholder-text" class="placeholder">Изменить изображение</div>
-                    @elseif (session('temp_photo_path'))
+                    @if (session('temp_photo_path'))
                         <img id="preview-image" src="{{ asset('storage/' . session('temp_photo_path')) }}" class="rounded-circle">
                         <div id="placeholder-text" class="placeholder">Изменить изображение</div>
+                    @isset($character)
+                        @elseif ($character->images->first())
+                        <img id="preview-image" src="{{ asset('storage/' . $character->images->first()->path) }}" class="rounded-circle">
+                        <div id="placeholder-text" class="placeholder">Изменить изображение</div>
+                    @endisset
                     @else
                         <img id="preview-image" src="#" class="rounded-circle" style="display: none;">
                         <div id="placeholder-text" class="placeholder">Загрузить изображение</div>
@@ -177,7 +179,9 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const tempPhotoPath = "{{ session('temp_photo_path') }}";
-        const photoPath = "{{ $character->images->first()?->path }}"
+        @isset($character)
+            const photoPath = "{{ $character->images->first()?->path }}"
+        @endisset
         const previewImage = document.getElementById('preview-image');
         const placeholderText = document.getElementById('placeholder-text');
 
@@ -187,11 +191,14 @@
             previewImage.style.display = 'block';
             placeholderText.style.display = 'none';
         } 
-        else if (photoPath) {
+        @isset($character)
+            else if (photoPath) {
                 previewImage.src = "{{ asset('storage/' . $character->images->first()?->path) }}";
                 previewImage.style.display = 'block';
                 placeholderText.style.display = 'none';
             }
+        @endisset
+        
         else {
             // Если временного файла нет, показываем placeholder
             previewImage.style.display = 'none';
