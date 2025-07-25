@@ -66,6 +66,7 @@
     height: 100%;
     object-fit: cover;
     border-radius: 10px;
+    object-position: top;
 }
 
 #preview-image {
@@ -323,25 +324,30 @@
 .topic-link {
     position: relative;
     text-decoration: none;
-    color: #f4d03f; /* Ярко-жёлтый текст */
+    color: #f4d03f; 
+    background-color: rgba(10, 14, 23, 0.9);
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
     border: 2px solid #f4d03f;
     display: block;
     padding: 25px 10px;
+    /* padding: 25px 0px 10px 10px; */
     transition: background-color 0.3s ease;
 }
 
 .topic-link:hover {
+    scale: 1.05;
     border-color: #ec7063; /* Ярко-жёлтый фон при наведении */
 }
 
 
 .topic-link.active {
-    background-color: #f4d03f; 
-    border-color: #f4d03f;
-    color: #1a1a40; 
+    scale: 1.05;
+    border-color: #ec7063;
+    /* background-color: #f4d03f;  */
+    /* border-color: #f4d03f; */
+    /* color: #1a1a40;  */
     font-weight: bold;
 }
 
@@ -363,11 +369,17 @@
 }
 
 .character-name {
-    display: inline-block;
+    /* display: inline-block; */
+    display: flex;
+    flex-direction: row;
     font-weight: bold;
+    gap: 10px;
 }
 
 .character-status {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
     position: absolute; /* Абсолютное позиционирование */
     top: 5px; /* Отступ сверху */
     right: 5px; /* Отступ справа */
@@ -396,6 +408,7 @@
 }
 
 .character-info-container{
+    padding-right: 5px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -412,4 +425,80 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.editCharacter {
+    color: #f4d03f;
+    text-decoration: none;
+}
+
+.editCharacter:hover {
+    text-decoration: underline;
+}
+
+.character-available-points-container {
+    position: absolute;
+    display: inline-block;
+    top: 5px; 
+    left: 10px; 
+}
+
+.character-available-points {
+    z-index: 2;
+    font-size: 14px;
+    font-weight: normal;
+    animation: pulse 1.5s infinite;
+}
+
+.character-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f4d03f; /* Цвет колец */
+    border-radius: 50%; /* Круглая форма */
+    transform: translate(-50%, -50%); /* Центрирование */
+    animation: ring-animation 3s infinite ease-out; /* Анимация колец */
+    opacity: 0; /* Начальная прозрачность */
+    z-index: 1; /* Чтобы кольца были под точкой */
+}
+
+.character-ring:nth-child(1) {
+    animation-delay: 0s; 
+}
+
+.character-ring:nth-child(2) {
+    animation-delay: 1s; 
+}
+
+.character-ring:nth-child(3) {
+    animation-delay: 2s; 
+}
+
+
+@keyframes pulse {
+    0% {
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1; 
+        transform: scale(1.2); 
+    }
+    100% {
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+@keyframes ring-animation {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5); /* Маленький размер в начале */
+        opacity: 1; /* Полная видимость */
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.2); /* Большой размер в конце */
+        opacity: 0; /* Исчезновение */
+    }
 }

@@ -20,16 +20,42 @@
                     @foreach ($characters as $character)
                         <li>
                             <a href="?character_id={{ $character->id }}"  class="topic-link {{ $selectedCharacter && $selectedCharacter->id == $character->id ? 'active' : '' }}">
+                                @if ($character->available_points > 0)
+                                    <div class="character-available-points-container" style="color: #f4d03f">
+                                        <span class="character-available-points">&#9679;</span>
+                                        <div class="character-ring"></div>
+                                        <div class="character-ring"></div>
+                                        <div class="character-ring"></div>
+                                    </div>
+                                @endif
+                                
                                 <span class="character-name">
                                     {{ $character->firstName . ' ' . $character->secondName }}
                                 </span>
-                                <span class="character-status">
-                                    {{ $character->status->name }}
-                                </span>
+
+                                @if ($character->isPreparing() || $character->isConsideration())
+                                    <span class="character-status" style="color: #f4d03f">
+                                        {{ $character->status->name }}
+                                    </span>
+                                @elseif ($character->isApproved())
+                                    <span class="character-status" style="color: green">
+                                        {{ $character->status->name }}
+                                    </span>
+                                @elseif ($character->isRejected())
+                                    <span class="character-status" style="color: #ec7063">
+                                        {{ $character->status->name }}
+                                    </span>
+                                @elseif ($character->isArchive())
+                                    <span class="character-status" style="color: grey">
+                                        {{ $character->status->name }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                     @endforeach
-                    <a href={{ route('characters.showMainInfo') }} class="topic-link-button">Создать персонажа</a>
+                    @if ($characters->where('status_id', '!=', 5)->count() < 5)
+                        <a href={{ route('characters.showMainInfo') }} class="topic-link-button">Создать персонажа</a>
+                    @endif
                 </ul>
             </div>
 
@@ -51,9 +77,45 @@
                                         @endif
                                     <div class="character-main-info-content">
                                         <div>
-                                            <strong>Имя Фамилия</strong> 
+                                            <div class="character-main-info-double-content">
+                                                <div style="width: 50%">
+                                                    <strong>Имя Фамилия</strong> 
+                                                </div>
+                                                @if ($selectedCharacter->isArchive())
+                                                    <div>
+                                                        <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Вернуть из архива</strong> </a>
+                                                    </div>
+                                                @endif
+                                                @if ($selectedCharacter->isApproved())
+                                                    <div style="display: flex; flex-direction: row; gap: 10px;">
+                                                        @if ($selectedCharacter->available_points > 0)
+                                                            <div>
+                                                                <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Изменить навыки</strong> </a>
+                                                            </div>
+                                                        @endif
+                                                        <div>
+                                                            <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} style="color: gray;" class="editCharacter"><strong>В архив</strong> </a>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive())
+                                                <div style="display: flex; flex-direction: row; gap: 10px;">
+                                                    <div>
+                                                        <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>
+                                                    </div>
+                                                        <div>
+                                                        <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} style="color: #ec7063;" class="editCharacter"><strong>Удалить</strong> </a>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                                
+                                            </div>
                                             <hr>
-                                            {{ $selectedCharacter->firstName . ' ' . $selectedCharacter->secondName }}
+                                            <div class="character-main-info-double-content">
+                                                <div style="width: 50%">
+                                                    {{ $selectedCharacter->firstName . ' ' . $selectedCharacter->secondName }}
+                                                </div>
+                                            </div>
                                         </div>
                                         
                                         <div>

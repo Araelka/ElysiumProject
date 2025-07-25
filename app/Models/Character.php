@@ -39,7 +39,7 @@ class Character extends Model
     }
     
     public function description() {
-        return CharacterDescription::where('character_id', $this->id)->first();
+        return $this->hasOne(CharacterDescription::class)->get()->first();
     }
 
     public function status(){
@@ -50,20 +50,24 @@ class Character extends Model
         return $this->hasMany(CharacterImage::class);
     }
 
-    public function preparing(){
-        return $this->character_status_id === 1;
+    public function isPreparing(){
+        return $this->status_id === 1;
     }
 
-    public function consideration(){
-        return $this->character_status_id === 2;
+    public function isConsideration(){
+        return $this->status_id === 2;
     }
 
-    public function approved(){
-        return $this->character_status_id === 3;
+    public function isApproved(){
+        return $this->status_id === 3;
     }
 
-    public function rejected(){
-        return $this->character_status_id === 4;
+    public function isRejected(){
+        return $this->status_id === 4;
+    }
+
+    public function isArchive(){
+        return $this->status_id === 5;
     }
 
     public function getTotalSpentPoints(){

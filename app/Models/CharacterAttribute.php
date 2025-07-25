@@ -27,7 +27,7 @@ class CharacterAttribute extends Model
         $skills = Skill::where('attribute_id', $this->attribute_id)->get();
         $characterSkills = [];
         foreach ($skills as $skill) {
-            $characterSkills[] = CharacterSkill::where('skill_id', $skill->id)->first();
+            $characterSkills[] = CharacterSkill::where('skill_id', $skill->id)->where('character_id', $this->character_id)->get()->first();
         }
 
         return $characterSkills;

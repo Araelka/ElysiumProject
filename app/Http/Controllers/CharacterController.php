@@ -12,6 +12,7 @@ use App\Models\CharacterSkill;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CharacterController extends Controller
@@ -109,7 +110,33 @@ class CharacterController extends Controller
             'status_id' => 1
         ]);
 
+
+
+        if ($request->hasFile('image')) {
+             
+            if ($character->images->first()) {
+                if (Storage::disk('public')->exists($character->images->first()->path)) {
+                    Storage::disk('public')->delete($character->images->first()->path);
+                }
+            }
+
+            $file = $request->file('image');
+
+            $folderPath = "images/character/{$character->uuid}";
+            $imagePath = $request->file('image')->store($folderPath, 'public');
+
+            $fileContent = file_get_contents($file->getPathname());
+
+            $hash = md5($fileContent);
+
+            $character->images->first()->update([
+                'path' => $imagePath,
+                'file_hash' => $hash
+            ]);
+        }
+
         $characterId = $uuid;
+        
 
         return redirect()->route('characters.showCreateSkills', $characterId);
     }

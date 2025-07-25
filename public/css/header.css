@@ -8,6 +8,7 @@ body {
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    background-color: rgba(10, 14, 23, 0.9);
     color: #fff;
     overflow: hidden;
 }
