@@ -1,6 +1,7 @@
 @extends('frontend.characters.indexCreate')
 
 @section('characterContent')
+
 @isset($characterDescripron)
     <form action={{ route("characters.updateDescription", $characterId) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
         @csrf

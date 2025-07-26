@@ -29,7 +29,11 @@ class CharacterController extends Controller
 
         $selectedCharacterId = $request->query('character_id');
 
-        $selectedCharacter = Character::find($selectedCharacterId);
+        $selectedCharacter = Character::where('uuid', $selectedCharacterId)->first();
+
+        // if ($selectedCharacter && $selectedCharacter->user_id != auth()->user()->id) {
+        //     return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        // }
 
 
         $characters = Character::where('user_id', auth()->user()->id)->get();
@@ -70,7 +74,7 @@ class CharacterController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $folderPath = "images/character/{$character->uuid}";
+            $folderPath = "images/characters/{$character->uuid}";
             $imagePath = $request->file('image')->store($folderPath, 'public');
 
             $file = $request->file('image');
@@ -122,17 +126,27 @@ class CharacterController extends Controller
 
             $file = $request->file('image');
 
-            $folderPath = "images/character/{$character->uuid}";
+            $folderPath = "images/characters/{$character->uuid}";
             $imagePath = $request->file('image')->store($folderPath, 'public');
 
             $fileContent = file_get_contents($file->getPathname());
 
             $hash = md5($fileContent);
 
-            $character->images->first()->update([
+            if ($character->images->first()) {
+                    $character->images->first()->update([
+                    'path' => $imagePath,
+                    'file_hash' => $hash
+                ]);
+            }
+            else {
+                CharacterImage::create([
+                'character_id' => $character->id,
                 'path' => $imagePath,
                 'file_hash' => $hash
             ]);
+            }
+            
         }
 
         $characterId = $uuid;
@@ -258,7 +272,7 @@ class CharacterController extends Controller
         return view('frontend.characters.description', compact( 'characterId'));
     }
 
-    public function createDescription($uuid ,Request $request) {
+    public function createDescription($uuid, Request $request) {
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
             return redirect()->back()->withErrors('Недостаточно прав');    
@@ -301,18 +315,46 @@ class CharacterController extends Controller
         $character = Character::where('uuid', $uuid)->first();
         $characterId = $character->id;
 
-        $characterDescription = CharacterDescription::findOrFail($characterId);
+
+        $characterDescription = CharacterDescription::where('character_id', $characterId)->first();
+        
+
         $characterDescription->update([
             'biography' => $validated['biography'],
             'description' => $validated['description'],
             'headcounts' => $validated['headcounts']
         ]);
 
+
         $character->update([
             'status_id' => 2
         ]);
 
+
         return redirect()->route('characters.index');
+    }
+
+    public function characterDestoy ($uuid) {
+
+        if (Character::where('uuid', $uuid)->first()->user_id != auth()->user()->id && !auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        if (!auth()->user()->isAdmin() && !Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $character = Character::where('uuid', $uuid)->first();
+
+        if ($character->images->first()) {
+            if (Storage::disk('public')->exists('images/characters/' . $character->uuid)) {
+                Storage::disk('public')->deleteDirectory('images/characters/' . $character->uuid);
+            }
+        }
+
+        $character->delete();
+
+        return redirect()->back();
     }
 
 }

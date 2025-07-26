@@ -338,7 +338,9 @@
 
 .topic-link:hover {
     scale: 1.05;
-    border-color: #ec7063; /* Ярко-жёлтый фон при наведении */
+    color: #1a1a40;
+    background-color: #f4d03f;
+    /* border-color: #ec7063;  */
 }
 
 
@@ -354,18 +356,24 @@
 .topic-link-button {
     position: relative;
     text-decoration: none;
-    color: #1a1a40; 
+    /* color: #1a1a40;  */
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
-    background-color: #f4d03f;
+    /* background-color: #f4d03f; */
     display: block;
     padding: 10px 10px;
     transition: background-color 0.3s ease;
+
+    background-color: transparent;
+    border: 2px solid #f4d03f;
+    color: #f4d03f;
 }
 
 .topic-link-button:hover {
-    background-color: #ec7063;
+    /* background-color: #ec7063; */
+    color: #1a1a40;
+    background-color: #f4d03f;
 }
 
 .character-name {
@@ -501,4 +509,14 @@
         transform: translate(-50%, -50%) scale(1.2); /* Большой размер в конце */
         opacity: 0; /* Исчезновение */
     }
+}
+
+.delete-character-button {
+    color: #ec7063;
+    background-color: transparent;
+    border: 0px;
+}
+
+.delete-character-button:hover {
+    text-decoration: underline;
 }

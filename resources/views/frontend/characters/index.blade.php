@@ -19,7 +19,7 @@
                 <ul class="topics-list">
                     @foreach ($characters as $character)
                         <li>
-                            <a href="?character_id={{ $character->id }}"  class="topic-link {{ $selectedCharacter && $selectedCharacter->id == $character->id ? 'active' : '' }}">
+                            <a href="?character_id={{ $character->uuid }}"  class="topic-link {{ $selectedCharacter && $selectedCharacter->id == $character->id ? 'active' : '' }}">
                                 @if ($character->available_points > 0)
                                     <div class="character-available-points-container" style="color: #f4d03f">
                                         <span class="character-available-points">&#9679;</span>
@@ -71,8 +71,12 @@
                                                 <img src="{{ asset('storage/' . $selectedCharacter->images->first()->path) }}" class="rounded-circle">
                                             </div>
                                         @else
-                                            <div class="image-preview" style="width:306px; height:306px;" >
-                                                <img id="preview-image" src="#" class="rounded-circle" style="display: none;">
+                                            <div class="image-view" style="width:306px; height:306px;" >
+                                            @if ($selectedCharacter->gender == 'Мужской')
+                                                    <img src="{{ asset('images/characters/characterMale.jpg') }}" class="rounded-circle">
+                                            @else
+                                                    <img src="{{ asset('images/characters/characterFemale.jpg') }}" class="rounded-circle">
+                                            @endif
                                             </div>
                                         @endif
                                     <div class="character-main-info-content">
@@ -98,16 +102,20 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive())
+                                                {{-- @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration()) --}}
                                                 <div style="display: flex; flex-direction: row; gap: 10px;">
                                                     <div>
                                                         <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>
                                                     </div>
                                                         <div>
-                                                        <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} style="color: #ec7063;" class="editCharacter"><strong>Удалить</strong> </a>
+                                                            <form action="{{ route('characters.characterDestoy',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST" class="delete-form">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="delete-character-button"><strong>Удалить</strong></button>
+                                                            </form>
                                                     </div>
                                                 </div>
-                                                @endif
+                                                {{-- @endif --}}
                                                 
                                             </div>
                                             <hr>
