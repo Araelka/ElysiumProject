@@ -195,9 +195,15 @@
                                 </div>
 
                                 <div>
-                                    <strong>Характер</strong> 
-                                    <hr>
-                                    {{ $selectedCharacter->personality }}
+                                    {{-- <strong>Характер</strong> 
+                                    <hr> --}}
+                                    <details>
+                                        <summary><strong>Характер</strong> 
+                                        </summary>
+                                        <hr>
+                                        {{ $selectedCharacter->personality }}
+                                    </details>
+                                    
                                 </div>
 
                                 @if ($selectedCharacter->description())
