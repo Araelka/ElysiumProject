@@ -1,3 +1,8 @@
+form {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
 .character-form-container {
     padding: 20px 0px;
     margin-bottom: 20px;
@@ -337,21 +342,49 @@
 }
 
 .topic-link:hover {
-    scale: 1.05;
+    /* scale: 1.05; */
     color: #1a1a40;
     background-color: #f4d03f;
     /* border-color: #ec7063;  */
 }
 
+.status-preparing {
+    font-weight: bold;
+    color: #f4d03f;
+}
+
+.topic-link:hover .character-status .status-preparing{
+    color: #1a1a40;
+}
+
+.status-approved {
+    font-weight: bold;
+    color: green;
+}
+
+.status-rejected {
+    font-weight: bold;
+    color: #ec7063;
+}
+
+.status-archive {
+    font-weight: bold;
+    color: gray;
+}
 
 .topic-link.active {
-    scale: 1.05;
-    border-color: #ec7063;
-    /* background-color: #f4d03f;  */
+    /* scale: 1.05; */
+    /* border-color: #ec7063; */
+    background-color: #f4d03f; 
     /* border-color: #f4d03f; */
-    /* color: #1a1a40;  */
+    color: #1a1a40; 
     font-weight: bold;
 }
+
+.topic-link.active .character-status .status-preparing {
+    color: #1a1a40; 
+}
+
 
 .topic-link-button {
     position: relative;
@@ -397,6 +430,7 @@
     border-radius: 5px;
 }
 
+
 .character-main-info {
     display: flex;
     flex-direction: row;
@@ -416,7 +450,8 @@
 }
 
 .character-info-container{
-    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -452,6 +487,7 @@
 }
 
 .character-available-points {
+    color: #f4d03f;
     z-index: 2;
     font-size: 14px;
     font-weight: normal;
@@ -467,7 +503,7 @@
     border: 2px solid #f4d03f; /* Цвет колец */
     border-radius: 50%; /* Круглая форма */
     transform: translate(-50%, -50%); /* Центрирование */
-    animation: ring-animation 3s infinite ease-out; /* Анимация колец */
+    animation: ring-animation 3s infinite ease-out; 
     opacity: 0; /* Начальная прозрачность */
     z-index: 1; /* Чтобы кольца были под точкой */
 }
@@ -482,6 +518,16 @@
 
 .character-ring:nth-child(3) {
     animation-delay: 2s; 
+}
+
+.topic-link:hover > .character-available-points-container > .character-available-points,
+.topic-link.active > .character-available-points-container > .character-available-points  {
+    color: #1a1a40;
+}
+
+.topic-link:hover > .character-available-points-container > .character-ring,
+.topic-link.active > .character-available-points-container > .character-ring  {
+    border-color: #1a1a40;
 }
 
 
@@ -519,4 +565,57 @@
 
 .delete-character-button:hover {
     text-decoration: underline;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary {
+    list-style: none;
+}
+
+details summary:before {
+    content: '⮚';
+    margin-right: 5px;
+}
+
+details[open] summary:before {
+    content: '⮛';
+}
+
+.skill-update {
+    border: 2px solid #f4d03f;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: flex-end;
+    width: 200px;
+    min-width: 120px;
+    max-width: 200px;
+    height: 240px;
+    min-height: 175px;
+    max-height: 240px;
+}
+
+.skill-update:hover {
+    border-color: #fff;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+.skill-update:hover .skill-name {
+    color: #1a1a40;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.skill-update.active {
+    transform: scale(1.05);
+    border-color: #fff;
+}
+
+.skill-update.active .skill-name {
+    color: #1a1a40;
+    background-color: #fff;
 }

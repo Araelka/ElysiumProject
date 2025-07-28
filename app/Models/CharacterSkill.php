@@ -31,11 +31,11 @@ class CharacterSkill extends Model
         return 2 * $attributLevel;
     }
 
-    public function getLevelAttribute(){
+    public function getLevelSkill(){
         $attributLevel = $this->character->attributes()
             ->where('attribute_id', $this->skill->attribute_id)
             ->value('level');
 
-        return min($attributLevel + $this->poins, 2 * $attributLevel);
+        return min($attributLevel + $this->points, 2 * $attributLevel);
     }
 }

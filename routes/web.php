@@ -38,9 +38,11 @@ Route::middleware('auth')->group(function(){
         Route::put('update/info/{id}', [CharacterController::class, 'updateMainInfo'])->name('updateMainInfo');
         Route::delete('destoy/character/{id}', [CharacterController::class, 'characterDestoy'])->name('characterDestoy');
 
-        Route::get('create/skills/{id}', [CharacterController::class, 'showCreateSkills'])->name('showCreateSkills');
-        Route::post('create/skills/{id}', [CharacterController::class, 'createSkills'])->name('createSkills');
-        Route::put('update/skills/{id}', [CharacterController::class, 'updateAttributes'])->name('updateAttributes');
+        Route::get('create/attributes/{id}', [CharacterController::class, 'showCreateSkills'])->name('showCreateSkills');
+        Route::get('update/skills/{id}', [CharacterController::class, 'showUpdateSkills'])->name('showUpdateSkills');
+        Route::post('create/attributes/{id}', [CharacterController::class, 'createSkills'])->name('createSkills');
+        Route::put('update/attributes/{id}', [CharacterController::class, 'updateAttributes'])->name('updateAttributes');
+        Route::put('update/skills/{id}', [CharacterController::class, 'updateSkills'])->name('updateSkills');
 
         Route::get('create/description/{id}', [CharacterController::class, 'showCreateDescription'])->name('showCreateDescription');
         Route::post('create/description/{id}', [CharacterController::class, 'createDescription'])->name('createDescription');

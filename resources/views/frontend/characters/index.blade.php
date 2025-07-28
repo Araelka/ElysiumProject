@@ -4,7 +4,6 @@
 @else
     @section('title', 'Персонажи')
 @endif
-
 <link rel="stylesheet" href="{{ asset('css/character.css') }}">
 
 
@@ -19,9 +18,9 @@
                 <ul class="topics-list">
                     @foreach ($characters as $character)
                         <li>
-                            <a href="?character_id={{ $character->uuid }}"  class="topic-link {{ $selectedCharacter && $selectedCharacter->id == $character->id ? 'active' : '' }}">
-                                @if ($character->available_points > 0)
-                                    <div class="character-available-points-container" style="color: #f4d03f">
+                            <a href="?character={{ $character->uuid }}"  class="topic-link {{ $selectedCharacter && $selectedCharacter->id == $character->id ? 'active' : '' }}">
+                                @if ($character->available_points > 0 && $character->isApproved())
+                                    <div class="character-available-points-container">
                                         <span class="character-available-points">&#9679;</span>
                                         <div class="character-ring"></div>
                                         <div class="character-ring"></div>
@@ -33,23 +32,25 @@
                                     {{ $character->firstName . ' ' . $character->secondName }}
                                 </span>
 
+                                <span class="character-status">
                                 @if ($character->isPreparing() || $character->isConsideration())
-                                    <span class="character-status" style="color: #f4d03f">
+                                    <div class="status-preparing">
                                         {{ $character->status->name }}
-                                    </span>
+                                    </div>
                                 @elseif ($character->isApproved())
-                                    <span class="character-status" style="color: green">
-                                        {{ $character->status->name }}
-                                    </span>
+                                        <div class="status-approved">
+                                            {{ $character->status->name }}
+                                        </div>
                                 @elseif ($character->isRejected())
-                                    <span class="character-status" style="color: #ec7063">
-                                        {{ $character->status->name }}
-                                    </span>
+                                <div class="status-rejected">
+                                    {{ $character->status->name }}
+                                </div>
                                 @elseif ($character->isArchive())
-                                    <span class="character-status" style="color: grey">
-                                        {{ $character->status->name }}
-                                    </span>
+                                        <div class="status-archive">
+                                            {{ $character->status->name }}
+                                        </div>
                                 @endif
+                                </span>
                             </a>
                         </li>
                     @endforeach
@@ -71,7 +72,7 @@
                                                 <img src="{{ asset('storage/' . $selectedCharacter->images->first()->path) }}" class="rounded-circle">
                                             </div>
                                         @else
-                                            <div class="image-view" style="width:306px; height:306px;" >
+                                            <div class="image-view" style="width:310px; height:310px;" >
                                             @if ($selectedCharacter->gender == 'Мужской')
                                                     <img src="{{ asset('images/characters/characterMale.jpg') }}" class="rounded-circle">
                                             @else
@@ -94,7 +95,7 @@
                                                     <div style="display: flex; flex-direction: row; gap: 10px;">
                                                         @if ($selectedCharacter->available_points > 0)
                                                             <div>
-                                                                <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Изменить навыки</strong> </a>
+                                                                <a href={{ route('characters.showUpdateSkills', $selectedCharacter->uuid) }} class="editCharacter"><strong>Повышение уровня</strong> </a>
                                                             </div>
                                                         @endif
                                                         <div>
@@ -102,7 +103,7 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                {{-- @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration()) --}}
+                                                @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration())
                                                 <div style="display: flex; flex-direction: row; gap: 10px;">
                                                     <div>
                                                         <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>
@@ -115,7 +116,7 @@
                                                             </form>
                                                     </div>
                                                 </div>
-                                                {{-- @endif --}}
+                                                @endif
                                                 
                                             </div>
                                             <hr>
@@ -195,39 +196,42 @@
                                 </div>
 
                                 <div>
-                                    {{-- <strong>Характер</strong> 
-                                    <hr> --}}
                                     <details>
                                         <summary><strong>Характер</strong> 
                                         </summary>
                                         <hr>
                                         {{ $selectedCharacter->personality }}
                                     </details>
-                                    
                                 </div>
 
                                 @if ($selectedCharacter->description())
                                     @if($selectedCharacter->description()->biography)
                                     <div>
-                                        <strong>Биография</strong> 
-                                        <hr>
-                                        {{ $selectedCharacter->description()->biography }}
+                                        <details>
+                                            <summary><strong>Биография</strong> </summary>
+                                            <hr>
+                                            {{ $selectedCharacter->description()->biography }}
+                                        </details>
                                     </div>
                                     @endif
 
                                     @if($selectedCharacter->description()->description)
                                         <div>
-                                            <strong>Внешность</strong> 
-                                            <hr>
-                                            {{ $selectedCharacter->description()->description }}
+                                            <details>
+                                                <summary><strong>Внешность</strong> </summary>
+                                                <hr>
+                                                {{ $selectedCharacter->description()->description }}
+                                            </details>
                                         </div>
                                     @endif
 
                                     @if($selectedCharacter->description()->headcounts)
                                         <div>
-                                            <strong>Внешность</strong> 
-                                            <hr>
-                                            {{ $selectedCharacter->description()->headcounts }}
+                                            <details>
+                                                <summary><strong>Внешность</strong> </summary>
+                                                <hr>
+                                                {{ $selectedCharacter->description()->headcounts }}
+                                            </details>
                                         </div>
                                     @endif
                                 @endif
@@ -246,11 +250,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="slills">
-                                                    @foreach ($attribute->skills() as $skill)
+                                                    @foreach ($attribute->skills() as $skillId => $skill)
                                                         <div class="skill" style="background-image: url({{ asset( $skill->skill->image_path) }}); background-size: contain; width: 122px; height: 173px;">
                                                             <div class="skill-content">
                                                                 <div class="skill-value-content">
-                                                                    <span data-attribute-id="{{ $attribute->id }}" id="skill-value-{{ $skill->id }}" class="skill-value">{{$attribute->level + $skill->points }}</span>
+                                                                    <span data-attribute-id="{{ $attribute->id }}" id="skill-value-{{ $skill->id }}" class="skill-value">{{ $skill->getLevelSkill() }}</span>
                                                                 </div>
 
                                                                 <div style="text-align: center; display: flex; flex-direction: column;">

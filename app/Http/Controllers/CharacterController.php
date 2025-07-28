@@ -27,13 +27,13 @@ class CharacterController extends Controller
 
         // $characters = Character::where('user_id', '=', auth()->user()->id)->get();
 
-        $selectedCharacterId = $request->query('character_id');
+        $selectedCharacterId = $request->query('character');
 
         $selectedCharacter = Character::where('uuid', $selectedCharacterId)->first();
 
-        // if ($selectedCharacter && $selectedCharacter->user_id != auth()->user()->id) {
-        //     return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
-        // }
+        if ($selectedCharacter && $selectedCharacter->user_id != auth()->user()->id) {
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
 
 
         $characters = Character::where('user_id', auth()->user()->id)->get();
@@ -43,10 +43,14 @@ class CharacterController extends Controller
 
     public function showMainInfo($uuid = null){
         if($uuid != null){
+            if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+                return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+            }
+            
             $character = Character::where('uuid', $uuid)->first();
             
             if (auth()->user()->id != $character->user_id){
-                return redirect()->back()->withErrors('Недостаточно прав');
+                return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
             }
 
             return view('frontend.characters.mainInfo', compact('character')); 
@@ -94,10 +98,14 @@ class CharacterController extends Controller
     }
 
     public function updateMainInfo($uuid, CharacterRequest $request){
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $character = Character::where('uuid', $uuid)->first();
 
         if (auth()->user()->id != $character->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
         }
 
         $character->update([
@@ -156,9 +164,13 @@ class CharacterController extends Controller
     }
 
     public function showCreateSkills($uuid){   
-
+        
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
-            return redirect()->back()->withErrors('Недостаточно прав');
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
         $attributes = Attribute::with('skills')->get();
@@ -175,10 +187,32 @@ class CharacterController extends Controller
         return view('frontend.characters.attributes', compact('attributes', 'characterId'));
     }
 
+    public function showUpdateSkills ($uuid) {
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        if (Character::where('uuid', $uuid)->first()->getAvailablePoints() <= 0 || !Character::where('uuid', $uuid)->first()->isApproved()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $attributes = Attribute::with('skills')->get();
+
+        $character = Character::where('uuid', $uuid)->first();
+        $characterId = $character->id;
+        $characterAttributes = $character->attributes;
+        $characterId = $uuid;
+
+        return view('frontend.characters.skills', compact('attributes', 'characterAttributes', 'character', 'characterId')); 
+
+
+    }
+
     public function createSkills($uuid, Request $request){
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
         }
 
         $validated = $request->validate([
@@ -222,7 +256,11 @@ class CharacterController extends Controller
     public function updateAttributes($uuid, Request $request){
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
         $validated = $request->validate([
@@ -248,10 +286,39 @@ class CharacterController extends Controller
         return redirect()->route('characters.showCreateDescription', $characterId);
     }
 
+    public function updateSkills ($uuid, Request $request){
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        if (Character::where('uuid', $uuid)->first()->getAvailablePoints() <= 0 || !Character::where('uuid', $uuid)->first()->isApproved()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        // dd($request);
+
+        $validated = $request->validate([
+            'skills' => ['required', 'array', 'max:1'],
+            'skills.*' => ['required', 'integer', 'min:1', 'max:6']
+        ]);
+
+        foreach ($validated['skills'] as $id => $skill) {
+            $skill = CharacterSkill::findOrFail($id);
+        }
+
+        // $skill = CharacterSkill::findOrFail($validated['skills'[0]]);
+        // dd($skill);
+    }
+
     public function showCreateDescription($uuid){
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id) {
-            return redirect()->back()->withErrors('Недостаточно прав');
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
         $characterId = Character::where('uuid', $uuid)->first()->id;
@@ -259,7 +326,7 @@ class CharacterController extends Controller
         if (CharacterDescription::where('character_id',  $characterId)->first()){
             $characterDescripron = CharacterDescription::where('character_id',  $characterId)->first();
             if  (auth()->user()->id != $characterDescripron->character->user_id){
-                return redirect()->back()->withErrors('Недостаточно прав');
+                return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
             }
 
             $characterId = $uuid;
@@ -275,7 +342,11 @@ class CharacterController extends Controller
     public function createDescription($uuid, Request $request) {
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
         $validated = $request->validate([
@@ -303,7 +374,11 @@ class CharacterController extends Controller
     public function updateDescription($uuid, Request $request){
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
-            return redirect()->back()->withErrors('Недостаточно прав');    
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isPreparing() && !Character::where('uuid', $uuid)->first()->isRejected()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
         $validated = $request->validate([

@@ -2,11 +2,11 @@
 
 @section('characterContent')
     @isset($character)
-        <form action={{ route('characters.updateMainInfo', $character->uuid) }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+        <form action={{ route('characters.updateMainInfo', $character->uuid) }} method="POST"  enctype="multipart/form-data">
             @csrf
             @method('PUT')
     @else
-        <form action={{ route("characters.createMainInfo") }} method="POST"  enctype="multipart/form-data" style="margin-right: 5px">
+        <form action={{ route("characters.createMainInfo") }} method="POST"  enctype="multipart/form-data">
             @csrf
     @endisset
 

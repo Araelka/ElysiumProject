@@ -23,6 +23,7 @@ class Character extends Model
         'residentialAddress',
         'activity',
         'personality',
+        'comment',
         'status_id'
     ];
 

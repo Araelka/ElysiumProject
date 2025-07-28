@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('activity');
             $table->text('personality');
             $table->integer('available_points')->default(0);
+            $table->string('comment')->nullable();
 
             $table->foreignId('status_id')->constrained('character_statuses')->onDelete('cascade');
             $table->timestamps();
