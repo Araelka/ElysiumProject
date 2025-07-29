@@ -128,8 +128,11 @@
 
         <!-- Характер -->
         <div class="form-control" style="margin-top: 10px">
-            <label for="personality">Характер:</label>
-            <textarea id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') ?? $character->personality ?? ''}}</textarea>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <label for="personality">Характер:</label>
+                <span id="personality-word-count">0/1000</span>
+            </div>
+            <textarea maxlength="5000" id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') ?? $character->personality ?? ''}}</textarea>
             @error('personality')
                 <span class="form__error">{{ $message }}</span>
             @enderror
@@ -177,7 +180,28 @@
         }
     }
 
+    function updateWordCount(personalityTextarea, wordCountElement) {
+        const currentLength = personalityTextarea.value.length;
+        const maxLength = personalityTextarea.getAttribute('maxlength');
+        wordCountElement.textContent = `${currentLength}/${maxLength}`;
+        
+        if (currentLength >= maxLength * 0.9) {
+            wordCountElement.style.color = '#ec7063'; 
+        } else {
+            wordCountElement.style.color = '#f4d03f'; 
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        const personalityTextarea = document.getElementById('personality');
+        const wordCountElement = document.getElementById('personality-word-count');
+
+        updateWordCount(personalityTextarea, wordCountElement);
+
+        personalityTextarea.addEventListener('input', () => {
+            updateWordCount(personalityTextarea, wordCountElement);
+        });
+
         const tempPhotoPath = "{{ session('temp_photo_path') }}";
         @isset($character)
             const photoPath = "{{ $character->images->first()?->path }}"

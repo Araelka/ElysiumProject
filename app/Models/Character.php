@@ -78,4 +78,14 @@ class Character extends Model
     public function getAvailablePoints(){
         return $this->available_points;
     }
+
+    public function increaseAvailablePoints() {
+        $this->increment('available_points');
+    }
+
+    public function decreaseAvailablePoints() {
+        if ($this->getAvailablePoints() > 0) {
+            $this->decrement('available_points');
+        }
+    }
 }

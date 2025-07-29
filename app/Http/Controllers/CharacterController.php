@@ -18,6 +18,24 @@ use Illuminate\Support\Str;
 class CharacterController extends Controller
 {
 
+    public function textProcessing ($text) {
+
+        $text = preg_replace('/(\r?\n){3,}/m', "\n\n", $text);
+
+        $text = preg_replace('/^[ \t]+/m', '', $text);
+
+        $text = preg_replace('/[ \t]{2,}/', ' ', $text);
+
+        $text = preg_replace('/\s*<(br|p)\s*\/?>\s*/i', '<$1>', $text);
+
+        $text = rtrim($text, " \t\n\r\0\x0B");
+
+        $text = preg_replace('/<\s*(br|p)\s*\/?>\s*<\s*\/?\s*\1\s*>/i', '', $text);
+        
+        return $text;
+
+    }
+
     public function index(Request $request) {
         // $character = Character::findOrFail(1);
         // $skills = Skill::findOrFail(3);
@@ -36,7 +54,7 @@ class CharacterController extends Controller
         }
 
 
-        $characters = Character::where('user_id', auth()->user()->id)->get();
+        $characters = Character::where('user_id', auth()->user()->id)->orderByRaw("FIELD(status_id, 3, 2, 1, 4, 5)")->get();
 
         return view('frontend.characters.index', compact('characters', 'selectedCharacter'));
     }
@@ -108,6 +126,8 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
         }
 
+        $text = $this->textProcessing($request->input('personality'));
+
         $character->update([
             'firstName' => $request->input('firstName'),
             'secondName' => $request->input('secondName'),
@@ -118,7 +138,7 @@ class CharacterController extends Controller
             'nationality' => $request->input('nationality'),
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
-            'personality' => $request->input('personality'),
+            'personality' => $text,
             'status_id' => 1
         ]);
 
@@ -296,19 +316,39 @@ class CharacterController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        // dd($request);
-
         $validated = $request->validate([
             'skills' => ['required', 'array', 'max:1'],
             'skills.*' => ['required', 'integer', 'min:1', 'max:6']
         ]);
 
+        $character = Character::where('uuid', $uuid)->first();
+
         foreach ($validated['skills'] as $id => $skill) {
-            $skill = CharacterSkill::findOrFail($id);
+            $selectedSkill = CharacterSkill::findOrFail($id);
+            $skillPoints = intval($skill);
         }
 
-        // $skill = CharacterSkill::findOrFail($validated['skills'[0]]);
-        // dd($skill);
+        if ($character->id != $selectedSkill->character_id){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        if ($skillPoints > $selectedSkill->getMaxPoints() || ($skillPoints - 1) != $selectedSkill->points) {
+            return redirect()->back()->withErrors('Превышен максимум очком для данного навыка');
+        }
+
+        $selectedSkill->update([
+            'points' => $skillPoints
+        ]);
+
+        $character->decreaseAvailablePoints();
+
+        if ($character->getAvailablePoints() > 0) {
+            return redirect()->back();
+        }
+        else {
+            return redirect()->route('characters.index');
+        }
+
     }
 
     public function showCreateDescription($uuid){

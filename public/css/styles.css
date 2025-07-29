@@ -37,8 +37,8 @@
     max-height: 90%; /* Ограничиваем максимальную высоту */
 
     /* Стили для прокрутки */
-    scrollbar-width: thin; /* Для Firefox */
-    scrollbar-color: #f4d03f #1a1a40; /* Цвет полосы и фона прокрутки */
+    /* scrollbar-width: thin; 
+    scrollbar-color: #f4d03f #1a1a40;  */
 }
 
 .sidebar::-webkit-scrollbar {

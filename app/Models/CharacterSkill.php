@@ -31,6 +31,14 @@ class CharacterSkill extends Model
         return 2 * $attributLevel;
     }
 
+    public function getMaxPoints(){
+        $maxPoints = $this->character->attributes()
+            ->where('attribute_id', $this->skill->attribute_id)
+            ->value('level');
+
+        return $maxPoints;
+    }
+
     public function getLevelSkill(){
         $attributLevel = $this->character->attributes()
             ->where('attribute_id', $this->skill->attribute_id)

@@ -1,3 +1,7 @@
+.sidebar {
+    overflow-y: hidden !important;
+}
+
 form {
     margin-left: 5px;
     margin-right: 5px;
@@ -322,9 +326,22 @@ form {
     flex-direction: column;
     gap: 10px;
     list-style: none;
-    padding: 0;
+    padding: 0px 2px;
     margin: 0px;
+    overflow-y: auto;
 }
+
+.topics-list::-webkit-scrollbar {
+    width: 2px; 
+}
+
+
+.topics-list::-webkit-scrollbar-thumb  {
+    background-color: #f4d03f; 
+    border-radius: 5px; 
+}
+
+
 
 .topic-link {
     position: relative;
@@ -548,16 +565,18 @@ form {
 
 @keyframes ring-animation {
     0% {
-        transform: translate(-50%, -50%) scale(0.5); /* Маленький размер в начале */
-        opacity: 1; /* Полная видимость */
+        transform: translate(-50%, -50%) scale(0.5); 
+        opacity: 1; 
     }
     100% {
-        transform: translate(-50%, -50%) scale(1.2); /* Большой размер в конце */
-        opacity: 0; /* Исчезновение */
+        transform: translate(-50%, -50%) scale(1.2); 
+        opacity: 0; 
     }
 }
 
 .delete-character-button {
+    font-family: 'Courier New';
+    font-size: 16px;
     color: #ec7063;
     background-color: transparent;
     border: 0px;
@@ -618,4 +637,8 @@ details[open] summary:before {
 .skill-update.active .skill-name {
     color: #1a1a40;
     background-color: #fff;
+}
+
+#personality-word-count {
+    transition: color 0.3s ease;
 }

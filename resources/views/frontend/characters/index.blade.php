@@ -92,19 +92,23 @@
                                                     </div>
                                                 @endif
                                                 @if ($selectedCharacter->isApproved())
-                                                    <div style="display: flex; flex-direction: row; gap: 10px;">
+                                                    <div style="display: flex; flex-direction: row; gap: 10px; margin-top: -2px;">
                                                         @if ($selectedCharacter->available_points > 0)
                                                             <div>
                                                                 <a href={{ route('characters.showUpdateSkills', $selectedCharacter->uuid) }} class="editCharacter"><strong>Повышение уровня</strong> </a>
                                                             </div>
                                                         @endif
                                                         <div>
-                                                            <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} style="color: gray;" class="editCharacter"><strong>В архив</strong> </a>
+                                                            <form action="{{ route('characters.characterDestoy',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST" class="delete-form">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="delete-character-button" style="color: gray;"><strong>В архив</strong></button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 @endif
                                                 @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration())
-                                                <div style="display: flex; flex-direction: row; gap: 10px;">
+                                                <div style="display: flex; flex-direction: row; gap: 10px; margin-top: -2px;">
                                                     <div>
                                                         <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>
                                                     </div>
@@ -200,7 +204,7 @@
                                         <summary><strong>Характер</strong> 
                                         </summary>
                                         <hr>
-                                        {{ $selectedCharacter->personality }}
+                                        <div>{!! nl2br(e($selectedCharacter->personality)) !!}</div>
                                     </details>
                                 </div>
 

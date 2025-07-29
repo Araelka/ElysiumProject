@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\MaxCharacters;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -78,7 +79,8 @@ class CharacterRequest extends FormRequest
             ],
 
             'personality' => [
-                'required'
+                'required',
+                new MaxCharacters(5000)
             ],
 
             'photo' => [
@@ -131,7 +133,8 @@ class CharacterRequest extends FormRequest
             'nationality.required' => 'Поле "Национальность" обязательно для заполнения',
             'residentialAddress.required' => 'Поле "Адрес проживания" обязательно для заполнения',
             'activity.required' => 'Поле "Род деятельности" обязательно для заполнения',
-            'personality.required' => 'Поле "Характер" обязательно для заполнения'
+            'personality.required' => 'Поле "Характер" обязательно для заполнения',
+            'personality.max' => 'Превышен лимит символом для характера. Максимальное количество символов - :max'
         ];
     }
 }
