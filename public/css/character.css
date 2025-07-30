@@ -639,6 +639,26 @@ details[open] summary:before {
     background-color: #fff;
 }
 
-#personality-word-count {
+#personality-word-count,
+#biography-word-count,
+#description-word-count,
+#headcounts-word-count {
     transition: color 0.3s ease;
+}
+
+.modal-content input{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.modal-content input:focus{
+    border-color: #ec7063;
+    outline: none;
 }

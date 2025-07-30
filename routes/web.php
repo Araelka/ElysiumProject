@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function(){
         Route::get('create/description/{id}', [CharacterController::class, 'showCreateDescription'])->name('showCreateDescription');
         Route::post('create/description/{id}', [CharacterController::class, 'createDescription'])->name('createDescription');
         Route::put('update/description/{id}', [CharacterController::class, 'updateDescription'])->name('updateDescription');
+
+        Route::put('update/archive-status/{id}', [CharacterController::class, 'changeArchiveStatus'])->name('changeArchiveStatus');
     });
 
     
@@ -114,6 +116,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
         Route::put('{id}/edit', [AdminController::class, 'editLocation'])->name('editLocation');
         Route::get('create', [AdminController::class, 'showCreateLocationForm'])->name('showLocationCreateForm');
         Route::post('create', [AdminController::class, 'createLocation'])->name('createLocation');
+    });
+
+    Route::prefix('characters')->name('admin.')->group(function(){
+        Route::get('/', [AdminController::class, 'showCharactersTable'])->name('showCharactersTable');
     });
 
 });

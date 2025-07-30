@@ -188,7 +188,7 @@
         if (currentLength >= maxLength * 0.9) {
             wordCountElement.style.color = '#ec7063'; 
         } else {
-            wordCountElement.style.color = '#f4d03f'; 
+            wordCountElement.style.color = '#fff'; 
         }
     }
 

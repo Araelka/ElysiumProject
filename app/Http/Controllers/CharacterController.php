@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CharacterDescriptionRequest;
 use App\Http\Requests\CharacterRequest;
 use App\Models\Attribute;
 use App\Models\Character;
@@ -10,6 +11,8 @@ use App\Models\CharacterDescription;
 use App\Models\CharacterImage;
 use App\Models\CharacterSkill;
 use App\Models\Skill;
+use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +21,7 @@ use Illuminate\Support\Str;
 class CharacterController extends Controller
 {
 
-    public function textProcessing ($text) {
+    protected function textProcessing ($text) {
 
         $text = preg_replace('/(\r?\n){3,}/m', "\n\n", $text);
 
@@ -36,27 +39,36 @@ class CharacterController extends Controller
 
     }
 
-    public function index(Request $request) {
-        // $character = Character::findOrFail(1);
-        // $skills = Skill::findOrFail(3);
-        // $characterA = CharacterAttribute::findOrFail(2);
-        // $skill = CharacterSkill::findOrFail($skills->id)->where('character_id', $character->id)->first();
-        // dd($character->status->name);
+    protected function diffInDays ($character) {
 
-        // $characters = Character::where('user_id', '=', auth()->user()->id)->get();
+        if (!$character || !$character->updated_at) {
+            return null;
+        }
+
+        $currentDate = Carbon::now();
+
+        $characterUpdatedDate = Carbon::parse($character->updated_at);
+
+        $diffInDays = $characterUpdatedDate->diffInDays($currentDate);
+
+        return $diffInDays;
+    }
+
+    public function index(Request $request) {
 
         $selectedCharacterId = $request->query('character');
 
         $selectedCharacter = Character::where('uuid', $selectedCharacterId)->first();
-
+        
         if ($selectedCharacter && $selectedCharacter->user_id != auth()->user()->id) {
             return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
         }
 
+        $diffInDays = $this->diffInDays($selectedCharacter);
 
         $characters = Character::where('user_id', auth()->user()->id)->orderByRaw("FIELD(status_id, 3, 2, 1, 4, 5)")->get();
 
-        return view('frontend.characters.index', compact('characters', 'selectedCharacter'));
+        return view('frontend.characters.index', compact('characters', 'selectedCharacter', 'diffInDays'));
     }
 
     public function showMainInfo($uuid = null){
@@ -74,10 +86,20 @@ class CharacterController extends Controller
             return view('frontend.characters.mainInfo', compact('character')); 
         };
 
+        if (Character::where('user_id', auth()->user()->id)->where('status_id', '!=', '5')->count() == 5){
+            return redirect()->back()->withErrors('Превышен предел персонажий');
+        }
+
         return view('frontend.characters.mainInfo'); 
     }
 
     public function createMainInfo(CharacterRequest $request) {
+
+        if (Character::where('user_id', auth()->user()->id)->where('status_id', '!=', '5')->count() == 5){
+            return redirect()->back()->withErrors('Превышен предел персонажий');
+        }
+
+        $text = $this->textProcessing($request->input('personality'));
 
         $character = Character::create([
             'uuid' => Str::uuid(),
@@ -91,7 +113,8 @@ class CharacterController extends Controller
             'nationality' => $request->input('nationality'),
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
-            'personality' => $request->input('personality'),
+            'personality' => $text,
+            'comment' => null,
             'status_id' => 1
         ]);
 
@@ -139,6 +162,7 @@ class CharacterController extends Controller
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
             'personality' => $text,
+            'comment' => null,
             'status_id' => 1
         ]);
 
@@ -379,7 +403,7 @@ class CharacterController extends Controller
         return view('frontend.characters.description', compact( 'characterId'));
     }
 
-    public function createDescription($uuid, Request $request) {
+    public function createDescription($uuid, CharacterDescriptionRequest $request) {
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
             return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
@@ -389,18 +413,17 @@ class CharacterController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        $validated = $request->validate([
-            'biography' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'headcounts' => ['nullable' ,'string']
-        ]);
+        $biography = $this->textProcessing($request->input(['biography']));
+        $description = $this->textProcessing($request->input(['description']));
+        $headcounts = $this->textProcessing($request->input(['headcounts']));
 
         $characterId = Character::where('uuid', $uuid)->first()->id;
+
         CharacterDescription::create([
             'character_id' => $characterId,
-            'biography' => $validated['biography'],
-            'description' => $validated['description'],
-            'headcounts' => $validated['headcounts']
+            'biography' => $biography,
+            'description' => $description,
+            'headcounts' => $headcounts
         ]);
 
         $character = Character::findOrFail($characterId);
@@ -411,7 +434,7 @@ class CharacterController extends Controller
         return redirect()->route('characters.index');
     }
 
-    public function updateDescription($uuid, Request $request){
+    public function updateDescription($uuid, CharacterDescriptionRequest $request){
 
         if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
             return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
@@ -421,23 +444,19 @@ class CharacterController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        $validated = $request->validate([
-            'biography' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'headcounts' => ['nullable' ,'string']
-        ]);
+        $biography = $this->textProcessing($request->input(['biography']));
+        $description = $this->textProcessing($request->input(['description']));
+        $headcounts = $this->textProcessing($request->input(['headcounts']));
 
         $character = Character::where('uuid', $uuid)->first();
         $characterId = $character->id;
 
-
         $characterDescription = CharacterDescription::where('character_id', $characterId)->first();
         
-
         $characterDescription->update([
-            'biography' => $validated['biography'],
-            'description' => $validated['description'],
-            'headcounts' => $validated['headcounts']
+            'biography' => $biography,
+            'description' => $description,
+            'headcounts' => $headcounts
         ]);
 
 
@@ -470,6 +489,39 @@ class CharacterController extends Controller
         $character->delete();
 
         return redirect()->back();
+    }
+
+    public function changeArchiveStatus ($uuid, Request $request){
+
+        if (auth()->user()->id != Character::where('uuid', $uuid)->first()->user_id){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isApproved() && !Character::where('uuid', $uuid)->first()->isArchive() ) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $character = Character::where('uuid', $uuid)->first();
+
+        $diffInDays = $this->diffInDays($character);
+
+        if ($diffInDays < 14) {
+            return redirect()->back()->withErrors('Смена статуса доступана раз в 2 недели');
+        }
+
+        if ($character->isApproved()){
+            $character->update([
+                'status_id' => 5
+            ]);
+        }
+        else {
+            $character->update([
+                'status_id' => 3
+            ]);
+        }
+
+        return redirect()->back()->with('Статус персонажа успешно изменён');
+
     }
 
 }

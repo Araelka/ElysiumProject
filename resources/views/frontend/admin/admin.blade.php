@@ -12,6 +12,7 @@
                     <div class="table-selection d-flex align-items-center">
                         <ul class="table-list d-flex">
                             <li><a href={{ route('admin.showUsers') }} class="table-link {{ request()->routeIs('admin.showUsers') ? 'active' : '' }}">Пользователи</a></li>
+                            <li><a href="{{ route('admin.showCharactersTable') }}" class="table-link {{ request()->routeIs('admin.showCharactersTable') ? 'active' : '' }}">Персонажи</a></li>
                             <li><a href="{{ route('admin.showLocations') }}" class="table-link {{ request()->routeIs('admin.showLocations') ? 'active' : '' }}">Локации</a></li>
                         </ul>
                     </div>

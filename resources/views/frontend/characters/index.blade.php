@@ -86,9 +86,13 @@
                                                 <div style="width: 50%">
                                                     <strong>Имя Фамилия</strong> 
                                                 </div>
-                                                @if ($selectedCharacter->isArchive())
+                                                @if ($selectedCharacter->isArchive()  && $diffInDays > 14)
                                                     <div>
-                                                        <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Вернуть из архива</strong> </a>
+                                                        <form id="archiveForm" action="{{ route('characters.changeArchiveStatus',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="delete-character-button" style="color: #f4d03f;" id="openArchiveModal"><strong>Вернуть из архива</strong></button>
+                                                        </form>
                                                     </div>
                                                 @endif
                                                 @if ($selectedCharacter->isApproved())
@@ -98,13 +102,15 @@
                                                                 <a href={{ route('characters.showUpdateSkills', $selectedCharacter->uuid) }} class="editCharacter"><strong>Повышение уровня</strong> </a>
                                                             </div>
                                                         @endif
-                                                        <div>
-                                                            <form action="{{ route('characters.characterDestoy',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST" class="delete-form">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button class="delete-character-button" style="color: gray;"><strong>В архив</strong></button>
-                                                            </form>
-                                                        </div>
+                                                        @if ($diffInDays > 14)
+                                                            <div>
+                                                                <form id="archiveForm" action="{{ route('characters.changeArchiveStatus',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button type="submit" class="delete-character-button" style="color: gray;" id="openArchiveModal"><strong>В архив</strong></button>
+                                                                </form>
+                                                            </div>    
+                                                        @endif
                                                     </div>
                                                 @endif
                                                 @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration())
@@ -113,7 +119,7 @@
                                                         <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>
                                                     </div>
                                                         <div>
-                                                            <form action="{{ route('characters.characterDestoy',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST" class="delete-form">
+                                                            <form action="{{ route('characters.characterDestoy',  $selectedCharacter->uuid) }}" style="margin: 0px;" method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button class="delete-character-button"><strong>Удалить</strong></button>
@@ -214,7 +220,7 @@
                                         <details>
                                             <summary><strong>Биография</strong> </summary>
                                             <hr>
-                                            {{ $selectedCharacter->description()->biography }}
+                                            <div>{!! nl2br(e($selectedCharacter->description()->biography)) !!}</div>
                                         </details>
                                     </div>
                                     @endif
@@ -224,7 +230,7 @@
                                             <details>
                                                 <summary><strong>Внешность</strong> </summary>
                                                 <hr>
-                                                {{ $selectedCharacter->description()->description }}
+                                                <div>{!! nl2br(e($selectedCharacter->description()->description)) !!}</div>
                                             </details>
                                         </div>
                                     @endif
@@ -232,9 +238,9 @@
                                     @if($selectedCharacter->description()->headcounts)
                                         <div>
                                             <details>
-                                                <summary><strong>Внешность</strong> </summary>
+                                                <summary><strong>Факты</strong> </summary>
                                                 <hr>
-                                                {{ $selectedCharacter->description()->headcounts }}
+                                                <div>{!! nl2br(e($selectedCharacter->description()->headcounts)) !!}</div>
                                             </details>
                                         </div>
                                     @endif
@@ -287,8 +293,9 @@
     </div>
 </div>
 
-<script>
 
+
+<script>
     function updateDiamonds(attributeId, value) {
         const diamondsContainer = document.getElementById(`attribute-level-${attributeId}`);
         diamondsContainer.innerHTML = ''; // Очищаем текущие ромбики

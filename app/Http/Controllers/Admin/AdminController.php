@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Character;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Role;
@@ -316,6 +317,48 @@ class AdminController extends Controller
         ]);
 
         return redirect()->route('admin.showLocations');
+    }
+
+    public function showCharactersTable (Request $request){
+
+        $filter = $request->query('filter', 'all');
+        $searchTerm = $request->query('search');
+        $searchFields = ['firstName', 'secondName'];
+
+        $query = Character::query()->with('status')
+        ->when($filter === 'approved', function ($query) {   
+            $query->where('status_id', 3);      
+        })->when($filter === 'consideration', function ($query) {   
+            $query->where('status_id', 2);      
+        })->when($filter === 'preparing', function ($query) {   
+            $query->where('status_id', 1);      
+        })->when($filter === 'rejected', function ($query) {   
+            $query->where('status_id', 4);      
+        })->when($filter === 'archive', function ($query) {   
+            $query->where('status_id', 5);      
+        });
+
+
+        if ($searchTerm) {
+            $query = $query->where(function ($query) use ($searchTerm, $searchFields) {
+                foreach ($searchFields as $field) {
+                    $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                }
+
+                $query->orWhereHas('user', function($query) use ($searchTerm){
+                    $query->whereRaw('LOWER(login) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                });
+            });
+        }
+
+        $characters = $query->paginate(20);
+
+        $characters->appends([
+            'filter' => $filter,
+            'search' => $searchTerm
+        ]);
+        
+        return view('frontend.admin.adminShowCharacters', compact('characters'));
     }
 
     

@@ -20,7 +20,7 @@
                 <th><input type="checkbox" id="select-all-checkbox"></th>
                 <th>ID</th>
                 <th>Наименование</th>
-                <th>Количество записей</th>
+                <th>Количество постов</th>
                 <th>Действия</th>
             </tr>
         </thead>
