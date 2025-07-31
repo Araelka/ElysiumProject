@@ -99,6 +99,7 @@ class ArticleController extends Controller
 
             $fileName = $hash . '.' . $file->getClientOriginalExtension();
 
+            // $folderPath = "images/wiki/";
             $imagePath = $file->store('images', 'public');
 
             $image = new ArticleImage();

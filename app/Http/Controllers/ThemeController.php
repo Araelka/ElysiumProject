@@ -44,17 +44,19 @@ class ThemeController extends Controller
             'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
         ]);
 
-        $theme = new Theme();
-        $theme->name = $validated['name'];
-        $theme->save();
+        $theme = Theme::create([
+            'name' => $validated['name']
+        ]);
 
-        $article = new Article();
-        $article->theme_id = $theme->id;
-        $article->content = "";
-        $article->save();
+        $article = Article::create([
+            'theme_id' => $theme->id,
+            'content' => ""
+        ]);
+
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
+            $folderPath = "images/wiki/{$theme->name}";
+            $imagePath = $request->file('image')->store($folderPath, 'public');
 
             $image = new ThemeImage();
             $image->theme_id = $theme->id;
@@ -90,6 +92,7 @@ class ThemeController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
+
         $validated = $request->validate([
             'image' => ['nullable', 'image', 'mimes:png,jpeg,jpg,webp', 'max:2048']
         ]);
@@ -107,7 +110,8 @@ class ThemeController extends Controller
 
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
+            $folderPath = "images/wiki/{$theme->name}";
+            $imagePath = $request->file('image')->store($folderPath, 'public');
 
             $image = new ThemeImage();
             $image->theme_id = $id;
@@ -142,17 +146,10 @@ class ThemeController extends Controller
 
         if ($theme->images) {
             foreach ($theme->images as $image) {
-                if (Storage::disk('public')->exists($image->path)) {
-                    Storage::disk('public')->delete($image->path);
+                if (Storage::disk('public')->exists('images/wiki/' . $theme->name)) {
+                    Storage::disk('public')->deleteDirectory('images/wiki/' . $theme->name);
                 }
-                $image->delete();
             }
-        }
-
-        
-
-        if ($theme->article) {
-            $theme->article->delete();
         }
 
         $theme->delete();
