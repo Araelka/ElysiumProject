@@ -42,14 +42,24 @@ class User extends Authenticatable
         return in_array($this->role_id, [1, 2]);
     }
 
-    public function isPlayer()
+    public function isGameMaster()
     {
         return in_array($this->role_id, [1, 2, 3]);
     }
 
+     public function isQuestionnaireSpecialist()
+    {
+        return in_array($this->role_id, [1, 2, 4]);
+    }
+
+    public function isPlayer()
+    {
+        return in_array($this->role_id, [1, 2, 3, 4, 5]);
+    }
+
     public function isUser()
     {
-        return $this->role_id === 4;
+        return $this->role_id === 6;
     }
 
     public function ban(string $reason='Нарушение правил сообщества'){

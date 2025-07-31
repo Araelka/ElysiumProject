@@ -8,7 +8,7 @@ form {
 }
 
 .character-form-container {
-    padding: 20px 0px;
+    padding: 20px 0px 0px 0px;
     margin-bottom: 20px;
     overflow-y: auto;
 }
@@ -189,13 +189,14 @@ form {
     margin-top: 10px;
     background-color: #f4d03f;
     color: #1a1a40;
-    padding: 10px 20px;
+    padding: 5px 15px;
     font-size: 18px;
     font-weight: bold;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    border: 2px solid transparent;
 }
 
 .btn-primary:hover {
@@ -661,4 +662,26 @@ details[open] summary:before {
 .modal-content input:focus{
     border-color: #ec7063;
     outline: none;
+}
+
+.save-button {
+    padding: 5px 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+    background-color: #f4d03f;
+    border: 2px solid #f4d03f00;
+}
+
+.save-button:hover {
+    background-color: #ec7063;
+}
+
+.save-button a {
+    color: #1a1a40;
+    text-decoration: none;
 }

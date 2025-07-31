@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         if ($user && $user->is_banned) {
             return back()->withErrors([
-                'identifier' => 'Ваш аккаунт заблокирован. Причина: ' . $user->ban_reason
+                'identifier' => 'Ваш аккаунт заблокирован.<br> Причина: ' . $user->ban_reason
             ])->onlyInput('identifier');
         }
 

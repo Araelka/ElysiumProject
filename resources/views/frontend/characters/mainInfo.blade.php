@@ -1,3 +1,6 @@
+@isset($character)
+    @section('title', $character->firstName . ' ' . $character->secondName)
+@endisset
 @extends('frontend.characters.indexCreate')
 
 @section('characterContent')
@@ -132,7 +135,7 @@
                 <label for="personality">Характер:</label>
                 <span id="personality-word-count">0/1000</span>
             </div>
-            <textarea maxlength="5000" id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 225px"  required>{{ old('personality') ?? $character->personality ?? ''}}</textarea>
+            <textarea maxlength="5000" id="personality" name="personality"  rows="6" placeholder="Расскажите о характере..." style="height: 255px"  required>{{ old('personality') ?? $character->personality ?? ''}}</textarea>
             @error('personality')
                 <span class="form__error">{{ $message }}</span>
             @enderror

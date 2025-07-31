@@ -1,5 +1,7 @@
 @extends('frontend.characters.indexCreate')
-
+@isset ($characterDescripron)
+    @section('title', $characterDescripron->character->firstName . ' ' . $characterDescripron->character->secondName)
+@endisset
 @section('characterContent')
 
 @isset($characterDescripron)
@@ -16,7 +18,7 @@
                 <label for="biography">Биография:</label>
                 <span id="biography-word-count">0/10000</span>
             </div>
-            <textarea maxlength="10000" id="biography" name="biography" style="height: 250px;" rows="6" placeholder="Расскажите биографию персонажа..." required>{{ old('biography') ?? $characterDescripron->biography ?? '' }}</textarea>
+            <textarea maxlength="10000" id="biography" name="biography" style="height: 285px;" rows="6" placeholder="Расскажите биографию персонажа..." required>{{ old('biography') ?? $characterDescripron->biography ?? '' }}</textarea>
             @error('biography')
                 <span class="form__error">{{ $message }}</span>
             @enderror

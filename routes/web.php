@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function(){
         Route::put('update/description/{id}', [CharacterController::class, 'updateDescription'])->name('updateDescription');
 
         Route::put('update/archive-status/{id}', [CharacterController::class, 'changeArchiveStatus'])->name('changeArchiveStatus');
+
+        Route::put('update/available-points/{id}', [CharacterController::class, 'increaseAvailablePoints'])->name('increaseAvailablePoints');
     });
 
     
@@ -97,11 +99,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
     Route::prefix('users')->name('admin.')->group(function(){
         Route::get('/', [AdminController::class, 'showTableUser'])->name('showUsers');
         Route::delete('{id}/destroy', [AdminController::class, 'destroyUser'])->name('destroyUser');
-        Route::get('{id}/edit', [AdminController::class, 'showEditUserForm'])->name('showUserEditForm');
-        Route::put('{id}/edit', [AdminController::class, 'editUser'])->name('editUser');
-        Route::put('{id}/reset-password', [AdminController::class, 'resetPassword'])->name('resetPassword'); 
-        Route::put('{id}/ban', [AdminController::class, 'userBan'])->name('userBan');
-        Route::put('{id}/unban', [AdminController::class, 'userUnban'])->name('userUnban');
+        Route::get('edit/{id}', [AdminController::class, 'showEditUserForm'])->name('showUserEditForm');
+        Route::put('edit/{id}', [AdminController::class, 'editUser'])->name('editUser');
+        Route::put('reset-password/{id}', [AdminController::class, 'resetPassword'])->name('resetPassword'); 
+        Route::put('ban/{id}', [AdminController::class, 'userBan'])->name('userBan');
+        Route::put('unban/{id}', [AdminController::class, 'userUnban'])->name('userUnban');
         Route::post('bulk-destroy', [AdminController::class, 'bulkUserDestroy'])->name('bulkUserDestroy');
         Route::put('bulk-ban', [AdminController::class, 'bulkUserBan'])->name('bulkUserBan');
         Route::get('create', [AdminController::class, 'showCreateUserForm'])->name('showCreateUserForm');
@@ -110,16 +112,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {
 
     Route::prefix('locations')->name('admin.')->group(function(){
         Route::get('/', [AdminController::class, 'showTableLocations'])->name('showLocations');
-        Route::delete('{id}/destroy', [AdminController::class, 'destroyLocation'])->name('destroyLocation');
+        Route::delete('destroy/{id}', [AdminController::class, 'destroyLocation'])->name('destroyLocation');
         Route::post('bulk-destroy', [AdminController::class, 'bulkLocationDestroy'])->name('bulkDestroyLocation');
-        Route::get('{id}/edit', [AdminController::class, 'showEditLocationForm'])->name('showLocationEditForm');
-        Route::put('{id}/edit', [AdminController::class, 'editLocation'])->name('editLocation');
+        Route::get('edit/{id}', [AdminController::class, 'showEditLocationForm'])->name('showLocationEditForm');
+        Route::put('edit/{id}', [AdminController::class, 'editLocation'])->name('editLocation');
         Route::get('create', [AdminController::class, 'showCreateLocationForm'])->name('showLocationCreateForm');
         Route::post('create', [AdminController::class, 'createLocation'])->name('createLocation');
     });
 
     Route::prefix('characters')->name('admin.')->group(function(){
         Route::get('/', [AdminController::class, 'showCharactersTable'])->name('showCharactersTable');
+        Route::get('edit/{id}', [AdminController::class, 'editCharacter'])->name('editCharacter');
+        Route::post('bulk-destroy', [AdminController::class, 'bulkCharacterDestroy'])->name('bulkCharacterDestroy');
+        Route::put('update/character-status/{id}', [AdminController::class, 'chatgeCharacterStatus'])->name('chatgeCharacterStatus');
     });
 
 });

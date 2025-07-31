@@ -258,7 +258,7 @@
 .button-group .right-buttons .delete-button,
 .button-group .right-buttons .ban-button,
 .button-group .right-buttons .unban-button {
-    padding: 10px 20px;
+    padding: 5px 15px;
     font-size: 18px;
     font-weight: bold;
     border: none;
@@ -454,3 +454,18 @@
     color: #fff;
 }
 
+.character-status-select select {
+    width: 100%;
+    padding: 0px;
+    font-size: 16px;
+    border: 0px solid transparent;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.character-status-select select:focus {
+    background-color: rgba(10, 14, 23, 0.7); 
+    outline: none;
+}

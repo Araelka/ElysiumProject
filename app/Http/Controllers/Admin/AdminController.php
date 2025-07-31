@@ -6,21 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Character;
+use App\Models\CharacterStatus;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Str;
 
 class AdminController extends Controller
 {
     public function index(){
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         return view('frontend.admin.admin');
     }
 
     public function showTableUser (Request $request) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
 
         $filter = $request->query('filter', 'all');
         $searchTerm = $request->query('search');
@@ -67,6 +77,11 @@ class AdminController extends Controller
     }
 
     public function showEditUserForm ($id){
+        
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $user = User::with('role')->findOrFail($id);
 
         $roles = Role::all();
@@ -82,10 +97,18 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
         $validated = $request->validated();
-        $user->update([
+        if ($user->id == 1){
+            $user->update([
+            'email' => $validated['email']
+        ]);
+        } else {
+            $user->update([
             'email' => $validated['email'],
             'role_id' => $validated['role_id']
         ]);
+        }
+
+
 
         return redirect()->route('admin.showUsers');
 
@@ -199,6 +222,11 @@ class AdminController extends Controller
 
     public function showCreateUserForm (){
 
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+
         $roles = Role::all();
 
         return view('frontend.admin.adminCreateUser', compact('roles'));
@@ -221,6 +249,10 @@ class AdminController extends Controller
     }
 
     public function showTableLocations (Request $request) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
 
         $searchTerm = $request->query('search');
         
@@ -250,6 +282,10 @@ class AdminController extends Controller
     }
 
     public function showEditLocationForm($id) {
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
         
         $location = Location::findOrFail($id);
 
@@ -299,6 +335,10 @@ class AdminController extends Controller
     }
 
     public function showCreateLocationForm () {
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         return view('frontend.admin.adminCreateLocation');
     }
 
@@ -320,6 +360,10 @@ class AdminController extends Controller
     }
 
     public function showCharactersTable (Request $request){
+
+        if (!auth()->user()->isAdmin()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
 
         $filter = $request->query('filter', 'all');
         $searchTerm = $request->query('search');
@@ -359,6 +403,62 @@ class AdminController extends Controller
         ]);
         
         return view('frontend.admin.adminShowCharacters', compact('characters'));
+    }
+
+    public function bulkCharacterDestroy(Request $request){
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+        
+        $validated = $request->validate([
+            'selected_ids' => ['required', 'string'], 
+        ]);
+
+        $selectedIds = explode(',', $validated['selected_ids']);
+
+        $idsArray = array_filter($selectedIds, 'is_numeric');
+
+        if (empty($idsArray)) {
+            return redirect()->back()->withErrors('Не выбраны элементы для удаления');
+        }
+
+        foreach ($idsArray as $id) {
+            $character = Character::findOrFail(intval($id))->first();
+
+            if ($character->images->first()) {
+                if (Storage::disk('public')->exists('images/characters/' . $character->uuid)) {
+                    Storage::disk('public')->deleteDirectory('images/characters/' . $character->uuid);
+                }
+            }
+
+            $character->delete();
+        }
+
+        return redirect()->back();
+    }
+
+    public function editCharacter($id){
+
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $character = Character::findOrFail($id);
+        $statuses = CharacterStatus::all();
+
+        return view('frontend.admin.adminShowCharacter', compact('character', 'statuses'));
+    }
+
+    public function chatgeCharacterStatus($id, Request $request){
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        $character = Character::findOrFail($id)->update([
+            'status_id' => $request->input('status_id')
+        ]);
+
+        return redirect()->back();
     }
 
     

@@ -80,12 +80,16 @@ class Character extends Model
     }
 
     public function increaseAvailablePoints() {
+        $this->timestamps = false;
         $this->increment('available_points');
+        $this->timestamps = true;
     }
 
     public function decreaseAvailablePoints() {
         if ($this->getAvailablePoints() > 0) {
+            $this->timestamps = false;
             $this->decrement('available_points');
+            $this->timestamps = true;
         }
     }
 }

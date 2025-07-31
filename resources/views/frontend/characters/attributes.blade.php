@@ -1,5 +1,7 @@
 @extends('frontend.characters.indexCreate')
-
+@isset ($characterAttributes)
+    @section('title', $characterAttributes->first()->character->firstName . ' ' . $characterAttributes->first()->character->secondName)
+@endisset
 @section('characterContent')
 @isset($characterAttributes)
     <form id="character-form" action={{ route('characters.updateAttributes', $characterId) }} method="POST"  enctype="multipart/form-data">

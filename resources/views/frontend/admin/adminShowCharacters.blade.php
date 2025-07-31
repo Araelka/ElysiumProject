@@ -18,7 +18,7 @@
 </div>
 
 <div class="top-menu-right">
-    <form id="bulk-delete-form" action={{ route('admin.bulkDestroyLocation') }} method="POST" data-action="delete">
+    <form id="bulk-delete-form" action={{ route('admin.bulkCharacterDestroy') }} method="POST" data-action="delete">
         @csrf
         <input type="hidden" name="selected_ids" data-input-type="location-delete" value="">
         <button type="submit" class="delete-button">Удалить выбранные</button>
@@ -32,8 +32,9 @@
                 <th><input type="checkbox" id="select-all-checkbox"></th>
                 <th>ID</th>
                 <th>Игрок</th>
-                <th>ФИО</th>
+                <th>Имя Фамилия</th>
                 <th>Статус</th>
+                <th>Свободных очков</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -46,9 +47,10 @@
                 <td>{{ $character->user->login }}</td>
                 <td>{{ $character->firstName . ' ' . $character->secondName }}</td>
                 <td>{{ $character->status->name }}</td>
+                <td>{{ $character->getAvailablePoints() }}</td>
                 <td>
-                    <a href={{ route('admin.showLocationEditForm', $character->id) }} class="edit-button">Редактировать</a>
-                    <form action="{{ route('admin.destroyLocation', $character->id) }}" method="POST" class="single-delete-form" style="display:inline-block;">
+                    <a href={{ route('admin.editCharacter', $character->id) }} class="edit-button">Редактировать</a>
+                    <form action="{{ route('characters.characterDestoy', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="delete-button">Удалить</button>
