@@ -18,5 +18,6 @@ class CharacterStatusTableSeeder extends Seeder
         CharacterStatus::create(['name' => 'Одобрен']);
         CharacterStatus::create(['name' => 'Отклонён']);
         CharacterStatus::create(['name' => 'В архиве']);
+        CharacterStatus::create(['name' => 'Мёртв']);
     }
 }

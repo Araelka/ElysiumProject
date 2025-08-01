@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="{{ asset('css/character.css') }}">
 
 
-
 @section('content')
 <div class="double-page">
     <div class="container d-flex justify-content-center align-items-stretch">
@@ -49,12 +48,16 @@
                                         <div class="status-archive">
                                             {{ $character->status->name }}
                                         </div>
+                                 @elseif ($character->isDead())
+                                        <div class="status-rejected">
+                                            {{ $character->status->name }}
+                                        </div>
                                 @endif
                                 </span>
                             </a>
                         </li>
                     @endforeach
-                    @if ($characters->where('status_id', '!=', 5)->count() < 5)
+                    @if (auth()->user()->getCountvailableCharacters() < 5)
                         <a href={{ route('characters.showMainInfo') }} class="topic-link-button">Создать персонажа</a>
                     @endif
                 </ul>
@@ -113,7 +116,7 @@
                                                         @endif
                                                     </div>
                                                 @endif
-                                                @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() & !$selectedCharacter->isConsideration())
+                                                @if (!$selectedCharacter->isApproved() && !$selectedCharacter->isArchive() && !$selectedCharacter->isConsideration() && !$selectedCharacter->isDead())
                                                 <div style="display: flex; flex-direction: row; gap: 10px; margin-top: -2px;">
                                                     <div>
                                                         <a href={{ route('characters.showMainInfo', $selectedCharacter->uuid) }} class="editCharacter"><strong>Редактировать</strong> </a>

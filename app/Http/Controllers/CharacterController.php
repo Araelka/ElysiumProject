@@ -66,7 +66,7 @@ class CharacterController extends Controller
 
         $diffInDays = $this->diffInDays($selectedCharacter);
 
-        $characters = Character::where('user_id', auth()->user()->id)->orderByRaw("FIELD(status_id, 3, 2, 1, 4, 5)")->get();
+        $characters = Character::where('user_id', auth()->user()->id)->orderByRaw("FIELD(status_id, 3, 2, 1, 4, 5, 6)")->get();
 
         return view('frontend.characters.index', compact('characters', 'selectedCharacter', 'diffInDays'));
     }
@@ -94,7 +94,7 @@ class CharacterController extends Controller
 
     public function createMainInfo(CharacterRequest $request) {
 
-        if (Character::where('user_id', auth()->user()->id)->where('status_id', '!=', '5')->count() == 5){
+        if (auth()->user()->getCountvailableCharacters() == 5){
             return redirect()->back()->withErrors('Превышен предел персонажий');
         }
 

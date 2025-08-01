@@ -69,7 +69,7 @@ class ArticleController extends Controller
     }
     
     public function uploadImage (Request $request, $id) {
-        // dd($request);
+
         if (!auth()->user()->isEditor()){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
@@ -81,11 +81,14 @@ class ArticleController extends Controller
         
 
         if ($request->hasFile('image')) {
+
+            $articleName = Article::findOrFail($id)->theme->name;
+
             $file = $request->file('image');
 
             $fileHash = md5_file($file->getPathname());
 
-            $existingFile = ArticleImage::where('file_hash', $fileHash )->first();
+            $existingFile = ArticleImage::where('article_id', $id)->where('file_hash', $fileHash )->first();
 
 
             if ($existingFile){
@@ -99,13 +102,14 @@ class ArticleController extends Controller
 
             $fileName = $hash . '.' . $file->getClientOriginalExtension();
 
-            // $folderPath = "images/wiki/";
-            $imagePath = $file->store('images', 'public');
+            $folderPath = "images/wiki/{$articleName}";
+            $imagePath = $file->store($folderPath, 'public');
 
-            $image = new ArticleImage();
-            $image->path = $imagePath;
-            $image->file_hash = $hash;
-            $image->save();
+            $image = ArticleImage::create([
+                'article_id' => $id,
+                'path' => $imagePath,
+                'file_hash' => $hash
+            ]);
 
             $url = asset('storage/' . $imagePath);
 

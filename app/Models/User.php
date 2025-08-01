@@ -110,4 +110,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getCountvailableCharacters(){
+        return $this->character()->where('status_id', '!=', 5)->where('status_id', '!=', 6)->count();
+    }
+
 }

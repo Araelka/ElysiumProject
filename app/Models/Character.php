@@ -71,6 +71,10 @@ class Character extends Model
         return $this->status_id === 5;
     }
 
+    public function isDead(){
+        return $this->status_id === 6;
+    }
+
     public function getTotalSpentPoints(){
         return $this->attributes()->sum('points') + $this->skills()->sum('points');
     }
