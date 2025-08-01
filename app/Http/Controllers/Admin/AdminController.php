@@ -222,6 +222,10 @@ class AdminController extends Controller
         }
         
         $user = User::findOrFail($id);
+        if ($user->id == 1){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $newPassword = Str::random(10);
         $user->password = Hash::make($newPassword);
         $user->save();

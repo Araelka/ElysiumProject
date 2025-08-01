@@ -19,7 +19,6 @@
 
 .table-link {
     font-family: 'Courier New', Courier, monospace !important;
-    font-weight: bold !important;
     text-decoration: none;
     color: #f4d03f; /* Ярко-жёлтый текст */
     font-size: 18px;
@@ -28,6 +27,7 @@
     display: block;
     padding: 5px 10px;
     border: 2px solid transparent;
+    border-bottom: 0;
     transition: background-color 0.3s ease;
 }
 

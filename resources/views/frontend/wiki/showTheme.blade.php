@@ -14,7 +14,7 @@
             <div class="flex-left">
                 <div class="image-preview" onclick="triggerFileInput()">
                     <img id="preview-image" src="#" style="display: none;"/>
-                    <div id="placeholder-text" class="placeholder">Предпросмотр изображение</div>
+                    <div id="placeholder-text" class="placeholder">Загрузить изображение</div>
                 </div>
             </div>
 
@@ -24,21 +24,12 @@
                 <div class="form-group-theme-labbe">
                     <label for="name">Наименование:</label>
                     <input type="text" id="name" name="name" required>
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden-input" hidden>
                     @error('name')
                         <span class="form__error">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <!-- Кнопка загрузки изображения -->
-                <div class="form-group-theme">
-                    <label for="image" class="custom-file-upload">
-                        Загрузить изображение
-                    </label>
-                    <input type="file" id="image" name="image" accept="image/*" class="hidden-input">
-                    @error('image')
-                        <span class="form__error">{{ $message }}</span>
-                    @enderror
-                </div>
 
                 <!-- Кнопка сохранить -->
                 <div class="form-group-theme-batton">
