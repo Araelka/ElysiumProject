@@ -18,13 +18,16 @@
 }
 
 .table-link {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: bold !important;
     text-decoration: none;
     color: #f4d03f; /* Ярко-жёлтый текст */
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
     display: block;
-    padding: 10px;
+    padding: 5px 10px;
+    border: 2px solid transparent;
     transition: background-color 0.3s ease;
 }
 
@@ -123,8 +126,9 @@
 .data-table .delete-button,
 .data-table .ban-button,
 .data-table .unban-button {
-    background-color: #ff4d4d; /* Красный цвет */
-    color: #fff; /* Белый текст */
+    font-family: 'Courier New', Courier, monospace;
+    background-color: transparent !important;
+    color: #ec7063;
     border-radius: 5px;
     border: none;
     padding: 5px 10px;
@@ -138,16 +142,18 @@
     font-weight: bold;
     vertical-align: middle;
     background-color: #f4d03f;
-    color: #1a1a40;
+    color: #f4d03f;
 }
 
 .data-table .unban-button:hover {
     background-color: #ec7063;
+    text-decoration: underline;
 }
 
 .data-table .delete-button:hover,
 .data-table .ban-button:hover  {
-    background-color: #cc0000; /* Темно-красный цвет при наведении */
+    /* background-color: #cc0000;  */
+    text-decoration: underline;
 }
 
 
@@ -155,7 +161,9 @@
 #confirm-delete,
 #cancel-delete,
 #close-reset-password-modal  {
-    padding: 10px 20px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px 10px;
+    border: 2px solid transparent;
     font-size: 18px;
     font-weight: bold;
     border: none; /* Убираем границы */
@@ -209,7 +217,9 @@
 
 #confirm-ban,
 #cancel-ban {
-    padding: 10px 20px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px 10px;
+    border: 2px solid transparent;
     font-size: 18px;
     font-weight: bold;
     border: none;
@@ -258,7 +268,9 @@
 .button-group .right-buttons .delete-button,
 .button-group .right-buttons .ban-button,
 .button-group .right-buttons .unban-button {
-    padding: 5px 15px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px 10px;
+    border: 2px solid transparent !important;
     font-size: 18px;
     font-weight: bold;
     border: none;
@@ -266,6 +278,10 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     box-sizing: border-box;
+}
+
+.button-group .right-buttons .reset-password-button {
+    border: 2px solid #f4d03f !important;
 }
 
 .button-group .left-buttons .save-button,
@@ -293,14 +309,15 @@
 
 .button-group .right-buttons .delete-button,
 .button-group .right-buttons .ban-button {
-    background-color: #ff4d4d;
-    color: #fff;
-    border: 2px solid #ffffff00;
+    background-color: #ff4d4d !important;
+    color: #fff !important;
+    border: 2px solid #ffffff00 !important;
+    text-decoration: none !important;
 }
 
 .button-group .right-buttons .delete-button:hover,
 .button-group .right-buttons .ban-button:hover {
-    background-color: #cc0000;
+    background-color: #cc0000 !important;
 }
 
 .button-group {
@@ -328,9 +345,10 @@
 }
 
 .add-button {
+    font-family: 'Courier New', Courier, monospace;
     background-color: transparent;
     color: #fff;
-    padding: 5px 15px;
+    padding: 5px 10px;
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
@@ -346,10 +364,11 @@
 
 .delete-button,
 .ban-button {
+    font-family: 'Courier New', Courier, monospace;
     background-color: #ff4d4d;
     color: #fff;
-    border: 2px solid #ffffff00;
-    padding: 5px 15px;
+    border: 2px solid transparent;
+    padding: 5px 10px;
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
@@ -395,10 +414,11 @@
 }
 
 .filter-button {
+    font-family: 'Courier New', Courier, monospace;
     background-color: transparent;
     color: #f4d03f;
-    padding: 5px 15px;
-    font-size: 16px;
+    padding: 5px 10px;
+    font-size: 18px;
     font-weight: bold;
     border: 2px solid #f4d03f;
     border-radius: 5px;
@@ -455,6 +475,7 @@
 }
 
 .character-status-select select {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
     padding: 0px;
     font-size: 16px;
@@ -468,4 +489,85 @@
 .character-status-select select:focus {
     background-color: rgba(10, 14, 23, 0.7); 
     outline: none;
+}
+
+
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    text-align: left;
+    cursor: pointer;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+}
+
+.dropdown-toggle::after {
+    content: '∨'; 
+    font-weight: bold;
+    font-size: 16px;
+    position: absolute;
+    right: 7px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: rgba(10, 14, 23, 1);
+    border: 2px solid #ec7063;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+    max-height: 200px; 
+    overflow-y: auto; 
+}
+
+.dropdown-toggle.active {
+    border-color: #ec7063;
+}
+
+.dropdown-menu.open {
+    border-color: #ec7063;
+    display: block;
+}
+
+.form-check {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.role-checkbox {
+    width: 1.3em !important;
+    height: 1.3em !important;
+    padding: 5px !important;
+    font-size: 0px !important;
+    background-color: transparent !important;
+    border-radius: 50% !important;
+    vertical-align: middle !important;
+    border: 2px solid #f4d03f !important;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.role-checkbox:checked {
+    background-color: #f4d03f !important;
 }

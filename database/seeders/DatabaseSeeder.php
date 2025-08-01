@@ -16,12 +16,13 @@ class DatabaseSeeder extends Seeder
         // $this->call(ThemesTableSeeder::class);
         $this->call(RoleTableSeeder::class);
         
-        User::create([
+        $user = User::create([
             'login' => 'admin', 
             'email' => 'admin@ex.ex',
             'password' => 'admin',
-            'role_id' => 1
         ]);
+
+        $user->roles()->attach(1);
 
         $this->call(CharacterStatusTableSeeder::class);
         $this->call(AttributeTableSeeder::class);

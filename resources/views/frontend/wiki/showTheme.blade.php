@@ -12,8 +12,8 @@
         <div class="form-group flex-row form-group-flex">
             <!-- Слева: предпросмотр изображения -->
             <div class="flex-left">
-                <div class="image-preview">
-                    <img id="preview-image" src="#"/>
+                <div class="image-preview" onclick="triggerFileInput()">
+                    <img id="preview-image" src="#" style="display: none;"/>
                     <div id="placeholder-text" class="placeholder">Предпросмотр изображение</div>
                 </div>
             </div>
@@ -48,5 +48,36 @@
         </div>
     </form>
 </div>
+
+<script>
+    // Функция для открытия диалога выбора файла при клике на предпросмотр
+    function triggerFileInput() {
+        document.getElementById('image').click();
+    }
+
+    // Функция для предпросмотра выбранного изображения
+    function previewFile(input) {
+        const file = input.files[0];
+        const previewImage = document.getElementById('preview-image');
+        const placeholderText = document.getElementById('placeholder-text');
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+                placeholderText.style.display = 'none';
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // Если файл не выбран, сбрасываем интерфейс
+            previewImage.src = '';
+            previewImage.style.display = 'none';
+            placeholderText.style.display = 'block';
+        }
+    }
+</script>
 
 @endsection

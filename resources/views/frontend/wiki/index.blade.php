@@ -18,7 +18,7 @@
                     </div>
                         <div class="search-container">
                             <form action="{{ request()->fullUrlWithQuery(['search' => '']) }}" method="GET" id="search-form">
-                                <input type="hidden" name="filter">
+                                <input type="hidden" name="filter" class="search-input">
                                 <div class="search-input-wrapper">
                                     <input 
                                         type="text" 

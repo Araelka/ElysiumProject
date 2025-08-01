@@ -23,6 +23,8 @@ class RegisterController extends Controller
             'password' => $request->input('password')
         ]);
 
+        $user->roles()->attach(6);
+
         auth()->login($user);
 
         return redirect('/')->with('success', 'Вы успешно зарегистрировались!');

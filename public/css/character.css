@@ -135,6 +135,7 @@ form {
 .form-control input,
 .form-control select,
 .form-control textarea {
+    font-family: 'Courier New', Courier, monospace !important;
     box-sizing: border-box;
     width: 100%;
     padding: 10px;
@@ -186,6 +187,7 @@ form {
 
 /* Стиль кнопки отправки формы */
 .btn-primary {
+    font-family: 'Courier New', Courier, monospace !important;
     margin-top: 10px;
     background-color: #f4d03f;
     color: #1a1a40;
@@ -206,13 +208,14 @@ form {
 
 /* Стили кнопок модального окна */
 .btn-accept {
+    font-family: 'Courier New', Courier, monospace;
     margin-top: 10px;
     background-color: #f4d03f;
     color: #1a1a40;
-    padding: 12px 20px;
+    padding: 5px 10px;
+    border: 2px solid transparent;
     font-size: 18px;
     font-weight: bold;
-    border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -223,10 +226,11 @@ form {
 }
 
 .btn-cancel {
+    font-family: 'Courier New', Courier, monospace;
     margin-top: 10px;
     background-color: transparent;
     color: #fff;
-    padding: 10px 20px;
+    padding: 5px 10px;
     font-size: 18px;
     font-weight: bold;
     border: 2px solid #f4d03f;
@@ -665,6 +669,7 @@ details[open] summary:before {
 }
 
 .save-button {
+    font-family: 'Courier New', Courier, monospace;
     padding: 5px 15px;
     font-size: 18px;
     font-weight: bold;
@@ -682,6 +687,7 @@ details[open] summary:before {
 }
 
 .save-button a {
+    font-family: 'Courier New', Courier, monospace;
     color: #1a1a40;
     text-decoration: none;
 }

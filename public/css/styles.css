@@ -116,7 +116,8 @@
 }
 
 .search-input {
-    padding: 10px;
+    font-family: 'Courier New', Courier, monospace !important;
+    padding: 5px 10px;
     font-size: 16px;
     border: 2px solid #f4d03f;
     border-radius: 5px;
@@ -154,9 +155,11 @@
 }
 
 .search-button {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 18px !important;
     background-color: f4d03f;
     color: #1a1a40;
-    padding: 10px 15px;
+    padding: 5px 10px;
     font-size: 16px;
     font-weight: bold;
     border: 2px solid #f4d03f00;
@@ -238,6 +241,7 @@
 }
 
 .form-group input {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
     padding: 10px;
     font-size: 16px;
@@ -256,6 +260,7 @@
 
 
 .form-group select {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
     padding: 10px;
     font-size: 16px;

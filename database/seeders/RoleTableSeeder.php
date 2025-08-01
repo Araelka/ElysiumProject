@@ -16,7 +16,7 @@ class RoleTableSeeder extends Seeder
         Role::create(['name' => 'Администратор']);
         Role::create(['name' => 'Редактор']);
         Role::create(['name' => 'Гейм-мастер']);
-        Role::create(['name' => 'Анектолог']);
+        Role::create(['name' => 'Анкетолог']);
         Role::create(['name' => 'Игрок']);
         Role::create(['name' => 'Пользователь']);
     }

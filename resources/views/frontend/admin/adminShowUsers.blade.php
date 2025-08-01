@@ -53,7 +53,11 @@
                 <td>{{ $user->id }}</td>
                 <td>{{ $user->login }}</td>
                 <td>{{ $user->email }}</td>
-                <td>{{ $user->role->name }}</td>
+                <td>
+                @foreach ($user->roles as $role)
+                    {{ $role->name }}
+                @endforeach
+                </td>
                 <td>
                     <a href={{ route('admin.showUserEditForm', $user->id) }} class="edit-button">Редактировать</a>
                     @if ($user->is_banned)

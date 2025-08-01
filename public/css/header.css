@@ -170,6 +170,7 @@ body {
 }
 .navbar__user-menu a,
 .navbar__user-menu button {
+    font-family: 'Courier New', Courier, monospace !important;
     cursor: pointer;
     background: none;
     border: none;

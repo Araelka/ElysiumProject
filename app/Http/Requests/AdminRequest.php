@@ -26,14 +26,13 @@ class AdminRequest extends FormRequest
         
         return [
             'email' => ['required', 
-            'string', 
-            'email', 
-            Rule::unique('users', 'email')->ignore($this->id), 
-            'max:255'
+                'string', 
+                'email', 
+                Rule::unique('users', 'email')->ignore($this->id), 
+                'max:255'
             ],
-            'role_id' => ['required', 
-            'integer', 
-            'exists:roles,id'
+            'roles' => [
+                'required'
             ]
         ];
     }
@@ -42,7 +41,7 @@ class AdminRequest extends FormRequest
         return [
             'email.required' => 'Поле "Email" обязательно для заполнения',
             'email.unique' => 'Этот email уже используется',
-            'role_id.required' => 'Поле "Роль" обязательно для заполнения'
+            'roles.required' => 'Поле "Роль" обязательно для заполнения'
         ];
     }
 }

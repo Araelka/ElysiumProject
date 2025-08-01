@@ -36,7 +36,7 @@ class AdminController extends Controller
         $searchTerm = $request->query('search');
         $searchFields = ['login', 'email'];
 
-        $query = User::query()->with('role')
+        $query = User::query()->with('roles')
         ->when($filter === 'active', function ($query) {   
             $query->where('is_banned', false);      
         })->when($filter === 'banned', function ($query) {
@@ -82,21 +82,30 @@ class AdminController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        $user = User::with('role')->findOrFail($id);
+        $user = User::with('roles')->findOrFail($id);
 
         $roles = Role::all();
 
         return view('frontend.admin.adminShowUser', ['user' => $user, 'roles' => $roles]);
     }
 
-    public function editUser (AdminRequest $request, $id) {
+    public function editUser ($id, AdminRequest $request) {
 
         if (!auth()->user()->isAdmin()){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
+        
+        $roleIds = explode(',' , $request->roles[0]);
 
+        foreach ($roleIds as $key => $roleId) {
+            $roleIds[$key] = intval($roleId);
+        }
+        
         $user = User::findOrFail($id);
+
         $validated = $request->validated();
+
+
         if ($user->id == 1){
             $user->update([
             'email' => $validated['email']
@@ -104,8 +113,8 @@ class AdminController extends Controller
         } else {
             $user->update([
             'email' => $validated['email'],
-            'role_id' => $validated['role_id']
-        ]);
+            ]);
+            $user->roles()->sync($roleIds);
         }
 
 
@@ -238,12 +247,19 @@ class AdminController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        User::create([
+        $roleIds = explode(',' , $request->roles[0]);
+
+        foreach ($roleIds as $key => $roleId) {
+            $roleIds[$key] = intval($roleId);
+        }
+
+        $user = User::create([
             'login' => $request->input('login'),
             'email' => $request->input('email'),
             'password' => $request->input('password'),
-            'role_id' => $request->input('role_id')
         ]);
+
+        $user->roles()->sync($roleIds);
 
         return redirect()->route('admin.showUsers');
     }

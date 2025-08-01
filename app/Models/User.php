@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use DB;
@@ -23,7 +24,6 @@ class User extends Authenticatable
         'login',
         'email',
         'password',
-        'role_id',
         'is_banned',
         'ban_reason'
     ];
@@ -34,32 +34,32 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->role_id === 1;
+        return in_array(1, $this->getRoleIds());
     }
 
     public function isEditor()
     {
-        return in_array($this->role_id, [1, 2]);
+        return array_intersect([1, 2], $this->getRoleIds()) != [];
     }
 
     public function isGameMaster()
     {
-        return in_array($this->role_id, [1, 2, 3]);
+        return array_intersect([1, 2, 3], $this->getRoleIds()) != [];
     }
 
      public function isQuestionnaireSpecialist()
     {
-        return in_array($this->role_id, [1, 2, 4]);
+        return array_intersect([1, 2, 4], $this->getRoleIds()) != [];
     }
 
     public function isPlayer()
     {
-        return in_array($this->role_id, [1, 2, 3, 4, 5]);
+        return array_intersect([1, 2, 3, 4, 5], $this->getRoleIds()) != [];
     }
 
     public function isUser()
     {
-        return $this->role_id === 6;
+        return in_array(6, $this->getRoleIds());
     }
 
     public function ban(string $reason='Нарушение правил сообщества'){
@@ -80,8 +80,16 @@ class User extends Authenticatable
         DB::table('sessions')->where('user_id', $this->id)->delete();
     }
 
-    public function role(){
-        return $this->belongsTo(Role::class);
+    // public function role(){
+    //     return $this->belongsTo(Role::class);
+    // }
+
+    public function roles(): BelongsToMany {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+
+    public function getRoleIds(){
+        return $this->roles()->pluck('id')->toArray();
     }
 
     public function character() {
