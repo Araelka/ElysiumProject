@@ -400,6 +400,8 @@ class AdminController extends Controller
             $query->where('status_id', 4);      
         })->when($filter === 'archive', function ($query) {   
             $query->where('status_id', 5);      
+        })->when($filter === 'dead', function ($query) {   
+            $query->where('status_id', 6);      
         });
 
 
@@ -473,10 +475,19 @@ class AdminController extends Controller
         if (!auth()->user()->isAdmin()) {
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
+        
 
         $character = Character::findOrFail($id)->update([
             'status_id' => $request->input('status_id')
         ]);
+
+        $character = Character::findOrFail($id);
+
+        if (!$character->isApproved() || !$character->user->isUser()){
+            return redirect()->back();
+        }
+
+        $character->user->roles()->sync([5]);
 
         return redirect()->back();
     }

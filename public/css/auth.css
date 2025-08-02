@@ -53,6 +53,7 @@
 }
 
 .login-form__input {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -70,6 +71,7 @@
 }
 
 .login-form__button {
+    font-family: 'Courier New', Courier, monospace;
     display: inline-block;
     width: 100%;
     padding: 12px;
@@ -152,6 +154,7 @@
 }
 
 .register-form__input {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -169,6 +172,7 @@
 }
 
 .register-form__button {
+    font-family: 'Courier New', Courier, monospace;
     display: inline-block;
     width: 100%;
     padding: 12px;

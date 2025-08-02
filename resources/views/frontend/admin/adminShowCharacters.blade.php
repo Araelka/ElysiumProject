@@ -14,6 +14,7 @@
         <button type="submit" name="filter" value="preparing" class="filter-button {{ request('filter') === 'preparing' ? 'active' : '' }}">В работе</button>
         <button type="submit" name="filter" value="rejected" class="filter-button {{ request('filter') === 'rejected' ? 'active' : '' }}">Отклонённые</button>
         <button type="submit" name="filter" value="archive" class="filter-button {{ request('filter') === 'archive' ? 'active' : '' }}">В архиве</button>
+        <button type="submit" name="filter" value="dead" class="filter-button {{ request('filter') === 'dead' ? 'active' : '' }}">Мёртвые</button>
     </form>
 </div>
 
