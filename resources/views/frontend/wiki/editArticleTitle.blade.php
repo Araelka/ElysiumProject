@@ -6,9 +6,9 @@
 @method('PUT')
 <div class="form-group-theme-labbe" style="margin-right: 10px">
         <input type="text" id="name" name="name" value="{{ $article->theme->name }}" required>
-        @error('name')
+        {{-- @error('name')
             <span class="form__error">{{ $message }}</span>
-        @enderror
+        @enderror --}}
     </div>
     <!-- Кнопка сохранить -->
     <div class="form-group-theme-batton">

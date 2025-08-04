@@ -48,7 +48,7 @@
                                         <div class="status-archive">
                                             {{ $character->status->name }}
                                         </div>
-                                 @elseif ($character->isDead())
+                                @elseif ($character->isDead())
                                         <div class="status-rejected">
                                             {{ $character->status->name }}
                                         </div>
@@ -287,6 +287,15 @@
                                         </div>
                                 @endforeach
                                 </div>
+                                @endif
+
+                                @if($selectedCharacter->comment && $selectedCharacter->isRejected())
+                                    <div>
+                                            <strong>Причина отклонения:</strong>
+
+                                            <div>{!! nl2br(e($selectedCharacter->comment)) !!}</div>
+                                        </details>
+                                    </div>
                                 @endif
 
                             </div>

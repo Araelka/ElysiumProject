@@ -103,7 +103,37 @@
     margin-top: auto; /* Если внутри flex */
 }
 
+.pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
 
+.pagination li {
+    list-style: none;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 8px 12px;
+    background-color: rgba(10, 14, 23, 0.9);
+    color: #f4d03f;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination li.active span {
+    background-color: #f4d03f; /* Ярко-жёлтый фон */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+.pagination li a:hover {
+    background-color: #ec7063; /* Розовый цвет при наведении */
+    color: #fff;
+}
 
 .form-group-flex {
     display: flex;
@@ -132,6 +162,23 @@
 
 .form-group-theme-labbe {
     margin-top: 0px;
+}
+
+.form-group-theme-labbe input {
+    font-family: 'Courier New', Courier, monospace;
+    width: 320px;
+    padding: 5px;
+    font-size: 16px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.form-group-theme-labbe input:focus {
+    border-color: #ec7063;
+    outline: none;
 }
 
 

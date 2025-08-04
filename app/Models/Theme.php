@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Theme extends Model
 {
+    /** @use HasFactory<\Database\Factories\ThemeFactory> */
     use HasFactory;
 
     public $timestamps = false; 

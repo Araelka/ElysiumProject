@@ -1,0 +1,211 @@
+.table-selection-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-selection {
+    display: flex;
+    align-items: center;
+}
+
+.table-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+}
+
+.table-link {
+    font-family: 'Courier New', Courier, monospace !important;
+    text-decoration: none;
+    color: #f4d03f; /* Ярко-жёлтый текст */
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    display: block;
+    padding: 5px 10px;
+    border: 2px solid transparent;
+    border-bottom: 0;
+    transition: background-color 0.3s ease;
+}
+
+.table-link.active {
+    background-color: #f4d03f; /* Ярко-жёлтый фон */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+.table-link:hover {
+    background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+
+
+.table-container {
+    height: 100%; /* Занимает всю высоту блока */
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+}
+
+.table-container::-webkit-scrollbar {
+    width: 5px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #f4d03f;
+    vertical-align: middle;
+}
+
+.data-table th {
+    background-color: rgba(10, 14, 23, 0.9);
+    color: #f4d03f;
+    font-weight: bold;
+}
+
+.data-table td {
+    background-color: rgba(10, 14, 23, 0.8);
+    color: #fff;
+}
+
+.data-table .edit-button{
+    text-decoration: none;
+    color: #f4d03f;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+    transition: color 0.3s ease;
+}
+
+.data-table .edit-button:hover {
+    text-decoration: underline;
+}
+
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination li {
+    list-style: none;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 8px 12px;
+    background-color: rgba(10, 14, 23, 0.9);
+    color: #f4d03f;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination li.active span {
+    background-color: #f4d03f; /* Ярко-жёлтый фон */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+.pagination li a:hover {
+    background-color: #ec7063; /* Розовый цвет при наведении */
+    color: #fff;
+}
+
+.top-menu {
+    display: flex;
+    justify-content: space-between; /* Разделяем левую и правую части */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    gap: 10px; /* Расстояние между элементами */
+}
+
+.top-menu form {
+    display: inline-block; /* Формы отображаются как строчные элементы */
+    margin: 0px 0px 10px 0px; /* Убираем лишние маргины */
+    padding: 0; /* Убираем лишние паддинги */
+}
+
+.top-menu-left {
+    display: flex;
+    gap: 10px; /* Расстояние между кнопками */
+}
+
+.top-menu-right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Расстояние между кнопками */
+}
+
+
+.top-menu-right form {
+    display: inline-block; /* Формы отображаются как строчные элементы */
+    margin: 0px 0px 10px 0px; /* Убираем лишние маргины */
+    padding: 0; /* Убираем лишние паддинги */
+}
+
+.filter-button {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: transparent;
+    color: #f4d03f;
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-button.active {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.filter-button:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.delete-button {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #ff4d4d;
+    color: #fff;
+    border: 2px solid transparent;
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.delete-button:hover {
+    background-color: #cc0000;
+}

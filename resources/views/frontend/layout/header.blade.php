@@ -32,6 +32,9 @@
                     @if (Auth::user()->isAdmin())
                         <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
                     @endif
+                    @if (Auth::user()->isGameMaster() || Auth::user()->isQuestionnaireSpecialist())
+                        <li><a href={{route('game-master.index') }} class="navbar__link">ГМ-панель</a></li>
+                    @endif
                     <li><a href={{ route('characters.index') }} class="navbar__link">Персонажи</a></li>
                     <li><a href="" class="navbar__link">Настройки</a></li>
                     <li>
@@ -56,6 +59,9 @@
                     <ul class="navbar__user-menu" id="user-menu-desktop" role="menu" aria-hidden="true">
                         @if (Auth::user()->isAdmin())
                             <li><a href={{route('admin') }} class="navbar__link">Админ-панель</a></li>
+                        @endif
+                        @if (Auth::user()->isGameMaster() || Auth::user()->isQuestionnaireSpecialist())
+                            <li><a href={{route('game-master.index') }} class="navbar__link">ГМ-панель</a></li>
                         @endif
                         <li><a href={{ route('characters.index') }} class="navbar__link">Персонажи</a></li>
                         <li><a href="" class="navbar__link">Настройки</a></li>

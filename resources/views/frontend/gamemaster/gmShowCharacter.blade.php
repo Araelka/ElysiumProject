@@ -1,10 +1,10 @@
-@extends('frontend.admin.admin')
+@extends('frontend.gamemaster.index')
 <link rel="stylesheet" href="{{ asset('css/character.css') }}">
-@section('title', 'Редактирование персонажа: ' . $character->firstName . ' ' . $character->secondName)
+@section('title', $character->firstName . ' ' . $character->secondName)
 @section('table')
 
 
-<div class="row w-100 h-100"> 
+<div class="row w-100 h-100" > 
     <div class="col-md-12 main-content d-flex flex-column justify-content-start" style="background-color: transparent; box-shadow: none; padding: 0px;">
         <div class="character-form-container" style="padding: 0px; margin-bottom: 0px; overflow-y: clip;">
             <div class="character-info-container">
@@ -31,17 +31,27 @@
                                     </div>
                                         <div style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
                                             <div class="character-status-select">
-                                                <form id="statusForm" action={{ route('admin.chatgeCharacterStatus', $character->id) }} style="margin-bottom: 0px" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <select id="status" name="status_id" onchange="document.getElementById('statusForm').submit()">
-                                                        @foreach ($statuses as $status)
-                                                            <option value={{ $status->id }} {{ $character->status_id == $status->id ? 'selected' : '' }}> 
-                                                                {{ $status->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </form>
+                                                @if ($character->isPreparing() || $character->isConsideration())
+                                                    <div class="status-preparing">
+                                                        {{ $character->status->name }}
+                                                    </div>
+                                                @elseif ($character->isApproved())
+                                                        <div class="status-approved">
+                                                            {{ $character->status->name }}
+                                                        </div>
+                                                @elseif ($character->isRejected())
+                                                <div class="status-rejected">
+                                                    {{ $character->status->name }}
+                                                </div>
+                                                @elseif ($character->isArchive())
+                                                        <div class="status-archive">
+                                                            {{ $character->status->name }}
+                                                        </div>
+                                                @elseif ($character->isDead())
+                                                        <div class="status-rejected">
+                                                            {{ $character->status->name }}
+                                                        </div>
+                                                @endif
                                             </div>   
                                         </div>                             
                                 </div>
@@ -199,37 +209,73 @@
 
                 </div>
 
-                <div style="display: flex; flex-direction: row; justify-content: flex-end; gap: 10px;">
-                    <div>
-                        <button class="save-button">
-                            <a href="{{ route('characters.showMainInfo', $character->uuid) }}">Редактировать</a>
-                        </button>
+                <div>
+                    @if (auth()->user()->isGameMaster() && $character->isApproved())
+                    <div style="display: flex; flex-direction: row; justify-content: flex-end; gap: 10px;">
+                        <div>
+                            <form action="{{ route('game-master.increaseAvailablePoints', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="save-button">Повысить уровень</button>
+                            </form>
+                        </div>
                     </div>
-                    <div>
-                        <form action="{{ route('characters.increaseAvailablePoints', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="save-button">Повысить уровень</button>
-                        </form>
+                    @endif
+                    @if (auth()->user()->isQuestionnaireSpecialist() && $character->isConsideration())
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="form-control">
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <label for="rejection">Причина отклонения:</label>
+                        </div>
+                        <span id="error-message" class="form__error" style="display: none">Пожалуйста, укажите причину отклонения.</span>
+                        <textarea id="rejection" name="rejection" style="height: 200px;" rows="6" placeholder="Причина отклонения...">{{ $character->comment }}</textarea>
                     </div>
-                    <div>
-                        <form action="{{ route('characters.characterDestoy', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete-button">Удалить</button>
-                        </form>
+                    <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
+                        <div>
+                            <form action="{{ route('game-master.characterApproval', $character->uuid) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="save-button">Одобрить</button>
+                            </form>
+                        </div>
+                        
+                        <div>
+                            <form action="{{ route('game-master.characterDeviation', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;" onsubmit="return validateRejection(event)">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="rejection_reason" id="rejection_reason">
+                                <button type="submit" class="delete-button">Отклонить</button>
+                            </form>
+                        </div>
                     </div>
+                    </div>
+                    @endif
                 </div>
     </div>
     </div>
 </div>
 
 <script>
+    function validateRejection(event) {
+        const rejectionText = document.getElementById('rejection').value.trim();
+        const errorMessage = document.getElementById('error-message');
+
+        if (!rejectionText) {
+            errorMessage.style.display = 'inline';
+            event.preventDefault();
+            return false; 
+        }
+
+        errorMessage.style.display = 'none'; 
+        document.getElementById('rejection_reason').value = rejectionText;
+
+        return true;
+    }
+    
     function updateDiamonds(attributeId, value) {
         const diamondsContainer = document.getElementById(`attribute-level-${attributeId}`);
-        diamondsContainer.innerHTML = ''; // Очищаем текущие ромбики
+        diamondsContainer.innerHTML = ''; 
 
-        // Добавляем нужное количество ромбиков
         for (let i = 0; i < value; i++) {
             const diamond = document.createElement('label');
             diamond.textContent = '◆';

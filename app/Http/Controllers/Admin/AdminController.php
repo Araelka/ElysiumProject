@@ -23,7 +23,8 @@ class AdminController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        return view('frontend.admin.admin');
+        // return view('frontend.admin.admin');
+        return redirect()->route('admin.showUsers');
     }
 
     public function showTableUser (Request $request) {

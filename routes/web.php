@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\GameMaster\GameMasterController;
+use App\Http\Controllers\Wiki\ArticleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\Character\CharacterController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\Wiki\ThemeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,6 +17,8 @@ Route::get('/', [PostController::class, 'index'])->name('homePage');
 
 Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
+
+
 
 
 
@@ -49,8 +52,6 @@ Route::middleware('auth')->group(function(){
         Route::put('update/description/{id}', [CharacterController::class, 'updateDescription'])->name('updateDescription');
 
         Route::put('update/archive-status/{id}', [CharacterController::class, 'changeArchiveStatus'])->name('changeArchiveStatus');
-
-        Route::put('update/available-points/{id}', [CharacterController::class, 'increaseAvailablePoints'])->name('increaseAvailablePoints');
     });
 
     
@@ -82,6 +83,23 @@ Route::middleware(['auth', 'editor'])->group(function(){
         Route::get('article/edit/content/{id}', [ArticleController::class, 'showEditArticleContent'])->name('showEditArticleContent');
         Route::put('article/edit/content/{id}', [ArticleController::class, 'editArticleContent'])->name('editArticleContent');
         Route::post('article/edit/content/{id}', [ArticleController::class, 'uploadImage'])->name('uploadArticleImage');
+    });
+});
+
+Route::middleware(['auth', 'gameMasterorOrQuestionnaireSpecialist'])->group(function(){
+    Route::prefix('game-master')->name('game-master.')->group(function(){
+        Route::get('/', [GameMasterController::class, 'index'])->name('index');
+        Route::get('characters', [GameMasterController::class, 'showCharactersTable'])->name('showCharactersTable');
+        Route::get('characters/{id}', [GameMasterController::class, 'showCharacter'])->name('showCharacter');
+    });
+
+    Route::middleware(['auth', 'questionnaireSpecialist'])->prefix('game-master')->name('game-master.')->group(function(){
+        Route::put('approval/{id}', [CharacterController::class, 'approval'])->name('characterApproval');
+        Route::put('deviation/{id}', [CharacterController::class, 'deviation'])->name('characterDeviation');
+    });
+
+    Route::middleware(['auth', 'gameMaster'])->prefix('game-master')->name('game-master.')->group(function(){
+        Route::put('increase-available-points/{id}', [CharacterController::class, 'increaseAvailablePoints'])->name('increaseAvailablePoints');
     });
 });
 

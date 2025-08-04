@@ -1,22 +1,20 @@
 @extends('frontend.layout.layout')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-@section('title', 'Админ-панель')
+<link rel="stylesheet" href="{{ asset('css/gamemaster.css') }}">
+@section('title', 'ГМ-панель')
 
 @section('content')
 <div class="main-page">
     <div class="container d-flex justify-content-center align-items-stretch"> 
         <div class="row w-100 h-100"> 
             <div class="col-md-12 main-content d-flex flex-column justify-content-start" style="overflow-y: visible">
-                <!-- Горизонтальный выбор таблицы и строка поиска -->
                 <div class="table-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="table-selection d-flex align-items-center">
                         <ul class="table-list d-flex">
-                            <li><a href="{{ route('admin.showUsers') }}" class="table-link {{ request()->routeIs('admin.showUsers') ? 'active' : '' }}">Пользователи</a></li>
-                            <li><a href="{{ route('admin.showCharactersTable') }}" class="table-link {{ request()->routeIs('admin.showCharactersTable') ? 'active' : '' }}">Персонажи</a></li>
-                            <li><a href="{{ route('admin.showLocations') }}" class="table-link {{ request()->routeIs('admin.showLocations') ? 'active' : '' }}">Локации</a></li>
+                            <li><a href="{{ route('game-master.showCharactersTable') }}" class="table-link {{ request()->routeIs('game-master.showCharactersTable') ? 'active' : '' }}">Персонажи</a></li>
                         </ul>
                     </div>
-                    @if (!Request::is('admin/*/*'))
+                    @if (!Request::is('game-master/*/*'))
+                        
                     <div class="search-container">
                         <form action="{{ url()->current() }}" method="GET" id="search-form">
                             <input type="hidden" name="filter" value="{{ request('filter', 'all') }}">
@@ -45,25 +43,4 @@
     </div>
 </div>
 
-<!-- Модальное окно для подтверждения удаления -->
-<div id="confirm-delete-modal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Вы уверены, что хотите удалить выбранные элементы?</p>
-        <button id="confirm-delete">Удалить</button>
-        <button id="cancel-delete">Отмена</button>
-    </div>
-</div>
-
-<!-- Модальное окно для подтверждения бана -->
-<div id="confirm-ban-modal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Вы уверены, что хотите забанить выбранных пользователей?</p>
-        <label for="ban-reason">Причина бана:</label>
-        <input type="text" id="ban-reason" placeholder="Укажите причину бана">
-        <button id="confirm-ban">Забанить</button>
-        <button id="cancel-ban">Отмена</button>
-    </div>
-</div>
 @endsection

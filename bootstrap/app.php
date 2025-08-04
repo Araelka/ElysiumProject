@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\CheckAdmin::class,
             'editor' => \App\Http\Middleware\CheckEditor::class,
-            'player' => \App\Http\Middleware\CheckPlayer::class,
+            'gameMaster' => \App\Http\Middleware\CheckGameMaster::class,
+            'questionnaireSpecialist' => \App\Http\Middleware\CheckQuestionnaireSpecialist::class,
+            'gameMasterorOrQuestionnaireSpecialist' => \App\Http\Middleware\CheckGameMasterOrQuestionnaireSpecialist::class,
+            'player' => \App\Http\Middleware\CheckPlayer::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

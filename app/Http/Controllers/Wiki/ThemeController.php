@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Wiki;
 
+use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\Theme;
 use App\Models\ThemeImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use function PHPUnit\Framework\returnArgument;
 
 class ThemeController extends Controller
@@ -72,8 +74,13 @@ class ThemeController extends Controller
         if (!auth()->user()->isEditor()){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
+
         $validate = $request->validate([
-            'name' => ['required', 'max:255', 'unique:themes']
+            'name' => [
+                'required', 
+                'max:255', 
+                Rule::unique('themes', 'name')->ignore($id)
+                ]
         ]);
 
 

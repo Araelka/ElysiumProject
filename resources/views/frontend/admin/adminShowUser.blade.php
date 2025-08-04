@@ -25,7 +25,7 @@
 
                 
                 <!-- Кнопка для открытия выпадающего списка -->
-                <select id="rolesDropdownToggle" readonly>
+                <select class="dropdown-toggle" id="rolesDropdownToggle" readonly>
                     <option id="selectedOption"></option>
                 </select>
 
@@ -126,11 +126,13 @@
         toggleButton.addEventListener('mousedown', function (event) {
             event.preventDefault(); 
             dropdownMenu.classList.toggle('open'); 
+            toggleButton.classList.toggle('active');
         });
 
         document.addEventListener('click', function (event) {
             if (!dropdownMenu.contains(event.target) && !toggleButton.contains(event.target)) {
                 dropdownMenu.classList.remove('open');
+                toggleButton.classList.remove('active');
             }
         });
 

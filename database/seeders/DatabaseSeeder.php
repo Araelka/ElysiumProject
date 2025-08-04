@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Article;
+use App\Models\Theme;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call(ThemesTableSeeder::class);
         $this->call(RoleTableSeeder::class);
         
         $user = User::create([
@@ -28,6 +30,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AttributeTableSeeder::class);
         $this->call(SkillTableSeeder::class);
 
+        // Theme::factory(20)->create();   
         // User::factory(20)->create();
 
     }

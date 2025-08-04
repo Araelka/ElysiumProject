@@ -498,26 +498,6 @@
     width: 100%;
 }
 
-.dropdown-toggle {
-    width: 100%;
-    padding: 10px;
-    background-color: transparent;
-    border: 2px solid #f4d03f;
-    border-radius: 5px;
-    text-align: left;
-    cursor: pointer;
-    color: #fff;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 16px;
-}
-
-.dropdown-toggle::after {
-    content: '∨'; 
-    font-weight: bold;
-    font-size: 16px;
-    position: absolute;
-    right: 7px;
-}
 
 .dropdown-menu {
     display: none;
@@ -536,7 +516,7 @@
 }
 
 .dropdown-toggle.active {
-    border-color: #ec7063;
+    border-color: #ec7063 !important;
 }
 
 .dropdown-menu.open {

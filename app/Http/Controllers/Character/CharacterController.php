@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Character;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CharacterDescriptionRequest;
 use App\Http\Requests\CharacterRequest;
 use App\Models\Attribute;
@@ -161,7 +162,6 @@ class CharacterController extends Controller
             'residentialAddress' => $request->input('residentialAddress'),
             'activity' => $request->input('activity'),
             'personality' => $text,
-            'comment' => null,
             'status_id' => 1
         ]);
 
@@ -542,6 +542,53 @@ class CharacterController extends Controller
         $character = Character::where('uuid', $uuid)->first();
         $character->increaseAvailablePoints();
         return redirect()->back();
+    }
+
+    public function approval($uuid) {
+        if (!auth()->user()->isQuestionnaireSpecialist()){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isConsideration()){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');  
+        }
+
+        $character = Character::where('uuid', $uuid)->first();
+
+        $character->update([
+            'status_id' => 3,
+            'comment' => null
+        ]);
+
+        return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
+    }
+
+    public function deviation($uuid, Request $request){
+        if (!auth()->user()->isQuestionnaireSpecialist()){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
+        }
+
+        if (!Character::where('uuid', $uuid)->first()->isConsideration()){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');  
+        }
+
+        $character = Character::where('uuid', $uuid)->first();
+
+        $validated = $request->validate([
+            'rejection_reason' =>[
+                'required',
+                'string'
+            ]
+        ]);
+
+        $text = $this->textProcessing($validated['rejection_reason']);
+
+        $character->update([
+            'status_id' => 4,
+            'comment' => $text
+        ]);
+
+        return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
     }
 
 }
