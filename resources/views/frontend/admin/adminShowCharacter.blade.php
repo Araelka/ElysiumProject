@@ -206,7 +206,7 @@
                         </button>
                     </div>
                     <div>
-                        <form action="{{ route('characters.increaseAvailablePoints', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
+                        <form action="{{ route('game-master.increaseAvailablePoints', $character->uuid) }}" method="POST" class="single-delete-form" style="display:inline-block;">
                             @csrf
                             @method('PUT')
                             <button type="submit" class="save-button">Повысить уровень</button>

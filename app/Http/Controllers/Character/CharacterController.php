@@ -560,6 +560,12 @@ class CharacterController extends Controller
             'comment' => null
         ]);
 
+        if (!$character->isApproved() || !$character->user->isUser()){
+            return redirect()->back();
+        }
+
+        $character->user->roles()->sync([5]);
+
         return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
     }
 
