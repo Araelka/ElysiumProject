@@ -11,7 +11,7 @@
             @if (auth()->check() && auth()->user()->isPlayer())
                 <li><a href="" class="navbar__link">Игровая</a></li>
             @endif
-            <li><a href="" class="navbar__link">Персонажи</a></li>
+            <li><a href="{{ route('character.publicIndex') }}" class="navbar__link">Персонажи</a></li>
             <li><a href="{{ route('wiki.index') }}"  class="navbar__link">Вики</a></li>
             <li><a href="" class="navbar__link">Карта</a></li>
             <li><a href="" class="navbar__link">О нас</a></li>

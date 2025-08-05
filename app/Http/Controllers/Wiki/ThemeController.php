@@ -28,7 +28,9 @@ class ThemeController extends Controller
            $query->orderBy('id', 'asc')->take(1);
        }]);
 
-
+        if (!auth()->user()->isEditor()) {
+            $query = $query->where('visibility', 1);
+        }
 
         $themes = $query->paginate(20);
 

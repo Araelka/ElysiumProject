@@ -691,3 +691,114 @@ details[open] summary:before {
     color: #1a1a40;
     text-decoration: none;
 }
+
+.character-selection-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0px;
+}
+
+.character-container {
+    overflow-y: auto;
+    max-width: 100%; 
+    overflow-x: hidden;
+    box-sizing: border-box; 
+}
+
+.character-container::-webkit-scrollbar {
+    width: 2px; 
+    border-radius: 5px; 
+}
+
+.character-container::-webkit-scrollbar-track {
+    background: #00000000; 
+    border-radius: 5px; 
+}
+
+.character-container::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; 
+    border-radius: 5px; 
+}
+
+.character-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.character-item {
+    flex: 0 0 calc(25% - 15px); 
+    max-width: calc(25% - 15px);
+}
+
+.character-card {
+    position: relative;
+    background-color: rgba(10, 14, 23, 0.9); 
+    border: 2px solid #f4d03f; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
+    padding: 15px;
+    display: flex; 
+    align-items: center; 
+    transition: transform 0.3s ease; 
+    height: auto; 
+    flex-direction: row-reverse;
+}
+
+.character-card:hover {
+    border-color: #ec7063;
+}
+
+/* Содержимое карточки */
+.character-card-content {
+    overflow: hidden; 
+    flex-grow: 1; 
+}
+
+.character-card-title {
+    color: #f4d03f;
+    font-size: 18px;
+    margin: 0; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-height: 80px;
+}
+
+/* Изображение */
+.character-card-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    margin-right: 10px;
+}
+
+.character-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: top;
+    border-radius: 10px; 
+}
+
+.footer-pagination {
+    position: relative;
+    text-align: center;
+    margin-top: auto; 
+}
+
+.character-user {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    position: absolute;
+    bottom: 5px; 
+    right: 5px; 
+    font-size: 14px;
+    font-weight: normal;
+    padding: 2px 8px;
+    border-radius: 5px;
+}

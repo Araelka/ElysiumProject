@@ -299,7 +299,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 0px;
+    padding: 5px 0px;
 }
 
 .theme-list {
@@ -762,4 +762,40 @@
     width: 30%;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Тень */
     position: relative;
+}
+
+#confirm-delete {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #ff4d4d;
+    color: #fff;
+    border: 2px solid transparent;
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+#confirm-delete:hover {
+    background-color: #cc0000;
+}
+
+#cancel-delete {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: transparent; 
+    color: #f4d03f; 
+    border: 2px solid #f4d03f; 
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#cancel-delete:hover  {
+    background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
+    color: #1a1a40; /* Тёмный текст */
 }

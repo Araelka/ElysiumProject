@@ -32,10 +32,10 @@
                         @endif
              
                         @if (Auth::check() && Auth::user()->isEditor())
-                            <form action="{{ route('wiki.destroyTheme', $theme->id) }}" method="POST" class="delete-form">
+                            <form id="delete-form-{{ $theme->id }}" action="{{ route('wiki.destroyTheme', $theme->id) }}" method="POST" class="delete-form">
                                 @csrf
                                 @method('DELETE')
-                                <button class="delete-theme-button" data-id="{{ $theme->id }}">×</button>
+                                <button type="button" class="delete-theme-button" data-id="{{ $theme->id }}" onclick="confirmDelete(event, {{ $theme->id }})">×</button>
                             </form>
                         @endif
 
@@ -83,7 +83,45 @@
     @endif
 </div>
 
+<!-- Модальное окно -->
+<div id="delete-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <p>Вы уверены, что хотите удалить эту тему?</p>
+        <button id="confirm-delete" class="btn btn-danger">Удалить</button>
+        <button id="cancel-delete" class="btn btn-secondary">Отмена</button>
+    </div>
+</div>
+
 <script>
+    let currentThemeId = null;
+
+    // Функция открытия модального окна
+    function confirmDelete(event, themeId) {
+        event.preventDefault();
+        event.stopPropagation(); 
+        currentThemeId = themeId;
+        const modal = document.getElementById('delete-modal');
+        modal.style.display = 'block';
+    }
+
+    // Функция закрытия модального окна
+    document.getElementById('cancel-delete').addEventListener('click', function () {
+        const modal = document.getElementById('delete-modal');
+        modal.style.display = 'none';
+        currentThemeId = null;
+    });
+
+    // Функция подтверждения удаления
+    document.getElementById('confirm-delete').addEventListener('click', function () {
+        if (currentThemeId) {
+            const form = document.getElementById(`delete-form-${currentThemeId}`);
+            form.submit(); 
+        }
+        const modal = document.getElementById('delete-modal');
+        modal.style.display = 'none';
+        currentThemeId = null;
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
     // Находим все формы с классом image-upload-form
     const forms = document.querySelectorAll('.image-upload-form');
@@ -91,7 +129,7 @@
     forms.forEach(form => {
         const fileInput = form.querySelector('input[type="file"]');
         fileInput.addEventListener('change', function () {
-            form.submit(); // Автоматическая отправка формы при выборе файла
+            form.submit(); 
         });
     });
 });

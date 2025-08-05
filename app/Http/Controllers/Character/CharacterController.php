@@ -55,6 +55,7 @@ class CharacterController extends Controller
         return $diffInDays;
     }
 
+
     public function index(Request $request) {
 
         $selectedCharacterId = $request->query('character');
@@ -70,6 +71,36 @@ class CharacterController extends Controller
         $characters = Character::where('user_id', auth()->user()->id)->orderByRaw("FIELD(status_id, 3, 2, 1, 4, 5, 6)")->get();
 
         return view('frontend.characters.index', compact('characters', 'selectedCharacter', 'diffInDays'));
+    }
+
+    public function publicIndex (Request $request) {
+
+        $searchTerm = $request->query('search');
+        $searchFields = ['firstName', 'secondName'];
+
+        $query = Character::whereIn('status_id', [3,5,6]);
+
+
+        if ($searchTerm) {
+            $query = $query->where(function ($query) use ($searchTerm, $searchFields) {
+                foreach ($searchFields as $field) {
+                    $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                }
+
+                $query->orWhereHas('user', function($query) use ($searchTerm){
+                    $query->whereRaw('LOWER(login) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                });
+            });
+        }
+             
+        $characters = $query->paginate(20);
+
+
+        $characters->appends([
+            'search' => $searchTerm
+        ]);
+        
+        return view('frontend.characters.publicIndex', compact('characters'));
     }
 
     public function showMainInfo($uuid = null){

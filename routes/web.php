@@ -18,7 +18,7 @@ Route::get('/', [PostController::class, 'index'])->name('homePage');
 Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
 
-
+Route::get('characters/public', [CharacterController::class, 'publicIndex'])->name('character.publicIndex');
 
 
 

@@ -10,13 +10,19 @@
                  @if (Request::is('wiki'))
                 <div class="theme-selection-container d-flex justify-content-between align-items-center mb-3">
                     <div class="theme-selection d-flex align-items-center">
-                        @if (Auth::check() && Auth::user()->isEditor())
-                            <ul class="theme-list d-flex">
-                            <li><a href={{ route('wiki.showCreateThemeForm') }} class="theme-link">Создать</a></li>
-                            </ul>
-                        @endif
+                        <div>
+                            <h2>
+                                Вики
+                            </h2>
+                        </div>
                     </div>
                         <div class="search-container">
+                             @if (Auth::check() && Auth::user()->isEditor())
+                                <ul class="theme-list d-flex">
+                                <li><a href={{ route('wiki.showCreateThemeForm') }} class="theme-link">+</a></li>
+
+                            @endif
+
                             <form action="{{ request()->fullUrlWithQuery(['search' => '']) }}" method="GET" id="search-form">
                                 <input type="hidden" name="filter" class="search-input">
                                 <div class="search-input-wrapper">
