@@ -50,6 +50,8 @@ class GameMasterController extends Controller
                     $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
                 }
 
+                $query->orWhereRaw('CONCAT(LOWER(firstName), \' \', LOWER(secondName)) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+
                 $query->orWhereHas('user', function($query) use ($searchTerm){
                     $query->whereRaw('LOWER(login) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
                 });

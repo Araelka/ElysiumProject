@@ -96,4 +96,8 @@ class Character extends Model
             $this->timestamps = true;
         }
     }
+
+    public function posts(){
+        return $this->hasMany(Post::class);
+    }
 }

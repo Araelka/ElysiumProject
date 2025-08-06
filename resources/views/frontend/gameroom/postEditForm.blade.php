@@ -1,4 +1,4 @@
-<form class="post-form" action={{ route('post.edit', $post->id) }} method="POST">
+<form class="post-form" action={{ route('gameroom.edit', $post->id) }} method="POST">
     @csrf
     @method('PUT')
     <div class="post-form__group">

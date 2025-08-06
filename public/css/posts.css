@@ -2,14 +2,19 @@
     list-style: none;
     padding: 0;
     margin: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 
 .topic-link {
+    font-family: 'Courier New', Courier, monospace;
     text-decoration: none;
     color: #f4d03f; /* Ярко-жёлтый текст */
     font-size: 18px;
     font-weight: bold;
+    border: 2px solid #f4d03f;
     border-radius: 5px;
     display: block;
     padding: 10px;
@@ -28,7 +33,7 @@
 }
 
 .posts::-webkit-scrollbar {
-    width: 5px; /* Ширина полосы прокрутки */
+    width: 2px; /* Ширина полосы прокрутки */
     border-radius: 5px; 
 }
 
@@ -51,11 +56,12 @@
 
 
 .post {
+    background-color: rgba(10, 14, 23);
     margin-bottom: 20px;
     /* margin-left: 5px; */
     margin-right: 2px;
     padding: 10px;
-    border: 1px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border: 2px solid #f4d03f; /* Ярко-жёлтая рамка */
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Добавляем тень */
 }
@@ -76,7 +82,7 @@
     color: #fff; /* Белый текст */
 }
 
-.post small {
+.post-date {
     color: #ec7063; /* Розовый цвет для автора */
     font-size: 14px;
 }
@@ -92,7 +98,15 @@
 }
 
 .post-form__group {
+    background-color: rgba(10, 14, 23);;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
     text-align: left;
+    align-items: stretch;
+    gap: 10px;
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
 }
 
 .post-form__label {
@@ -102,29 +116,32 @@
 }
 
 .post-form__input {
+    font-family: 'Courier New', Courier, monospace;
     width: 100%;
-    min-height: 120px; /* Минимальная высота поля ввода */
-    padding: 12px;
+    height: 100%;
+    max-height: 200px;
+    /* min-height: 50px; */
     font-size: 16px;
-    border: 2px solid #f4d03f; /* Ярко-жёлтая рамка */
+    border: 1px solid transparent; 
     border-radius: 5px;
     background-color: transparent;
     color: #fff;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
+    /* background-color: #fff; */
+    /* transition: border-color 0.3s ease; */
+    /* box-sizing: border-box; */
     resize: none;
 
     overflow-y: auto; /* Добавляем вертикальную прокрутку */
 }
 
 .post-form__input::-webkit-scrollbar {
-    width: 5px; /* Ширина полосы прокрутки */
+    width: 0px; /* Ширина полосы прокрутки */
     border-radius: 5px; 
 }
 
 .post-form__input::-webkit-scrollbar-track {
     background: #00000000; /* Фон полосы прокрутки */
-    border-radius: 5px; 
+    border-radius: 0px; 
 }
 
 .post-form__input::-webkit-scrollbar-thumb {
@@ -133,33 +150,34 @@
 }
 
 .post-form__input:focus {
-    border-color: #ec7063; /* Розовая рамка при фокусе */
+    border-color: transparent; /* Розовая рамка при фокусе */
     outline: none;
 }
 
 .post-form__button {
+    font-family: 'Courier New', Courier, monospace;
+    color: #f4d03f;
     display: inline-block;
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     font-size: 18px;
     font-weight: bold;
-    color: #1a1a40;
-    background-color: #f4d03f; /* Ярко-жёлтый фон */
-    border: none;
-    border-radius: 5px;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
     box-sizing: border-box;
 }
 
 .post-form__button:hover {
-    background-color: #ec7063; /* Розовый фон при наведении */
-    transform: scale(1.02);
+    /* background-color: #ec7063; */
+    color: #ec7063;
 }
 
 .topic-link.active {
-    background-color: #f4d03f; /* Ярко-жёлтый фон */
-    color: #1a1a40; /* Тёмный текст */
+    background-color: #f4d03f;
+    color: #1a1a40;
     font-weight: bold;
 }
 
@@ -197,4 +215,85 @@
     color: #ec7063; /* Ярко-жёлтый при наведении */
 }
 
+.custom-dropdown {
+    position: relative; 
+    width: max-content; 
+}
+
+.dropdown-toggle {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    width: 100%;
+    /* color: #f4d03f; */
+    /* padding: 10px; */
+    font-size: 16px;
+    border: 0px solid transparent;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+    text-decoration: underline;
+    /* background-color: #f4d03f; */
+    /* color: #1a1a40; */
+}
+
+
+.dropdown-menu {
+    display: none; 
+    position: absolute;
+    bottom: 100%; 
+    left: 0;
+    width: max-content;
+    background-color: rgba(10, 14, 23, 0.9);
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    z-index: 1000;
+    overflow-y: auto; 
+    max-height: 200px; 
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 2px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
+
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+    font-weight: bold;
+}
+
+
+.dropdown-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 50%;
+}
 

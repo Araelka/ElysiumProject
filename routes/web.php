@@ -7,18 +7,19 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Character\CharacterController;
 use App\Http\Controllers\MainController;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\GameRoom\PostController;
 use App\Http\Controllers\Wiki\ThemeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
 
-Route::get('/', [PostController::class, 'index'])->name('homePage');
+Route::get('/', [MainController::class, 'index'])->name('homePage');
 
 Route::get('wiki', [ThemeController::class, 'index'])->name('wiki.index');
 Route::get('wiki/article/{id}', [ArticleController::class, 'index'])->name('wiki.article.index');
 
 Route::get('characters/public', [CharacterController::class, 'publicIndex'])->name('character.publicIndex');
+Route::get('characters/public/{id}', [CharacterController::class, 'publicCharacter'])->name('character.publicCharacter');
 
 
 
@@ -104,11 +105,16 @@ Route::middleware(['auth', 'gameMasterorOrQuestionnaireSpecialist'])->group(func
 });
 
 Route::middleware(['auth', 'player'])->group(function(){
-    Route::post('publish', [PostController::class, 'store'])->name('post.publish');
-    Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::prefix('game-room')->name('gameroom.')->group(function(){
+        Route::get('/', [PostController::class, 'index'])->name('index');
 
-    Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('post.editShow');
-    Route::put('edit', [PostController::class, 'edit'])->name('post.edit');
+        Route::post('publish', [PostController::class, 'store'])->name('publish');
+        Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
+
+        Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('editShow');
+        Route::put('edit', [PostController::class, 'edit'])->name('edit');
+    });
+    
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function() {

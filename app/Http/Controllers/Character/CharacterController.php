@@ -78,7 +78,7 @@ class CharacterController extends Controller
         $searchTerm = $request->query('search');
         $searchFields = ['firstName', 'secondName'];
 
-        $query = Character::whereIn('status_id', [3,5,6]);
+        $query = Character::whereIn('status_id', [3,5,6])->orderBy('firstName', 'asc')->orderBy('secondName', 'asc');
 
 
         if ($searchTerm) {
@@ -87,11 +87,14 @@ class CharacterController extends Controller
                     $query->orWhereRaw('LOWER(' . $field . ') LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
                 }
 
+                $query->orWhereRaw('CONCAT(LOWER(firstName), \' \', LOWER(secondName)) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+
                 $query->orWhereHas('user', function($query) use ($searchTerm){
                     $query->whereRaw('LOWER(login) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
                 });
             });
         }
+
              
         $characters = $query->paginate(20);
 
@@ -100,7 +103,19 @@ class CharacterController extends Controller
             'search' => $searchTerm
         ]);
         
-        return view('frontend.characters.publicIndex', compact('characters'));
+        return view('frontend.characters.publicCharacters', compact('characters'));
+    }
+
+    public function publicCharacter($id) {
+
+        $character = Character::findOrFail($id);
+
+        if (!$character->isApproved() && !$character->isArchive() && !$character->isDead()){
+            return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');
+        }
+
+        return view('frontend.characters.publicCharacter', compact('character'));
+
     }
 
     public function showMainInfo($uuid = null){

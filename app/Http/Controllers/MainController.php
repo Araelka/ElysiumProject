@@ -10,5 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MainController extends Controller
 {
-    //
+    public function index(){
+        return view('frontend.index');
+    }
 }

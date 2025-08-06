@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\GameRoom;
 
+use App\Http\Controllers\Controller;
 use App\Events\PostCreated;
+use App\Models\Character;
 use App\Models\Location;
 use App\Models\Post;
 use App\Models\Theme;
@@ -15,6 +17,10 @@ class PostController extends Controller
     
     public function index(Request $request){
 
+        if (!auth()->user()->isPlayer()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $locations = Location::all();
 
         $selectedLocationId = $request->query('location_id');
@@ -23,11 +29,13 @@ class PostController extends Controller
 
         $posts = $this->selectPostsByLocation($selectedLocationId);
 
-        return view('frontend/post/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation]);
+        $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
+
+        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters'));
     }
 
     private function selectPostsByLocation ($selectedLocationId) {
-        $posts = Post::where('location_id', $selectedLocationId)->with(relations:['locations', 'user'])->get();
+        $posts = Post::where('location_id', $selectedLocationId)->get();
 
         return $posts;
     }
@@ -35,16 +43,30 @@ class PostController extends Controller
 
 
     public function store (Request $request){
+        
+        if (!auth()->user()->isPlayer()){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
+        
         $validated = $request->validate([
             'post_text' => ['required', 'string'],
+            'character_uuid' => ['required']
         ]);
 
+        if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
 
-        $post = new Post();
-        $post->content = $validated['post_text'];
-        $post->user_id = auth()->id();
-        $post->location_id = $request->input('location_id');
-        $post->save();
+
+        $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
+
+
+        $post = Post::create([
+            'content' => $validated['post_text'],
+            'character_id' => $characterId,
+            'location_id' => $request->input('location_id')
+        ]);
 
         return redirect()->back();
     }

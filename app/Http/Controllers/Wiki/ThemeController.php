@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\Theme;
 use App\Models\ThemeImage;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,7 @@ class ThemeController extends Controller
            $query->orderBy('id', 'asc')->take(1);
        }]);
 
-        if (!auth()->user()->isEditor()) {
+        if (!auth()->check() || !auth()->user()->isEditor()) {
             $query = $query->where('visibility', 1);
         }
 
