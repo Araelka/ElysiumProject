@@ -58,12 +58,31 @@ class PostController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
+        try {
         $validated = $request->validate([
             'post_text' => ['required', 'string'],
-            'parent_post_id' => 'nullable|exists:posts,id',
-            'location_id' => 'required|exists:locations,id',
-            'character_uuid' => ['required']
+            'parent_post_id' => ['nullable', 'exists:posts,id'],
+            'location_id' => ['required', 'exists:locations,id'],
+            'character_uuid' => ['required', 'exists:characters,uuid']
         ]);
+        }
+        catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->has('parent_post_id')) {
+                $parentPost = Post::find($request->input('parent_post_id'));
+                if ($parentPost) {
+                    $request->session()->flash('parent_post', [
+                        'id' => $parentPost->id,
+                        'character_name' => $parentPost->character->firstName . ' ' . $parentPost->character->secondName,
+                        'content' => Str::limit($parentPost->content, 100),
+                    ]);
+                }
+            }
+
+            // Возвращаемся на предыдущую страницу с ошибками и старыми данными
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        }
 
 
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
@@ -86,6 +105,7 @@ class PostController extends Controller
         }
 
         $location_id = $validated['location_id'];
+
 
         return redirect()->route('gameroom.index', compact('location_id'));
     }

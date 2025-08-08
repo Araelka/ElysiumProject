@@ -28,24 +28,19 @@
 
     <div class="post-form__group">
             <div style="width: 100%">
-                @if ($parentPost)
-                    <div class="parent-link" style="display: none;">
-                        <a href="javascript:void(0)" onclick="scrollToPost({{ $parentPost->id }})" style="text-decoration: none">
+                <div id="parent-link" class="parent-link" style="display: none;">
+                    @if (session('parent_post'))
+                        <a href="javascript:void(0)" onclick="scrollToPost({{ session('parent_post')['id'] }})" style="text-decoration: none">
                             <div class="parent-link-content">
-                                <div style="color: #f4d03f">
-                                    {{ $parentPost->character->firstName . ' ' . $parentPost->character->secondName }}
-                                </div>
-                                <div>
-                                    {!! nl2br(e(Str::limit($parentPost->content, 100))) !!}
-                                </div>
+                                <div style="color: #f4d03f">{{ session('parent_post')['character_name'] }}</div>
+                                <div>{{ session('parent_post')['content'] }}</div>
                             </div>
                         </a>
-                    </div>
-                @else
-                    <div class="parent-link" style="display: none;"></div>
-                @endif
+                    @endif
+                </div>
+
                 <input type="hidden" name="location_id" value={{ $selectedLocation->id }}>
-                <input type="hidden" id="parent-post-id" name="parent_post_id" value={{ $parentPost->id ?? null }}>
+                <input type="hidden" id="parent-post-id" name="parent_post_id" value={{ old('parent_post_id') }}>
                 <textarea id="post-text" name="post_text" class="post-form__input" placeholder="Сообщение">{{ old('post_text') }}</textarea>
             </div>
             <div style="display: flex; align-items: flex-end;">
@@ -95,37 +90,75 @@
     function setParentPostId(button) {
         const postId = button.getAttribute('data-post-id'); 
         const parentPostIdInput = document.getElementById('parent-post-id'); 
-        const parentLink = document.querySelector('.parent-link'); 
+        const parentLink = document.getElementById('parent-link');
 
         parentPostIdInput.value = postId;
 
-
         if (postId) {
             fetch(`/game-room/get-post-content/${postId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сообщение не найдено');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (parentLink) {
-
                         parentLink.innerHTML = '';
 
                         parentLink.innerHTML = `
-                        <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
-                            <div class="parent-link-content">
-                                <div style="color: #f4d03f">${data.character_name}</div>
-                                <div>${data.content}</div>
-                            </div>
-                        </a>
-                    `;
-                    
+                            <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
+                                <div class="parent-link-content">
+                                    <div style="color: #f4d03f">${data.character_name}</div>
+                                    <div>${data.content}</div>
+                                </div>
+                            </a>
+                        `;
                         parentLink.style.display = 'block'; 
-
                     }
                 })
                 .catch(error => console.error('Ошибка:', error));
         } else {
             if (parentLink) {
-                parentLink.style.display = 'none'; 
+                parentLink.style.display = 'none';
             }
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const parentPostId = "{{ old('parent_post_id') ?? session('parent_post.id') }}";
+        const parentLink = document.getElementById('parent-link');
+
+        if (parentPostId && parentLink) {
+            fetch(`/game-room/get-post-content/${parentPostId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (parentLink) {
+                        parentLink.innerHTML = `
+                            <a href="javascript:void(0)" onclick="scrollToPost(${parentPostId})" style="text-decoration: none">
+                                <div class="parent-link-content">
+                                    <div style="color: #f4d03f">${data.character_name}</div>
+                                    <div>${data.content}</div>
+                                </div>
+                            </a>
+                        `;
+                        parentLink.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        } else if (session('parent_post')) {
+            const parentPost = @json(session('parent_post'));
+            if (parentPost) {
+                parentLink.innerHTML = `
+                    <a href="javascript:void(0)" onclick="scrollToPost(${parentPost.id})" style="text-decoration: none">
+                        <div class="parent-link-content">
+                            <div style="color: #f4d03f">${parentPost.character_name}</div>
+                            <div>${parentPost.content}</div>
+                        </div>
+                    </a>
+                `;
+                parentLink.style.display = 'block';
+            }
+        }
+    });
 </script>
