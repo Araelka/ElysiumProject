@@ -181,18 +181,18 @@
     font-weight: bold;
 }
 
-.post-header button {
+/* .post-header button {
     background: none;
     border: none;
-    color: #ec7063; /* Розовый цвет */
+    color: #ec7063;
     font-size: 24px;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .post-header button:hover {
-    color: #f4d03f; /* Ярко-жёлтый при наведении */
-}
+    color: #f4d03f; 
+} */
 
 .post-header {
     display: flex;
@@ -244,17 +244,28 @@
 
 
 .dropdown-menu {
-    display: none; 
     position: absolute;
     bottom: 100%; 
     left: 0;
     width: max-content;
-    background-color: rgba(10, 14, 23, 0.9);
+    background-color: rgba(10, 14, 23, 1);
     border: 2px solid #f4d03f;
     border-radius: 5px;
     z-index: 1000;
     overflow-y: auto; 
     max-height: 200px; 
+
+    opacity: 0;
+    transform: translateY(10px); 
+    visibility: hidden; 
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.dropdown-menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(-5px); 
+    visibility: visible; 
 }
 
 .dropdown-menu::-webkit-scrollbar {
@@ -297,3 +308,148 @@
     border-radius: 50%;
 }
 
+
+.dropdown-toggle-post {
+    width: 100%;
+    color: #f4d03f !important;
+    font-size: 16px;
+    border: 0px solid transparent;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Стиль для кнопки "..." */
+.dropdown-toggle-post {
+    background-color: transparent;
+    border: none;
+    color: #f4d03f;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.dropdown-toggle-post:hover {
+    color: #ec7063;
+}
+
+
+.custom-dropdown-post {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu-post {
+    position: absolute;
+    top: 0%; 
+    right: 100%;
+    background-color: rgba(10, 14, 23, 1);
+    border: 2px solid #f4d03f;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: hidden;
+    min-width: 150px;
+
+    opacity: 0;
+    transform: translateX(10px); 
+    visibility: hidden; 
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.dropdown-menu-post.show {
+    display: block;
+    opacity: 1;
+    transform: translateX(0); 
+    visibility: visible; 
+}
+
+.dropdown-item-post {
+    padding: 5px 10px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item-post:hover {
+    background-color: #f4d03f;
+    color: #1a1a40;
+}
+
+.dropdown-item-delete-post {
+    font-size: 16px;
+    color: #ec7063;
+    background: transparent;
+    border: 0px solid transparent;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.dropdown-item-delete-post:hover {
+    cursor: pointer;
+    background-color: #f4d03f;
+}
+
+.dropdown-item-post a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.dropdown-item-post a:hover {
+    color: #1a1a40;
+}
+
+
+#confirm-delete {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #ff4d4d;
+    color: #fff;
+    border: 2px solid transparent;
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+#confirm-delete:hover {
+    background-color: #cc0000;
+}
+
+#cancel-delete {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: transparent; 
+    color: #f4d03f; 
+    border: 2px solid #f4d03f; 
+    padding: 5px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#cancel-delete:hover  {
+    background-color: #f4d03f; /* Ярко-жёлтый фон при наведении */
+    color: #1a1a40; /* Тёмный текст */
+}
+
+.parent-link {
+    border-left: 2px solid #f4d03f;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+.parent-link-content {
+    color: #fff;
+    text-decoration: none;
+}

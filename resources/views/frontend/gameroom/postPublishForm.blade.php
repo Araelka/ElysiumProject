@@ -28,8 +28,25 @@
 
     <div class="post-form__group">
             <div style="width: 100%">
+                @if ($parentPost)
+                    <div class="parent-link" style="display: none;">
+                        <a href="javascript:void(0)" onclick="scrollToPost({{ $parentPost->id }})" style="text-decoration: none">
+                            <div class="parent-link-content">
+                                <div style="color: #f4d03f">
+                                    {{ $parentPost->character->firstName . ' ' . $parentPost->character->secondName }}
+                                </div>
+                                <div>
+                                    {!! nl2br(e(Str::limit($parentPost->content, 100))) !!}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                @else
+                    <div class="parent-link" style="display: none;"></div>
+                @endif
                 <input type="hidden" name="location_id" value={{ $selectedLocation->id }}>
-                <textarea id="post-text" name="post_text" class="post-form__input"></textarea>
+                <input type="hidden" id="parent-post-id" name="parent_post_id" value={{ $parentPost->id ?? null }}>
+                <textarea id="post-text" name="post_text" class="post-form__input" placeholder="Сообщение">{{ old('post_text') }}</textarea>
             </div>
             <div style="display: flex; align-items: flex-end;">
                 <button type="submit" class="post-form__button">➤</button>
@@ -39,8 +56,8 @@
 
 <script>
     function toggleDropdown() {
-        const dropdownMenu = document.getElementById('character-dropdown');
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        const dropdownCharacterMenu = document.getElementById('character-dropdown');
+        dropdownCharacterMenu.classList.toggle('show');
     }
 
     function selectCharacter(item) {
@@ -66,12 +83,49 @@
         autoResize();
 
         document.addEventListener('click', function (event) {
-            const dropdownMenu = document.getElementById('character-dropdown');
+            const dropdownCharacterMenu = document.getElementById('character-dropdown');
             const customDropdown = document.querySelector('.custom-dropdown');
 
             if (!customDropdown.contains(event.target)) {
-                dropdownMenu.style.display = 'none';
+                dropdownCharacterMenu.classList.remove('show');
             }
         });
     });
+
+    function setParentPostId(button) {
+        const postId = button.getAttribute('data-post-id'); 
+        const parentPostIdInput = document.getElementById('parent-post-id'); 
+        const parentLink = document.querySelector('.parent-link'); 
+
+        parentPostIdInput.value = postId;
+
+
+        if (postId) {
+            fetch(`/game-room/get-post-content/${postId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (parentLink) {
+
+                        parentLink.innerHTML = '';
+
+                        parentLink.innerHTML = `
+                        <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
+                            <div class="parent-link-content">
+                                <div style="color: #f4d03f">${data.character_name}</div>
+                                <div>${data.content}</div>
+                            </div>
+                        </a>
+                    `;
+                    
+                        parentLink.style.display = 'block'; 
+
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        } else {
+            if (parentLink) {
+                parentLink.style.display = 'none'; 
+            }
+        }
+    }
 </script>

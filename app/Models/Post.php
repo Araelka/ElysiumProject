@@ -9,6 +9,7 @@ class Post extends Model
     protected $fillable =[
         'character_id',
         'location_id',
+        'parent_post_id',
         'content'
     ];
 
@@ -18,5 +19,15 @@ class Post extends Model
 
     public function locations(){
         return $this->belongsTo(Location::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Post::class, 'parent_post_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Post::class, 'parent_post_id');
     }
 }

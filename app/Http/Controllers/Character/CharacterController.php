@@ -12,6 +12,7 @@ use App\Models\CharacterDescription;
 use App\Models\CharacterImage;
 use App\Models\CharacterSkill;
 use App\Models\Skill;
+use App\Services\TextProcessingService;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -22,22 +23,10 @@ use Illuminate\Support\Str;
 class CharacterController extends Controller
 {
 
-    protected function textProcessing ($text) {
+    protected $textProcessingService;
 
-        $text = preg_replace('/(\r?\n){3,}/m', "\n\n", $text);
-
-        $text = preg_replace('/^[ \t]+/m', '', $text);
-
-        $text = preg_replace('/[ \t]{2,}/', ' ', $text);
-
-        $text = preg_replace('/\s*<(br|p)\s*\/?>\s*/i', '<$1>', $text);
-
-        $text = rtrim($text, " \t\n\r\0\x0B");
-
-        $text = preg_replace('/<\s*(br|p)\s*\/?>\s*<\s*\/?\s*\1\s*>/i', '', $text);
-        
-        return $text;
-
+    public function __construct(TextProcessingService $textProcessingService) {
+        $this->textProcessingService = $textProcessingService;
     }
 
     protected function diffInDays ($character) {
@@ -145,7 +134,7 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('Превышен предел персонажий');
         }
 
-        $text = $this->textProcessing($request->input('personality'));
+        $text = $this->textProcessingService->textProcessing($request->input('personality'));
 
         $character = Character::create([
             'uuid' => Str::uuid(),
@@ -195,7 +184,7 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors('У вас нет прав на совершение данного действия');    
         }
 
-        $text = $this->textProcessing($request->input('personality'));
+        $text = $this->textProcessingService->textProcessing($request->input('personality'));
 
         $character->update([
             'firstName' => $request->input('firstName'),
@@ -457,9 +446,9 @@ class CharacterController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        $biography = $this->textProcessing($request->input(['biography']));
-        $description = $this->textProcessing($request->input(['description']));
-        $headcounts = $this->textProcessing($request->input(['headcounts']));
+        $biography = $this->textProcessingService->textProcessing($request->input(['biography']));
+        $description = $this->textProcessingService->textProcessing($request->input(['description']));
+        $headcounts = $this->textProcessingService->textProcessing($request->input(['headcounts']));
 
         $characterId = Character::where('uuid', $uuid)->first()->id;
 
@@ -492,9 +481,9 @@ class CharacterController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        $biography = $this->textProcessing($request->input(['biography']));
-        $description = $this->textProcessing($request->input(['description']));
-        $headcounts = $this->textProcessing($request->input(['headcounts']));
+        $biography = $this->textProcessingService->textProcessing($request->input(['biography']));
+        $description = $this->textProcessingService->textProcessing($request->input(['description']));
+        $headcounts = $this->textProcessingService->textProcessing($request->input(['headcounts']));
 
         $character = Character::where('uuid', $uuid)->first();
         $characterId = $character->id;
@@ -633,7 +622,7 @@ class CharacterController extends Controller
             ]
         ]);
 
-        $text = $this->textProcessing($validated['rejection_reason']);
+        $text = $this->textProcessingService->textProcessing($validated['rejection_reason']);
 
         $character->update([
             'status_id' => 4,

@@ -8,12 +8,20 @@ use App\Models\Character;
 use App\Models\Location;
 use App\Models\Post;
 use App\Models\Theme;
+use App\Services\TextProcessingService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ThemeController;
+use Str;
 
 
 class PostController extends Controller
 {
+
+    protected $textProcessingService;
+
+    public function __construct(TextProcessingService $textProcessingService) {
+        $this->textProcessingService = $textProcessingService;
+    }
     
     public function index(Request $request){
 
@@ -31,11 +39,13 @@ class PostController extends Controller
 
         $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
 
-        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters'));
+        $parentPost = Post::find($request->get('parent_post_id'));
+        
+        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters', 'parentPost'));
     }
 
     private function selectPostsByLocation ($selectedLocationId) {
-        $posts = Post::where('location_id', $selectedLocationId)->get();
+        $posts = Post::with('parent')->where('location_id', $selectedLocationId)->get();
 
         return $posts;
     }
@@ -48,11 +58,13 @@ class PostController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        
         $validated = $request->validate([
             'post_text' => ['required', 'string'],
+            'parent_post_id' => 'nullable|exists:posts,id',
+            'location_id' => 'required|exists:locations,id',
             'character_uuid' => ['required']
         ]);
+
 
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
@@ -61,56 +73,88 @@ class PostController extends Controller
 
         $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
 
-
         $post = Post::create([
-            'content' => $validated['post_text'],
+            'content' => $this->textProcessingService->textProcessing($validated['post_text']),
             'character_id' => $characterId,
-            'location_id' => $request->input('location_id')
+            'location_id' => $validated['location_id']
         ]);
 
-        return redirect()->back();
+        if ($validated['parent_post_id']) {
+            $post->update([
+                'parent_post_id' => $validated['parent_post_id']
+            ]); 
+        }
+
+        $location_id = $validated['location_id'];
+
+        return redirect()->route('gameroom.index', compact('location_id'));
     }
 
     public function destroy ($id){
 
+        if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isEditor()) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $post = Post::findOrFail($id);
 
-        if (auth()->id() == $post->user_id || auth()->user()->isAdmin()) {
-            $post->delete();
-        }
+        $post->delete();
 
         return redirect()->back();
     }
 
     public function showEditForm ($id){
-        $post = Post::findOrFail($id);
 
-        if (auth()->id() != $post->user_id) {
-            return redirect()->route('homePage', ['location_id' => $post->location_id]);
+        if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id) {
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
+
+        $postContent = Post::findOrFail($id);
 
         $locations = Location::all();
 
-        $selectedLocationId = $post->location_id;
+        $selectedLocationId = $postContent->location_id;
 
         $selectedLocation = Location::find($selectedLocationId);
 
         $posts = $this->selectPostsByLocation($selectedLocationId);
 
-        return view('frontend/index', ['locations' => $locations, 'posts' => $posts, 'selectedLocation' => $selectedLocation, 'postContent' => $post]);
+        $parentPost = $postContent;
+
+        return view('frontend/gameroom/index', compact('locations', 'posts', 'selectedLocation', 'postContent', 'parentPost'));
     }
 
     public function edit(Request $request) {
+
+        if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id 
+        || $request->input('character_uuid') != Post::findOrFail($request->input('post_id'))->character()->first()->uuid){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
+
         $validated = $request->validate(
             ['post_text' =>  ['required', 'string']
         ]);
 
-        if (auth()->id() == $request->input('user_id')){
-            $post = Post::findOrFail($request->input('post_id'));
-            $post->content = $validated['post_text'];
-            $post->update();
+        $post = Post::findOrFail($request->input('post_id'))->update([
+            'content' => $this->textProcessingService->textProcessing($validated['post_text'])
+        ]);
+
+        $location_id = $request->input('location_id');
+
+        return redirect()->route('gameroom.index', compact('location_id'));
+    }
+
+    public function getPostContent($id){
+        $post = Post::find($id);
+
+        if ($post) {
+            return response()->json([
+                'character_name' => $post->character->firstName . ' ' . $post->character->secondName,
+                'content' => Str::limit($post->content, 100), 
+            ]);
         }
 
-        return redirect()->route('homePage', ['location_id' => $request->input('location_id')]);
+        return response()->json(['error' => 'Сообщение не найдено'], 404);
     }
+
 }

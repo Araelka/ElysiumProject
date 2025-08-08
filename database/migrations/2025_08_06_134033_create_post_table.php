@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('character_id')->constrained()->onDelete('cascade');
             $table->foreignId('location_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('parent_post_id')->nullable();
+            $table->foreign('parent_post_id')->references('id')->on('posts')->onDelete('set null');
             $table->text('content');
             $table->timestamps();
         });

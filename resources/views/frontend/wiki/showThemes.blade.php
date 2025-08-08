@@ -86,6 +86,7 @@
 <!-- Модальное окно -->
 <div id="delete-modal" class="modal" style="display: none;">
     <div class="modal-content">
+        <h3>Удалить тему</h3>
         <p>Вы уверены, что хотите удалить эту тему?</p>
         <button id="confirm-delete" class="btn btn-danger">Удалить</button>
         <button id="cancel-delete" class="btn btn-secondary">Отмена</button>

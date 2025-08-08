@@ -66,4 +66,159 @@
         <button id="cancel-ban">Отмена</button>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Элементы для модальных окон
+        const deleteModal = document.getElementById('confirm-delete-modal');
+        const banModal = document.getElementById('confirm-ban-modal');
+
+        // Общие элементы для обоих модальных окон
+        const confirmDeleteButton = document.getElementById('confirm-delete');
+        const cancelDeleteButton = document.getElementById('cancel-delete');
+        const deleteCloseButton = deleteModal.querySelector('.close');
+
+        const confirmBanButton = document.getElementById('confirm-ban');
+        const cancelBanButton = document.getElementById('cancel-ban');
+        const banCloseButton = banModal.querySelector('.close');
+        const banReasonInput = document.getElementById('ban-reason');
+
+        let currentForm = null;
+        let currentUserId = null; // Для хранения ID пользователя при бане конкретного пользователя
+
+        // Функция для открытия модального окна удаления
+        function openDeleteModal(event) {
+            event.preventDefault();
+            deleteModal.style.display = 'block';
+            currentForm = event.target.closest('form');
+        }
+
+        // Функция для закрытия модального окна удаления
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+            currentForm = null;
+        }
+
+        // Функция для открытия модального окна бана
+        function openBanModal(event) {
+            event.preventDefault();
+
+            // Проверяем, является ли это баном конкретного пользователя
+            const banButton = event.target.closest('.ban-button');
+            if (banButton && banButton.dataset.userId) {
+                // Бан конкретного пользователя
+                currentUserId = banButton.dataset.userId; // Сохраняем ID пользователя
+            } else {
+                // Массовый бан
+                const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+                if (!selectedIdsInput || !selectedIdsInput.value) {
+                    alert('Не выбраны пользователи для бана');
+                    return;
+                }
+            }
+
+            banModal.style.display = 'block';
+        }
+
+        // Функция для закрытия модального окна бана
+        function closeBanModal() {
+            banModal.style.display = 'none';
+            banReasonInput.value = ''; // Очищаем поле причины бана
+            currentUserId = null; // Сбрасываем ID пользователя
+        }
+
+        // Обработчик события для всех кнопок отправки форм
+        document.querySelectorAll('.delete-button, .ban-button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const form = event.target.closest('form');
+                const action = form.dataset.action;
+
+                if (action === 'ban') {
+                    openBanModal(event);
+                } else if (action === 'delete') {
+                    openDeleteModal(event);
+                }
+            });
+        });
+
+        // Добавляем обработчик для кнопок бана отдельных пользователей
+        document.querySelectorAll('.single-ban-form .ban-button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                openBanModal(event);
+            });
+        });
+
+        // Добавляем обработчик для кнопок удаления одного элемента
+        document.querySelectorAll('.single-delete-form .delete-button').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                openDeleteModal(event);
+            });
+        });
+
+        // Обработчик события для кнопки подтверждения удаления
+        confirmDeleteButton.addEventListener('click', function () {
+            if (currentForm) {
+                currentForm.submit();
+            }
+            closeDeleteModal();
+        });
+
+        // Обработчик события для кнопки отмены и крестика (удаление)
+        [cancelDeleteButton, deleteCloseButton].forEach(button => {
+            button.addEventListener('click', closeDeleteModal);
+        });
+
+        // Обработчик события для кнопки подтверждения бана
+        confirmBanButton.addEventListener('click', function () {
+            let reason = banReasonInput.value.trim(); // Получаем значение из поля ввода
+
+            // Если поле пустое, отправляем null
+            if (!reason) {
+                reason = null;
+            }
+
+            if (currentUserId) {
+                // Бан конкретного пользователя
+                const banForm = document.querySelector(`.single-ban-form button[data-user-id="${currentUserId}"]`).closest('form');
+
+                // Добавляем причину бана в форму как скрытое поле
+                const hiddenReasonInput = document.createElement('input');
+                hiddenReasonInput.type = 'hidden';
+                hiddenReasonInput.name = 'ban_reason';
+                hiddenReasonInput.value = reason;
+
+                banForm.appendChild(hiddenReasonInput);
+                banForm.submit(); // Отправляем форму
+            } else {
+                // Массовый бан
+                const selectedIdsInput = document.querySelector('[data-input-type="users-ban"]');
+                if (!selectedIdsInput || !selectedIdsInput.value) {
+                    alert('Не выбраны пользователи для бана');
+                    return;
+                }
+
+                // Добавляем причину бана в форму как скрытое поле
+                const hiddenReasonInput = document.createElement('input');
+                hiddenReasonInput.type = 'hidden';
+                hiddenReasonInput.name = 'ban_reason';
+                hiddenReasonInput.value = reason;
+
+                const banForm = document.querySelector('#bulk-ban-form');
+                banForm.appendChild(hiddenReasonInput);
+                banForm.submit(); // Отправляем форму
+            }
+
+            closeBanModal();
+        });
+
+        // Обработчик события для кнопки отмены и крестика (бан)
+        [cancelBanButton, banCloseButton].forEach(button => {
+            button.addEventListener('click', closeBanModal);
+        });
+    }); 
+</script>
 @endsection

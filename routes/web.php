@@ -109,6 +109,8 @@ Route::middleware(['auth', 'player'])->group(function(){
         Route::get('/', [PostController::class, 'index'])->name('index');
 
         Route::post('publish', [PostController::class, 'store'])->name('publish');
+        Route::get('get-post-content/{id}', [PostController::class, 'getPostContent']);
+
         Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
 
         Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('editShow');

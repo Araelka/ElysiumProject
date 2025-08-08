@@ -230,7 +230,7 @@
                         <span id="error-message" class="form__error" style="display: none">Пожалуйста, укажите причину отклонения.</span>
                         <textarea id="rejection" name="rejection" style="height: 200px;" rows="6" placeholder="Причина отклонения...">{{ $character->comment }}</textarea>
                     </div>
-                    <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; flex-direction: row-reverse; justify-content: space-between; gap: 10px;">
                         <div>
                             <form action="{{ route('game-master.characterApproval', $character->uuid) }}" method="POST">
                                 @csrf
