@@ -25,106 +25,23 @@
 
             <!-- Блок для просмотра постов (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
-                     @if ($selectedLocation)
+                @if ($selectedLocation)
                     <h3>{{ $selectedLocation->name }}</h3>
                     @endif
                     <div class="posts" id="posts-container">
                     @if ($posts->isEmpty())
                     @else
                     @foreach ($posts as $post)
-                        <div class="post" id="post-{{ $post->id }}" data-post-id="{{ $post->id }}">
-                            <div class="post-header">
-                                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                                    <div>
-                                        @if ($post->character->images->first())
-                                            <img src="{{ asset('storage/' . $post->character->images->first()->path ) }}" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">
-                                        @elseif ($post->character->gender == 'Мужской')
-                                            <img src="{{ asset('images/characters/characterMale.jpg') }}" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">
-                                        @else 
-                                            <img src="{{ asset('images/characters/characterFemale.jpg') }}" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <h4 style="padding-left: 5px">{{ $post->character->firstName . ' ' . $post->character->secondName }}</h4>
-                                    </div>
-                                </div>
-                                    <div style="display: flex; flex-direction: row; align-items: center;">
-                                        <div class="custom-dropdown-post">
-                                            <div>
-                                                <button type="button" class="dropdown-toggle-post" onclick="toggleDropdownPostMenu(this)">...</button>
-                                            </div>
-
-                                            <div class="dropdown-menu-post">
-                                                <div class="dropdown-item-post" style="padding: 0px">
-                                                            <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="setParentPostId(this)" data-close-dropdown="true">
-                                                                <div style="padding: 5px 10px">
-                                                                    Ответить
-                                                                </div>
-                                                            </a>
-                                                    </div>
-
-                                                @if (auth()->user()->id == $post->character->user_id)
-                                                    <div class="dropdown-item-post" style="padding: 0px">
-                                                            <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="editPost(this)" data-close-dropdown="true">
-                                                                <div style="padding: 5px 10px">
-                                                                    Редактировать
-                                                                </div>
-                                                            </a>
-                                                    </div>
-                                                @endif
-                                                @if (auth()->user()->id == $post->character->user_id || Auth::user()->isEditor())
-                                                    <div  data-post-id="{{ $post->id }}">
-                                                        <form id="delete-post-form-{{ $post->id }}" action={{ route('gameroom.destroy', $post->id) }} method="POST" style="margin: 0px;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="dropdown-item-delete-post " type="button" onclick="confirmDelete(event, {{ $post->id }})" data-close-dropdown="true">Удалить</button>
-                                                        </form>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                            </div>
-
-                            @if ($post->parent_post_id)
-                                <div class="parent-link">
-                                    <a href="javascript:void(0)" onclick="scrollToPost({{ $post->parent_post_id }})" style="text-decoration: none">
-                                        <div class="parent-link-content">
-                                            <div style="color: #f4d03f">
-                                                {{ $post->parent->character->firstName . ' ' . $post->parent->character->secondName }}
-                                            </div>
-                                            <div>
-                                                {!! nl2br(e(Str::limit($post->parent->content, 100))) !!}
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            @endif
-
-                            <p>{!! nl2br(e($post->content)) !!}</p>
-                            <small>
-                                <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                                    <div class="post-date">
-                                    {{ $post->updated_at->isoFormat('HH:mm DD.MM.YYYY') }}
-                                    @if ($post->updated_at != $post->created_at)
-                                        (изм)
-                                    @endif
-                                    </div>
-                                    <div>
-                                        {{ $post->character->user->login }}
-                                    </div>
-                                </div>
-                            </small>
-                
-                        </div>
+                    <div>
+                        @include('frontend.gameroom.post', $post)
+                    </div>
                     @endforeach
+
                     @endif
                 </div>
 
-                @if ($selectedLocation && !isset($postContent)) 
+                @if ($selectedLocation) 
                     @include('frontend.gameroom.postPublishForm')
-                @elseif ($selectedLocation && isset($postContent))
-                    @include('frontend.gameroom.postEditForm')
                 @endif
 
 
@@ -206,14 +123,39 @@
     document.getElementById('cancel-delete').addEventListener('click', function () {
         const modal = document.getElementById('delete-post-modal');
         modal.style.display = 'none';
-        currentThemeId = null;
+        currentPostId = null;
     });
 
     document.getElementById('confirm-delete').addEventListener('click', function () {
         if (currentPostId) {
+            
             const form = document.getElementById(`delete-post-form-${currentPostId}`);
-            form.submit(); 
+            
+            fetch(`/game-room/destroy/${currentPostId}`, {        
+                method: form.method,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector(`#delete-post-form-${currentPostId} input[name="_token"]`).value
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка при удалении.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const postElement = document.getElementById(`post-${data.post_id}`);
+                        if (postElement) {
+                            postElement.remove();
+                        }
+                    }
+                })
+                .finally(() => {
+                    modal.style.display = 'none';
+                });
         }
+        
         const modal = document.getElementById('delete-post-modal');
         modal.style.display = 'none';
         currentPostId = null;
@@ -239,6 +181,7 @@
         }
     }
 
+    
 
 </script>
 

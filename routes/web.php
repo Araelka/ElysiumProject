@@ -56,8 +56,6 @@ Route::middleware('auth')->group(function(){
     });
 
     
-
-
     Route::post('/delete-temp-file', function (\Illuminate\Http\Request $request) {
         $path = $request->input('path');
 
@@ -111,9 +109,8 @@ Route::middleware(['auth', 'player'])->group(function(){
         Route::post('publish', [PostController::class, 'store'])->name('publish');
         Route::get('get-post-content/{id}', [PostController::class, 'getPostContent']);
 
-        Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
+        Route::post('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
 
-        Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('editShow');
         Route::post('edit/{id}', [PostController::class, 'edit'])->name('edit');
     });
     

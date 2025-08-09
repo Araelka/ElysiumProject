@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\GameRoom;
 
+use App\Events\PostEvent;
 use App\Http\Controllers\Controller;
 use App\Events\PostCreated;
 use App\Models\Character;
@@ -11,6 +12,8 @@ use App\Models\Theme;
 use App\Services\TextProcessingService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ThemeController;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\View;
 use Str;
 
 
@@ -78,8 +81,6 @@ class PostController extends Controller
                     ]);
                 }
             }
-
-            // Возвращаемся на предыдущую страницу с ошибками и старыми данными
             return redirect()->back()
                 ->withErrors($e->errors())
                 ->withInput();
@@ -105,13 +106,25 @@ class PostController extends Controller
             ]); 
         }
 
-        $location_id = $validated['location_id'];
+        event(new PostEvent('create', $this->renderPost($post)));
+
+         return response()->json([
+            'html' => $this->renderPost($post)
+        ]);
 
 
-        return redirect()->route('gameroom.index', compact('location_id'));
+        // return redirect()->route('gameroom.index', compact('location_id'));
     }
 
+    public function renderPost($post){
+        return View::make('frontend.gameroom.post', ['post' => $post])->render();
+    }
+
+
+
     public function destroy ($id){
+
+        Log::info('Пост для удаления : ' . $id);
 
         if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isEditor()) {
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
@@ -119,9 +132,12 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
 
+         
+
         $post->delete();
 
-        return redirect()->back();
+        return response()->json(['success' => true, 'post_id' => $id]);
+        // return redirect()->back();
     }
 
     public function showEditForm ($id){
@@ -146,8 +162,7 @@ class PostController extends Controller
     }
 
     public function edit($id, Request $request) {
-
-        // dd($request);
+        
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id 
         || $request->input('character_uuid') != Post::findOrFail($request->input('post_id'))->character()->first()->uuid){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
@@ -157,13 +172,18 @@ class PostController extends Controller
             ['post_text' =>  ['required', 'string']
         ]);
 
-        $post = Post::findOrFail($request->input('post_id'))->update([
+        $post = Post::findOrFail($request->input('post_id'));
+        
+        $post->update([
             'content' => $this->textProcessingService->textProcessing($validated['post_text'])
         ]);
 
-        $location_id = $request->input('location_id');
+        return response()->json([
+            'html' => $this->renderPost($post),
+            'post_id' => $post->id,
+        ]);
 
-        return redirect()->route('gameroom.index', compact('location_id'));
+        // return redirect()->route('gameroom.index', compact('location_id'));
     }
 
     public function getPostContent($id){

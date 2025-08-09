@@ -4,7 +4,7 @@
     <div style="display: flex; align-items: flex-end;">
         <div class="custom-dropdown">
             <div>
-                <button type="button" class="dropdown-toggle" onclick="toggleDropdown()">Выберите персонажа</button>
+                <button id="dropdown-toggle" type="button" class="dropdown-toggle" onclick="toggleDropdown()">Выберите персонажа</button>
             </div>
 
             <div class="dropdown-menu" id="character-dropdown">
@@ -49,7 +49,7 @@
                 <textarea id="post-text" name="post_text" class="post-form__input" placeholder="Сообщение">{{ old('post_text') }}</textarea>
             </div>
             <div style="display: flex; align-items: flex-end;">
-                <button type="button" class="post-form__button" onclick="submitForm(this)">➤</button>
+                <button type="button" class="post-form__button" onclick="submitPostForm(this)">➤</button>
             </div>
         </div>
     </div>
@@ -93,12 +93,23 @@
         });
     });
 
-    function setParentPostId(button) {
+    function replyPost(button) {
         const postId = button.getAttribute('data-post-id'); 
         const parentPostIdInput = document.getElementById('parent-post-id'); 
         const parentLink = document.getElementById('parent-link');
-
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+        
+        document.getElementById('post-form').action = `/game-room/publish`;
         parentPostIdInput.value = postId;
+        dropdownToggle.disabled = false;
+        dropdownToggle.style.cursor = 'pointer';
+        dropdownToggle.onmouseover = function () {
+        dropdownToggle.style.textDecoration = 'underline';
+        };
+
+        dropdownToggle.onmouseout = function () {
+            dropdownToggle.style.textDecoration = 'none';
+        };
 
         if (postId) {
             fetch(`/game-room/get-post-content/${postId}`)
@@ -191,6 +202,41 @@
         }
     }
 
+    function clearEditPost() {
+        const parentLink = document.getElementById('parent-link');
+        const parentPostIdInput = document.getElementById('parent-post-id');
+        const postText = document.getElementById('post-text');
+        const postId = document.getElementById('post-id');
+        const characterId = document.getElementById('selected-character-id');
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+
+        document.getElementById('post-form').action = `/game-room/publish`;
+
+        if (parentLink) {
+            parentLink.innerHTML = '';
+            parentLink.style.display = 'none'; 
+            postText.value = '';
+            postId.value = null;
+            characterId.value = null;
+            dropdownToggle.innerText = 'Выберите персонажа';
+            dropdownToggle.disabled = false;
+            dropdownToggle.style.cursor = 'pointer';
+            
+            dropdownToggle.onmouseover = function () {
+            dropdownToggle.style.textDecoration = 'underline';
+            };
+
+            dropdownToggle.onmouseout = function () {
+                dropdownToggle.style.textDecoration = 'none';
+            };
+        }
+
+        if (parentPostIdInput) {
+            parentPostIdInput.value = ''; 
+        }
+    }
+
+
     function editPost(button) {
         const postId = button.getAttribute('data-post-id');
 
@@ -201,8 +247,18 @@
                 document.getElementById('selected-character-id').value = data.character_uuid;
                 document.querySelector('.dropdown-toggle').innerText = `${data.character_name}`; 
                 document.getElementById('post-text').value = data.content; 
+                
+                const dropdownToggle = document.getElementById('dropdown-toggle');
+                dropdownToggle.disabled = true;
+                dropdownToggle.style.cursor = 'auto';
+                dropdownToggle.onmouseover = function () {
+                dropdownToggle.style.textDecoration = 'none';
+                };
 
-                // Если есть родительский пост, отображаем его
+                dropdownToggle.onmouseout = function () {
+                    dropdownToggle.style.textDecoration = 'none';
+                };
+
                 const parentLink = document.getElementById('parent-link');
                     parentLink.innerHTML = `
                         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
@@ -212,7 +268,7 @@
                                     <div>${data.content}</div>
                                 </div>
                             </a>
-                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                            <div class="parent-post-close" onclick="clearEditPost()">&#10006;</div>
                         </div>
                     `;
                     parentLink.style.display = 'block';
@@ -222,4 +278,60 @@
             .catch(error => console.error('Ошибка:', error));
     }
     
+    function submitPostForm(btn) {
+        btn.disabled = true;
+
+        const form = document.getElementById('post-form');
+        const formData = new FormData(form);
+                
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('#post-form input[name="_token"]').value,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при отправке.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                                                
+                                
+                if (form.action.includes('/edit/')) {
+                    updatePostInDOM(data);
+                } else {
+                    addPostToDOM(data);
+                }
+
+                clearEditPost();
+            })
+            .finally(() => {
+                btn.disabled = false;
+            });
+    }
+
+    function updatePostInDOM(postData) {
+        const postElement = document.getElementById(`post-${postData.post_id}`);
+        if (postElement) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = postData.html;
+
+            postElement.replaceWith(tempDiv.firstChild);
+        }
+    }
+
+    function addPostToDOM(postData) {
+        const postsContainer = document.getElementById('posts-container'); 
+
+        const postElement = document.createElement('div');
+        postElement.innerHTML = postData.html;
+       
+
+        postsContainer.append(postElement);
+    }
+
 </script>
