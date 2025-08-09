@@ -101,9 +101,7 @@
     background-color: rgba(10, 14, 23);;
     padding: 10px;
     display: flex;
-    flex-direction: row;
-    text-align: left;
-    align-items: stretch;
+    flex-direction: column;
     gap: 10px;
     border: 2px solid #f4d03f;
     border-radius: 5px;
@@ -452,4 +450,14 @@
 .parent-link-content {
     color: #fff;
     text-decoration: none;
+}
+
+.parent-post-close {
+    cursor: pointer;
+    color: #ec7063;
+    font-size: 14px;
+}
+
+.parent-post-close:hover {
+    color: #cc0000;
 }

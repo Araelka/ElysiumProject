@@ -33,7 +33,7 @@
 
                 <!-- Кнопка сохранить -->
                 <div class="form-group-theme-batton">
-                    <button type="submit" class="save-button">Сохранить</button>
+                    <button type="batton" class="save-button" onclick="submitForm(this)">Сохранить</button>
                 </div>
             </div>
         </div>

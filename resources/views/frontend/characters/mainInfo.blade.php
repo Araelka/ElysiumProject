@@ -143,7 +143,7 @@
 
         <!-- Кнопка отправки формы -->
         <div class="mt-4" style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary">Далее</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm(this)">Далее</button>
         </div>
     </form>
 

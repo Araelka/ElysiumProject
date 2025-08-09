@@ -1,4 +1,4 @@
-<form class="post-form" action={{ route('gameroom.publish') }} method="POST">
+<form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST">
     @csrf
 
     <div style="display: flex; align-items: flex-end;">
@@ -27,25 +27,31 @@
     </div>
 
     <div class="post-form__group">
-            <div style="width: 100%">
-                <div id="parent-link" class="parent-link" style="display: none;">
+        <div id="parent-link" class="parent-link" style="display: none;">
                     @if (session('parent_post'))
+                    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                         <a href="javascript:void(0)" onclick="scrollToPost({{ session('parent_post')['id'] }})" style="text-decoration: none">
                             <div class="parent-link-content">
                                 <div style="color: #f4d03f">{{ session('parent_post')['character_name'] }}</div>
                                 <div>{{ session('parent_post')['content'] }}</div>
                             </div>
                         </a>
+                        <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                    </div>
                     @endif
                 </div>
+            <div style="display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between;">
+            <div style="width: 100%">
 
                 <input type="hidden" name="location_id" value={{ $selectedLocation->id }}>
+                <input type="hidden" id="post-id" name="post_id" value="">
                 <input type="hidden" id="parent-post-id" name="parent_post_id" value={{ old('parent_post_id') }}>
                 <textarea id="post-text" name="post_text" class="post-form__input" placeholder="Сообщение">{{ old('post_text') }}</textarea>
             </div>
             <div style="display: flex; align-items: flex-end;">
-                <button type="submit" class="post-form__button">➤</button>
+                <button type="button" class="post-form__button" onclick="submitForm(this)">➤</button>
             </div>
+        </div>
     </div>
 </form>
 
@@ -107,12 +113,15 @@
                         parentLink.innerHTML = '';
 
                         parentLink.innerHTML = `
+                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                             <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
                                 <div class="parent-link-content">
                                     <div style="color: #f4d03f">${data.character_name}</div>
                                     <div>${data.content}</div>
                                 </div>
                             </a>
+                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                        </div>
                         `;
                         parentLink.style.display = 'block'; 
                     }
@@ -135,12 +144,15 @@
                 .then(data => {
                     if (parentLink) {
                         parentLink.innerHTML = `
+                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                             <a href="javascript:void(0)" onclick="scrollToPost(${parentPostId})" style="text-decoration: none">
                                 <div class="parent-link-content">
                                     <div style="color: #f4d03f">${data.character_name}</div>
                                     <div>${data.content}</div>
                                 </div>
                             </a>
+                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                        </div>
                         `;
                         parentLink.style.display = 'block';
                     }
@@ -150,15 +162,64 @@
             const parentPost = @json(session('parent_post'));
             if (parentPost) {
                 parentLink.innerHTML = `
+                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                     <a href="javascript:void(0)" onclick="scrollToPost(${parentPost.id})" style="text-decoration: none">
                         <div class="parent-link-content">
                             <div style="color: #f4d03f">${parentPost.character_name}</div>
                             <div>${parentPost.content}</div>
                         </div>
                     </a>
+                    <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                </div>
                 `;
                 parentLink.style.display = 'block';
             }
         }
     });
+
+    function clearParentPost() {
+        const parentLink = document.getElementById('parent-link');
+        const parentPostIdInput = document.getElementById('parent-post-id');
+
+        if (parentLink) {
+            parentLink.innerHTML = '';
+            parentLink.style.display = 'none'; 
+        }
+
+        if (parentPostIdInput) {
+            parentPostIdInput.value = ''; 
+        }
+    }
+
+    function editPost(button) {
+        const postId = button.getAttribute('data-post-id');
+
+        fetch(`/game-room/get-post-content/${postId}`)
+            .then(response => response.json())
+            .then(data => {                
+                document.getElementById('post-id').value = postId; 
+                document.getElementById('selected-character-id').value = data.character_uuid;
+                document.querySelector('.dropdown-toggle').innerText = `${data.character_name}`; 
+                document.getElementById('post-text').value = data.content; 
+
+                // Если есть родительский пост, отображаем его
+                const parentLink = document.getElementById('parent-link');
+                    parentLink.innerHTML = `
+                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
+                            <a href="javascript:void(0)" onclick="scrollToPost(${data.id})" style="text-decoration: none">
+                                <div class="parent-link-content">
+                                    <div style="color: #f4d03f">${data.character_name}</div>
+                                    <div>${data.content}</div>
+                                </div>
+                            </a>
+                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
+                        </div>
+                    `;
+                    parentLink.style.display = 'block';
+
+                document.getElementById('post-form').action = `/game-room/edit/${postId}`;
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+    
 </script>

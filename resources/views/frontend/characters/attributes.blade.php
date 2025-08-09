@@ -178,25 +178,26 @@
         const confirmSubmitButton = document.getElementById('confirm-submit');
         const cancelSubmitButton = document.getElementById('cancel-submit');
 
+        const submitButton = document.getElementById('submit-button');
+
         form.addEventListener('submit', (event) => {
             const availablePoints = parseInt(document.getElementById('available-points').textContent);
+            submitButton.disabled = true;
 
             if (availablePoints > 0) {
-                event.preventDefault(); // Отменяем отправку формы
+                event.preventDefault(); 
 
-                // Показываем модальное окно
                 remainingPointsSpan.textContent = availablePoints;
                 modal.style.display = 'block';
 
-                // Подтверждение отправки
                 confirmSubmitButton.onclick = () => {
                     modal.style.display = 'none';
-                    form.submit(); // Принудительно отправляем форму
+                    form.submit(); 
                 };
 
-                // Отмена отправки
                 cancelSubmitButton.onclick = () => {
                     modal.style.display = 'none';
+                    submitButton.disabled = false;
                 };
             }
         });

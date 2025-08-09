@@ -51,7 +51,7 @@
         <!-- Кнопка отправки формы -->
         <div class="mt-4" style="display: flex; justify-content: space-between;">
             <a href="{{ route('characters.showCreateSkills', ['id' => $characterId]) }}" style="font-family: sans-serif; text-decoration: none;" class="btn btn-primary">Назад</a>
-            <button type="submit" class="btn btn-primary">Отправить на проверку</button>
+            <button type="batton" class="btn btn-primary" onclick="submitForm(this)">Отправить на проверку</button>
         </div>
 
     </form>

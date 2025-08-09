@@ -36,7 +36,7 @@
                     <span class="form__error">{{ $message }}</span>
                 @enderror
             </div>
-            <button type="submit" class="register-form__button">Зарегистрироваться</button>
+            <button type="button" class="register-form__button" onclick="submitForm(this)">Зарегистрироваться</button>
         </form>
     </div>
 </div>

@@ -114,7 +114,7 @@ Route::middleware(['auth', 'player'])->group(function(){
         Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
 
         Route::get('edit/{id}', [PostController::class, 'showEditForm'])->name('editShow');
-        Route::put('edit', [PostController::class, 'edit'])->name('edit');
+        Route::post('edit/{id}', [PostController::class, 'edit'])->name('edit');
     });
     
 });

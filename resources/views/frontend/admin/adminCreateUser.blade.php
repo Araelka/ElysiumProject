@@ -78,7 +78,7 @@
 
         <div class="button-group">
             <div class="left-buttons">
-                <button type="submit" class="save-button">Сохранить</button>
+                <button type="batton" class="save-button" onclick="submitForm(this)">Сохранить</button>
             </div>
             </div>
         </div>

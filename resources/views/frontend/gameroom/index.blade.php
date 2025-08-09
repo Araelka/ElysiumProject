@@ -56,7 +56,7 @@
 
                                             <div class="dropdown-menu-post">
                                                 <div class="dropdown-item-post" style="padding: 0px">
-                                                            <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="setParentPostId(this)">
+                                                            <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="setParentPostId(this)" data-close-dropdown="true">
                                                                 <div style="padding: 5px 10px">
                                                                     Ответить
                                                                 </div>
@@ -65,7 +65,7 @@
 
                                                 @if (auth()->user()->id == $post->character->user_id)
                                                     <div class="dropdown-item-post" style="padding: 0px">
-                                                            <a href={{ route('gameroom.editShow', $post->id) }}>
+                                                            <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="editPost(this)" data-close-dropdown="true">
                                                                 <div style="padding: 5px 10px">
                                                                     Редактировать
                                                                 </div>
@@ -77,7 +77,7 @@
                                                         <form id="delete-post-form-{{ $post->id }}" action={{ route('gameroom.destroy', $post->id) }} method="POST" style="margin: 0px;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button class="dropdown-item-delete-post " type="button" onclick="confirmDelete(event, {{ $post->id }})">Удалить</button>
+                                                            <button class="dropdown-item-delete-post " type="button" onclick="confirmDelete(event, {{ $post->id }})" data-close-dropdown="true">Удалить</button>
                                                         </form>
                                                     </div>
                                                 @endif
@@ -168,6 +168,15 @@
             if (!customDropdown.contains(event.target)) {
                 menu.classList.remove('show');
             }
+
+            if (event.target.dataset.closeDropdown === 'true') {
+                menu.classList.remove('show');
+            }
+
+            if (event.target.closest('[data-close-dropdown="true"]')) {
+                menu.classList.remove('show');
+            }
+            
         });
     });
 
@@ -229,6 +238,7 @@
             }, 2000);
         }
     }
+
 
 </script>
 

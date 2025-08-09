@@ -167,6 +167,10 @@ document.getElementById('image').addEventListener('change', function(event) {
     }
 });
 
+function submitForm(btn){
+    btn.disabled = true;
+    btn.form.submit();
+}
 
 
 

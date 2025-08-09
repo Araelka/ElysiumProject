@@ -7,28 +7,34 @@
     </div>
 
     <div class="post-form__group">
-            <div style="width: 100%">
-                @if ($parentPost)
-                    <div class="parent-link">
-                        <a href="javascript:void(0)" onclick="scrollToPost({{ $parentPost->id }})" style="text-decoration: none">
-                            <div class="parent-link-content">
-                                <div style="color: #f4d03f">
-                                    {{ $parentPost->character->firstName . ' ' . $parentPost->character->secondName }}
-                                </div>
-                                <div>
-                                    {!! nl2br(e(Str::limit($parentPost->content, 100))) !!}
-                                </div>
+        @if ($parentPost)
+            <div class="parent-link">
+                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
+                    <a href="javascript:void(0)" onclick="scrollToPost({{ $parentPost->id }})" style="text-decoration: none">
+                        <div class="parent-link-content">
+                            <div style="color: #f4d03f">
+                                {{ $parentPost->character->firstName . ' ' . $parentPost->character->secondName }}
                             </div>
-                        </a>
-                    </div>
-                @endif
-
-                <input type="hidden" name="post_id" value={{ $postContent->id }}>
-                <input type="hidden" name="location_id" value={{ $selectedLocation->id }}>
-                <textarea id="post-text" name="post_text" class="post-form__input">{{ $postContent->content }}</textarea>
+                            <div>
+                                {!! nl2br(e(Str::limit($parentPost->content, 100))) !!}
+                            </div>
+                        </div>
+                    </a>
+                    <div class="parent-post-close">&#10006;</div>
+                </div>
             </div>
-            <div style="display: flex; align-items: flex-end;">
-                <button type="submit" class="post-form__button">➤</button>
+        @endif
+            <div style="display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; align-items: flex-start;">
+                <div style="width: 100%">
+                    
+
+                    <input type="hidden" name="post_id" value={{ $postContent->id }}>
+                    <input type="hidden" name="location_id" value={{ $selectedLocation->id }}>
+                    <textarea id="post-text" name="post_text" class="post-form__input">{{ $postContent->content }}</textarea>
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="post-form__button">➤</button>
+                </div>
             </div>
     </div>
 </form>

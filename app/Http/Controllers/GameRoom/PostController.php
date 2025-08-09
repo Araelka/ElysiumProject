@@ -59,6 +59,7 @@ class PostController extends Controller
         }
 
         try {
+
         $validated = $request->validate([
             'post_text' => ['required', 'string'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
@@ -144,8 +145,9 @@ class PostController extends Controller
         return view('frontend/gameroom/index', compact('locations', 'posts', 'selectedLocation', 'postContent', 'parentPost'));
     }
 
-    public function edit(Request $request) {
+    public function edit($id, Request $request) {
 
+        // dd($request);
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id 
         || $request->input('character_uuid') != Post::findOrFail($request->input('post_id'))->character()->first()->uuid){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
@@ -169,7 +171,9 @@ class PostController extends Controller
 
         if ($post) {
             return response()->json([
+                'id' => $post->id,
                 'character_name' => $post->character->firstName . ' ' . $post->character->secondName,
+                'character_uuid' => $post->character->uuid,
                 'content' => Str::limit($post->content, 100), 
             ]);
         }
