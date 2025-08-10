@@ -159,11 +159,17 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
 
-         
 
-        $post->delete();
+        $replay = $post->replies()->get();
 
-        event(new PostEvent('delete', ['postId' => $post->id, 'html' => $this->renderPost($post)]));
+         //  $post->delete();
+
+        $postData = [
+            'id' => $post->id,
+            'replay' => $replay
+        ];
+
+        event(new PostEvent('delete', $postData));
 
         return response()->json(['success' => 200]);
     }
@@ -186,7 +192,13 @@ class PostController extends Controller
             'content' => $this->textProcessingService->textProcessing($validated['post_text'])
         ]);
 
-        event(new PostEvent('edit', ['postId' => $post->id, 'html' => $this->renderPost($post)]));
+        $postData = [
+            'id' => $post->id,
+            'content' => $post->content,            
+            'updated_at' => $post->updated_at->toIso8601String()
+        ];
+
+        event(new PostEvent('edit', $postData));
 
         return response()->json(['success' => 200]);
 
@@ -205,6 +217,15 @@ class PostController extends Controller
         }
 
         return response()->json(['error' => 'Сообщение не найдено'], 404);
+    }
+
+    public function getPermissions($id){
+        $post = Post::findOrFail($id);
+
+        return response()->json([
+            'isEditable' => auth()->check() && auth()->user()->id === $post->character->user_id,
+            'isDeletable' => auth()->check() && (auth()->user()->id === $post->character->user_id || auth()->user()->isEditor()),
+        ]);
     }
 
 }

@@ -21,13 +21,11 @@ class Post extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function parent()
-    {
+    public function parent(){
         return $this->belongsTo(Post::class, 'parent_post_id');
     }
 
-    public function replies()
-    {
+    public function replies(){
         return $this->hasMany(Post::class, 'parent_post_id');
     }
 }

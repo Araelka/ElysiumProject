@@ -34,99 +34,134 @@ function canDeletePost(postUserId) {
     return currentUserId === postUserId || isEditor;
 }
 
+async function fetchPermissions(id) {
+    const response = await fetch(`/game-room/api/posts/${id}/permissions`);
+    const data = await response.json();
+    return data;
+}
+
 
 function addPostToDOM(postData) {  
-    const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
-    const postsContainer = document.getElementById('posts-container'); 
+    fetchPermissions(postData.id).then(permissions => {
+        const baseUrl = document.querySelector('meta[name="base-url"]').getAttribute('content');
+        const postsContainer = document.getElementById('posts-container'); 
 
-    const postElement = document.createElement('div');
-    postElement.className = 'post';
-    postElement.id = `post-${postData.id}`;
-    postElement.dataset.postId = postData.id;
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.id = `post-${postData.id}`;
+        postElement.dataset.postId = postData.id;
 
-    postElement.innerHTML = `
-        <div class="post-header">
-            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                <div>
-                    ${postData.character.avatarPath
-                        ? `<img src="${baseUrl}${postData.character.avatarPath}" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
-                        : postData.character.gender === 'Мужской'
-                        ? `<img src="/images/characters/characterMale.jpg" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
-                        : `<img src="/images/characters/characterFemale.jpg" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
-                    }
-                </div>
-                <div>
-                    <h4 style="padding-left: 5px">${postData.character.firstName} ${postData.character.secondName}</h4>
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: row; align-items: center;">
-                <div class="custom-dropdown-post">
+        postElement.innerHTML = `
+            <div class="post-header">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
                     <div>
-                        <button type="button" class="dropdown-toggle-post" onclick="toggleDropdownPostMenu(this)">...</button>
+                        ${postData.character.avatarPath
+                            ? `<img src="${baseUrl}${postData.character.avatarPath}" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
+                            : postData.character.gender === 'Мужской'
+                            ? `<img src="/images/characters/characterMale.jpg" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
+                            : `<img src="/images/characters/characterFemale.jpg" alt="Аватар персонажа" class="dropdown-avatar" style="height: 35px; width: 35px;">`
+                        }
                     </div>
-                    <div class="dropdown-menu-post">
-                        <div class="dropdown-item-post" style="padding: 0px">
-                            <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="replyPost(this)" data-close-dropdown="true">
-                                <div style="padding: 5px 10px">Ответить</div>
-                            </a>
+                    <div>
+                        <h4 style="padding-left: 5px">${postData.character.firstName} ${postData.character.secondName}</h4>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="custom-dropdown-post">
+                        <div>
+                            <button type="button" class="dropdown-toggle-post" onclick="toggleDropdownPostMenu(this)">...</button>
                         </div>
-                        ${canEditPost(postData.character.userId)
-                            ? `
+                        <div class="dropdown-menu-post">
                             <div class="dropdown-item-post" style="padding: 0px">
-                                <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="editPost(this)" data-close-dropdown="true">
-                                    <div style="padding: 5px 10px">Редактировать</div>
+                                <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="replyPost(this)" data-close-dropdown="true">
+                                    <div style="padding: 5px 10px">Ответить</div>
                                 </a>
                             </div>
-                            `
-                            : ''
-                        }
-                        ${canDeletePost(postData.character.userId)
-                            ? `
-                            <div data-post-id="${postData.id}">
-                                <form id="delete-post-form-${postData.id}" action="/gameroom/${postData.id}" method="POST" style="margin: 0px;">
-                                    <input type="hidden" name="_token" value="${document.querySelector('#post-form input[name="_token"]').value}">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button class="dropdown-item-delete-post" type="button" onclick="confirmDelete(event, ${postData.id})" data-close-dropdown="true">Удалить</button>
-                                </form>
-                            </div>
-                            `
-                            : ''
-                        }                      
-                    </div>
-                </div>
-            </div>
-            </div>
-                    
-            ${postData.parentPost
-                ? `
-                <div class="parent-link">
-                    <a href="javascript:void(0)" onclick="scrollToPost(${ postData.parentPost.id })" style="text-decoration: none">
-                        <div class="parent-link-content">
-                            <div style="color: #f4d03f">
-                                ${postData.parentPost.character.firstName} ${postData.parentPost.character.secondName}
-                            </div>
-                            <div>
-                                ${ postData.parentPost.content }
-                            </div>
+                            ${permissions.isEditable
+                                ? `
+                                <div class="dropdown-item-post" style="padding: 0px">
+                                    <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="editPost(this)" data-close-dropdown="true">
+                                        <div style="padding: 5px 10px">Редактировать</div>
+                                    </a>
+                                </div>
+                                `
+                                : ''
+                            }
+                            ${permissions.isDeletable
+                                ? `
+                                <div data-post-id="${postData.id}">
+                                    <form id="delete-post-form-${postData.id}" action="/gameroom/${postData.id}" method="POST" style="margin: 0px;">
+                                        <input type="hidden" name="_token" value="${document.querySelector('#post-form input[name="_token"]').value}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button class="dropdown-item-delete-post" type="button" onclick="confirmDelete(event, ${postData.id})" data-close-dropdown="true">Удалить</button>
+                                    </form>
+                                </div>
+                                `
+                                : ''
+                            }                      
                         </div>
-                    </a>
+                    </div>
                 </div>
-                `
-                : ''
-            }
+                </div>
+                        
+                ${postData.parentPost
+                    ? `
+                    <div class="parent-link">
+                        <a href="javascript:void(0)" onclick="scrollToPost(${ postData.parentPost.id })" style="text-decoration: none">
+                            <div class="parent-link-content">
+                                <div style="color: #f4d03f">
+                                    ${postData.parentPost.character.firstName} ${postData.parentPost.character.secondName}
+                                </div>
+                                <div>
+                                    ${ postData.parentPost.content }
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    `
+                    : ''
+                }
 
-            <p class='post-content'>${postData.content}</p>
-            <small>
-                <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                    <div class="post-date">
-                        ${new Date(postData.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false })} ${new Date(postData.created_at).toLocaleDateString('ru-RU')}
+                <p class='post-content'>${postData.content}</p>
+                <small>
+                    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                        <div class="post-date">
+                            ${new Date(postData.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false })} ${new Date(postData.created_at).toLocaleDateString('ru-RU')}
+                        </div>
+                        <div>
+                            ${postData.character.userLogin}
+                        </div>
                     </div>
-                    <div>
-                        ${postData.character.userLogin}
-                    </div>
-                </div>
-            </small>
-        `;
+                </small>
+            `;
+        
+        postsContainer.append(postElement);
+
+    });
+}
+
+function updatePostInDOM(postData) {
+
+    const postElement = document.getElementById(`post-${postData.id}`);
     
-    postsContainer.append(postElement);
+    if (postElement) {
+        const postElementContent = postElement.getElementsByClassName(`post-content`)[0];
+        const postElementDate = postElement.getElementsByClassName(`post-date`)[0];
+        
+        postElementContent.innerHTML = postData.content;
+        postElementDate.innerHTML = new Date(postData.updated_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' ' + new Date(postData.updated_at).toLocaleDateString('ru-RU') + ' (изм)';
+        
+    }
+}
+
+function deletePostInDOM(postData) {
+
+    console.log(postData);
+    
+
+    const postElement = document.getElementById(`post-${postData.id}`);
+            
+    if (postElement) {
+        postElement.remove();
+    }
 }

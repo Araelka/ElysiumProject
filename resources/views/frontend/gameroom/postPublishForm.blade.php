@@ -308,28 +308,5 @@
             });
     }
 
-    function updatePostInDOM(postData) {
-
-        const postElement = document.getElementById(`post-${postData.postId}`);
-        if (postElement) {
-            
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = postData.html;
-
-            postElement.replaceWith(tempDiv.firstChild);
-        }
-    }
-
-    
-
-    function deletePostInDOM(postData) {
-
-        const postElement = document.getElementById(`post-${postData.postId}`);
-                
-        if (postElement) {
-            postElement.remove();
-        }
-        
-}
 
 </script>

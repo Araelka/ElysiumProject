@@ -112,6 +112,8 @@ Route::middleware(['auth', 'player'])->group(function(){
         Route::post('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
 
         Route::post('edit/{id}', [PostController::class, 'edit'])->name('edit');
+
+        Route::get('/api/posts/{id}/permissions', [PostController::class, 'getPermissions']);
     });
     
 });
