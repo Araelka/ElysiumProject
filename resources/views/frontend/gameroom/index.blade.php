@@ -144,12 +144,12 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.success) {
-                        const postElement = document.getElementById(`post-${data.post_id}`);
-                        if (postElement) {
-                            postElement.remove();
-                        }
-                    }
+                    // if (data.success) {
+                    //     const postElement = document.getElementById(`post-${data.postId}`);
+                    //     if (postElement) {
+                    //         postElement.remove();
+                    //     }
+                    // }
                 })
                 .finally(() => {
                     modal.style.display = 'none';

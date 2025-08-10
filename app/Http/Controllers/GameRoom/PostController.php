@@ -106,14 +106,10 @@ class PostController extends Controller
             ]); 
         }
 
-        event(new PostEvent('create', $this->renderPost($post)));
+        event(new PostEvent('create', ['html' => $this->renderPost($post)]));
 
-         return response()->json([
-            'html' => $this->renderPost($post)
-        ]);
-
-
-        // return redirect()->route('gameroom.index', compact('location_id'));
+        return response()->json(['success' => 200]);
+        
     }
 
     public function renderPost($post){
@@ -123,8 +119,6 @@ class PostController extends Controller
 
 
     public function destroy ($id){
-
-        Log::info('Пост для удаления : ' . $id);
 
         if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isEditor()) {
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
@@ -136,30 +130,11 @@ class PostController extends Controller
 
         $post->delete();
 
-        return response()->json(['success' => true, 'post_id' => $id]);
-        // return redirect()->back();
+        event(new PostEvent('delete', ['postId' => $post->id, 'html' => $this->renderPost($post)]));
+
+        return response()->json(['success' => 200]);
     }
 
-    public function showEditForm ($id){
-
-        if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id) {
-            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
-        }
-
-        $postContent = Post::findOrFail($id);
-
-        $locations = Location::all();
-
-        $selectedLocationId = $postContent->location_id;
-
-        $selectedLocation = Location::find($selectedLocationId);
-
-        $posts = $this->selectPostsByLocation($selectedLocationId);
-
-        $parentPost = $postContent;
-
-        return view('frontend/gameroom/index', compact('locations', 'posts', 'selectedLocation', 'postContent', 'parentPost'));
-    }
 
     public function edit($id, Request $request) {
         
@@ -178,12 +153,10 @@ class PostController extends Controller
             'content' => $this->textProcessingService->textProcessing($validated['post_text'])
         ]);
 
-        return response()->json([
-            'html' => $this->renderPost($post),
-            'post_id' => $post->id,
-        ]);
+        event(new PostEvent('edit', ['postId' => $post->id, 'html' => $this->renderPost($post)]));
 
-        // return redirect()->route('gameroom.index', compact('location_id'));
+        return response()->json(['success' => 200]);
+
     }
 
     public function getPostContent($id){

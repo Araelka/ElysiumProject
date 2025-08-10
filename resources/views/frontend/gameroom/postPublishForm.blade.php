@@ -300,14 +300,8 @@
             })
             .then(data => {
                                                 
-                                
-                if (form.action.includes('/edit/')) {
-                    updatePostInDOM(data);
-                } else {
-                    addPostToDOM(data);
-                }
-
                 clearEditPost();
+
             })
             .finally(() => {
                 btn.disabled = false;
@@ -315,8 +309,10 @@
     }
 
     function updatePostInDOM(postData) {
-        const postElement = document.getElementById(`post-${postData.post_id}`);
+
+        const postElement = document.getElementById(`post-${postData.postId}`);
         if (postElement) {
+            
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = postData.html;
 
@@ -325,6 +321,7 @@
     }
 
     function addPostToDOM(postData) {
+        
         const postsContainer = document.getElementById('posts-container'); 
 
         const postElement = document.createElement('div');
@@ -333,5 +330,14 @@
 
         postsContainer.append(postElement);
     }
+
+    function deletePostInDOM(postData) {
+
+        const postElement = document.getElementById(`post-${postData.postId}`);
+                
+        if (postElement) {
+            postElement.remove();
+        }
+}
 
 </script>

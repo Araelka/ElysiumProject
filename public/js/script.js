@@ -4,23 +4,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const pusher = new Pusher(pusherKey, {
         cluster: pusherCluster,
-        forceTLS: false,
+        forceTLS: false, 
     });
 
     const channel = pusher.subscribe('posts');
 
-    
-    channel.bind('PostEvent', function (data) {
-        console.log('Получено событие:', data);
-
+    channel.bind('App\\Events\\PostEvent', function (data) {
         const { action, postData } = data;
-        
+
         if (action === 'create') {
             addPostToDOM(postData);
-        } else if (action === 'update') {
+        }else if (action === 'edit') {
             updatePostInDOM(postData);
-        } else if (action === 'delete') {
-            removePostFromDOM(postData.id);
+        }else if (action === 'delete') {
+            deletePostInDOM(postData);
         }
     });
 });
