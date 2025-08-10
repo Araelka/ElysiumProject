@@ -49,13 +49,29 @@
                 <textarea id="post-text" name="post_text" class="post-form__input" placeholder="Сообщение">{{ old('post_text') }}</textarea>
             </div>
             <div style="display: flex; align-items: flex-end;">
-                <button type="button" class="post-form__button" onclick="submitPostForm(this)">➤</button>
+                <button id="submit-post" type="button" class="post-form__button" onclick="submitPostForm(this)">➤</button>
             </div>
         </div>
     </div>
 </form>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const postText = document.getElementById('post-text');
+        const submitButton = document.getElementById('submit-post');
+        
+        postText.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); 
+                submitPostForm(); 
+            }
+        });
+
+        submitButton.addEventListener('click', function () {
+            submitPostForm();
+        });
+    });
+
     function toggleDropdown() {
         const dropdownCharacterMenu = document.getElementById('character-dropdown');
         dropdownCharacterMenu.classList.toggle('show');
