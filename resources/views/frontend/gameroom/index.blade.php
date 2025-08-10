@@ -1,4 +1,9 @@
 @extends('frontend.layout.layout')
+
+<meta name="current-user-id" content="{{ auth()->id() }}">
+<meta name="is-editor" content="{{ auth()->user()->isEditor() ? 'true' : 'false' }}">
+<meta name="base-url" content="{{ url('/') }}/">
+
 <link rel="stylesheet" href="{{ asset('css/posts.css') }}">
 @if ($selectedLocation) 
 @section('title', $selectedLocation->name)
@@ -185,5 +190,7 @@
 
 </script>
 
+
+<script src="{{ asset('js/post.js') }}"></script>
 @endsection
 

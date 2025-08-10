@@ -320,16 +320,7 @@
         }
     }
 
-    function addPostToDOM(postData) {
-        
-        const postsContainer = document.getElementById('posts-container'); 
-
-        const postElement = document.createElement('div');
-        postElement.innerHTML = postData.html;
-       
-
-        postsContainer.append(postElement);
-    }
+    
 
     function deletePostInDOM(postData) {
 
@@ -338,6 +329,7 @@
         if (postElement) {
             postElement.remove();
         }
+        
 }
 
 </script>

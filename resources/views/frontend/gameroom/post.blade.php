@@ -66,15 +66,16 @@
         </div>
     @endif
 
-    <p>{!! nl2br(e($post->content)) !!}</p>
+    <p class='post-content'>{!! nl2br(e($post->content)) !!}</p>
     <small>
         <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <div class="post-date">
-            {{ $post->updated_at->isoFormat('HH:mm DD.MM.YYYY') }}
-            @if ($post->updated_at != $post->created_at)
-                (изм)
-            @endif
+                {{ $post->updated_at->isoFormat('HH:mm DD.MM.YYYY') }}
+                @if ($post->updated_at != $post->created_at)
+                    (изм)
+                @endif
             </div>
+
             <div>
                 {{ $post->character->user->login }}
             </div>

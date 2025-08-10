@@ -1,28 +1,3 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const pusherKey = 'e9b501d88e4c02269a2c'; 
-    const pusherCluster = 'ap1'; 
-
-    const pusher = new Pusher(pusherKey, {
-        cluster: pusherCluster,
-        forceTLS: false, 
-    });
-
-    const channel = pusher.subscribe('posts');
-
-    channel.bind('App\\Events\\PostEvent', function (data) {
-        const { action, postData } = data;
-
-        if (action === 'create') {
-            addPostToDOM(postData);
-        }else if (action === 'edit') {
-            updatePostInDOM(postData);
-        }else if (action === 'delete') {
-            deletePostInDOM(postData);
-        }
-    });
-});
-
-
 //Скрипт-обработчик меню
 document.addEventListener('DOMContentLoaded', () => {
     const mobileMenu = document.getElementById('mobile-menu');
@@ -196,6 +171,7 @@ function submitForm(btn){
     btn.disabled = true;
     btn.form.submit();
 }
+
 
 
 

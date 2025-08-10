@@ -14,7 +14,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
-use Str;
+use Illuminate\Support\Str;
+
 
 
 class PostController extends Controller
@@ -100,13 +101,45 @@ class PostController extends Controller
             'location_id' => $validated['location_id']
         ]);
 
+        $postData = [
+            'id' => $post->id,
+            'content' => $post->content,
+            'character' => [
+                'firstName' => $post->character->firstName,
+                'secondName' => $post->character->secondName,
+                'gender' => $post->character->gender,
+                'avatarPath' =>  $post->character->images->first()
+                ? 'storage/' . $post->character->images->first()->path
+                : null,
+                'userId' => $post->character->user_id,
+                'userLogin' => $post->character->user->login
+            ],
+            
+            'created_at' => $post->created_at->toIso8601String(),
+            'updated_at' => $post->updated_at->toIso8601String()
+        ];
+
         if ($validated['parent_post_id']) {
             $post->update([
                 'parent_post_id' => $validated['parent_post_id']
             ]); 
+
+            $parentPost = Post::find($validated['parent_post_id']);
+
+            $postData += [
+                'parentPost' => [
+                    'id' => $parentPost->id,
+                    'content' =>  Str::limit($parentPost->content, 100),
+                    'character' => [
+                        'firstName' => $parentPost->character->firstName,
+                        'secondName' => $parentPost->character->secondName,
+                    ]
+                ]
+            ];
         }
 
-        event(new PostEvent('create', ['html' => $this->renderPost($post)]));
+        
+        event(new PostEvent('create', $postData));
 
         return response()->json(['success' => 200]);
         
