@@ -83,8 +83,7 @@ class PostController extends Controller
             return response()->json(['error' => 'Локация не выбрана'], 400);
         }
 
-        $posts = Post::with(['character.images', 'parent.character'])
-            ->where('location_id', $selectedLocationId)
+        $posts = Post::where('location_id', $selectedLocationId)
             ->orderBy('created_at', 'desc')
             ->paginate($limit, ['*'], 'page', $page);
 
