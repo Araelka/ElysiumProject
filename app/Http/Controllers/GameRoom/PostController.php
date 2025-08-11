@@ -77,7 +77,7 @@ class PostController extends Controller
 
         $selectedLocationId = $request->query('location_id');
         $page = $request->query('page', 1);
-        $limit = $request->query('limit', 5);
+        $limit = $request->query('limit', 10);
 
         if (!$selectedLocationId) {
             return response()->json(['error' => 'Локация не выбрана'], 400);
