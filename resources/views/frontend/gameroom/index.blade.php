@@ -30,9 +30,10 @@
             <div class="col-md-10 content d-flex flex-column justify-content-start">
                 @if ($selectedLocation)
                     <h3>{{ $selectedLocation->name }}</h3>
-                    @endif
-                    <div class="posts" id="posts-container">
-                    @if ($posts->isEmpty())
+                @endif
+
+                <div class="posts" id="posts-container">
+                    {{-- @if ($posts->isEmpty())
                     @else
                     @foreach ($posts as $post)
                     <div>
@@ -40,7 +41,7 @@
                     </div>
                     @endforeach
 
-                    @endif
+                    @endif --}}
                 </div>
 
                 @if ($selectedLocation) 
@@ -100,18 +101,18 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const postsContainer = document.querySelector('.posts');
-        if (postsContainer) {
-            postsContainer.scrollTop = postsContainer.scrollHeight;
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const postsContainer = document.querySelector('.posts');
+    //     if (postsContainer) {
+    //         postsContainer.scrollTop = postsContainer.scrollHeight;
 
-            const observer = new MutationObserver(function () {
-                postsContainer.scrollTop = postsContainer.scrollHeight;
-            });
+    //         const observer = new MutationObserver(function () {
+    //             postsContainer.scrollTop = postsContainer.scrollHeight;
+    //         });
 
-            observer.observe(postsContainer, { childList: true });
-        }
-    });
+    //         observer.observe(postsContainer, { childList: true });
+    //     }
+    // });
 
     let currentPostId = null;
 

@@ -55,19 +55,78 @@ class PostController extends Controller
 
         $selectedLocation = Location::find($selectedLocationId);
 
-        $posts = $this->selectPostsByLocation($selectedLocationId);
+        // $posts = $this->selectPostsByLocation($selectedLocationId);
 
-        $diffInHours = [];
+        // $diffInHours = [];
 
-        foreach ($posts as  $post) {
-            $diffInHours += [$post->id => $this->diffInHours($post)];
-        }
+        // foreach ($posts as  $post) {
+        //     $diffInHours += [$post->id => $this->diffInHours($post)];
+        // }
         
         $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
 
-        $parentPost = Post::find($request->get('parent_post_id'));
+        // $parentPost = Post::find($request->get('parent_post_id'));
         
-        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters', 'parentPost', 'diffInHours'));
+        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'characters'));
+    }
+
+    public function loadPosts(Request $request){
+        if (!auth()->user()->isPlayer()) {
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
+        }
+
+        $selectedLocationId = $request->query('location_id');
+        $page = $request->query('page', 1);
+        $limit = $request->query('limit', 5);
+
+        if (!$selectedLocationId) {
+            return response()->json(['error' => 'Локация не выбрана'], 400);
+        }
+
+        $posts = Post::with(['character.images', 'parent.character'])
+            ->where('location_id', $selectedLocationId)
+            ->orderBy('created_at', 'desc')
+            ->paginate($limit, ['*'], 'page', $page);
+
+        $postData = $posts->map(function ($post) {
+            return [
+                'id' => $post->id,
+                'content' => $post->content,
+                'character' => [
+                    'firstName' => $post->character->firstName,
+                    'secondName' => $post->character->secondName,
+                    'gender' => $post->character->gender,
+                    'avatarPath' => $post->character->images->first()
+                        ? 'storage/' . $post->character->images->first()->path
+                        : null,
+                    'userId' => $post->character->user_id,
+                    'userLogin' => $post->character->user->login,
+                ],
+                'created_at' => $post->created_at->toIso8601String(),
+                'updated_at' => $post->updated_at->toIso8601String(),
+                'parentPost' => $post->parent_post_id
+                    ? [
+                        'id' => $post->parent->id,
+                        'content' => Str::limit($post->parent->content, 100),
+                        'character' => [
+                            'firstName' => $post->parent->character->firstName,
+                            'secondName' => $post->parent->character->secondName,
+                        ],
+                    ]
+                    : null,
+                'isEditable' => auth()->check() && auth()->user()->id === $post->character->user_id,
+                'isDeletable' => auth()->check() && (auth()->user()->id === $post->character->user_id || auth()->user()->isModerator()),
+
+            ];
+        });
+
+        $selectedLocation = Location::find($selectedLocationId);
+
+        return response()->json([
+            'posts' => $postData,
+            'hasMore' => $posts->hasMorePages(),
+            'currentPage' => $posts->currentPage(),
+        ]);
     }
 
     private function selectPostsByLocation ($selectedLocationId) {

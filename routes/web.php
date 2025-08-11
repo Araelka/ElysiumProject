@@ -105,6 +105,7 @@ Route::middleware(['auth', 'gameMasterorOrQuestionnaireSpecialist'])->group(func
 Route::middleware(['auth', 'player'])->group(function(){
     Route::prefix('game-room')->name('gameroom.')->group(function(){
         Route::get('/', [PostController::class, 'index'])->name('index');
+        Route::get('load-posts', [PostController::class, 'loadPosts'])->name('loadPosts');
 
         Route::post('publish', [PostController::class, 'store'])->name('publish');
         Route::get('get-post-content/{id}', [PostController::class, 'getPostContent']);

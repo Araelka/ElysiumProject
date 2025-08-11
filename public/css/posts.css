@@ -28,6 +28,8 @@
 
 
 .posts {
+    display: flex;
+    flex-direction: column-reverse;
     height: 100%; /* Занимает всю высоту блока */
     overflow-y: auto; /* Добавляем вертикальную прокрутку */
 }

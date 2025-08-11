@@ -57,6 +57,61 @@
 
 <script>
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const postsContainer = document.getElementById('posts-container');
+
+        if (postsContainer) {
+            postsContainer.scrollTop = 0;
+        }
+
+        let currentPage = 1;
+        let isLoading = false;
+        let hasMorePosts = true;
+
+        // Функция для проверки, находится ли пользователь в верхней части контейнера
+        function isScrollNearTop(container) {            
+            return container.scrollHeight + container.scrollTop - container.clientHeight  <= 300 ;
+        }
+
+        // Функция для загрузки постов
+        async function loadPosts() {
+            if (isLoading || !hasMorePosts) return;
+
+            isLoading = true;
+
+            try {
+                const locationId = {{ $selectedLocation->id }};
+                const response = await fetch(`/game-room/load-posts?location_id=${locationId}&page=${currentPage}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке постов.');
+                }
+
+                const data = await response.json();
+
+                if (data.posts.length > 0) {
+                    data.posts.forEach(postData => addLoadPostToDOM(postData));
+                    currentPage++;
+                    hasMorePosts = data.hasMore;
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Обработчик прокрутки
+        postsContainer.addEventListener('scroll', () => {
+            if (isScrollNearTop(postsContainer)) {
+                loadPosts();
+            }
+        });
+
+        // Загрузка первой страницы
+        loadPosts();        
+
+    });
+    
     function toggleDropdown() {
         const dropdownCharacterMenu = document.getElementById('character-dropdown');
         dropdownCharacterMenu.classList.toggle('show');
@@ -117,8 +172,4 @@
     });
 
 
-
-    
-    
-    
 </script>
