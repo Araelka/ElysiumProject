@@ -145,27 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-document.getElementById('image').addEventListener('change', function(event) {
-    const input = event.target;
-    const previewImage = document.getElementById('preview-image');
-    const placeholderText = document.getElementById('placeholder-text');
-
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            previewImage.src = e.target.result;
-            previewImage.style.display = 'block';
-            placeholderText.style.display = 'none';
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        previewImage.src = '#';
-        previewImage.style.display = 'none';
-        placeholderText.style.display = 'block';
-    }
-});
 
 function submitForm(btn){
     btn.disabled = true;

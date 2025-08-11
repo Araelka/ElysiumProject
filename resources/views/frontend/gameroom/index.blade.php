@@ -74,7 +74,7 @@
             if (menu !== dropdownMenu) {
                 menu.classList.remove('show');
             }
-        });
+        }); 
 
         dropdownMenu.classList.toggle('show');
 
@@ -146,14 +146,6 @@
                     }
                     return response.json();
                 })
-                .then(data => {
-                    // if (data.success) {
-                    //     const postElement = document.getElementById(`post-${data.postId}`);
-                    //     if (postElement) {
-                    //         postElement.remove();
-                    //     }
-                    // }
-                })
                 .finally(() => {
                     modal.style.display = 'none';
                 });
@@ -164,25 +156,7 @@
         currentPostId = null;
     });
 
-    function scrollToPost(postId) {
-    const postsContainer = document.getElementById('posts-container'); 
-    const postElement = document.querySelector(`#post-${postId}`);
-
-    if (postElement && postsContainer) {
-            
-            const postTop = postElement.offsetTop - postsContainer.offsetTop;
-
-            postsContainer.scrollTo({
-                top: postTop,
-                behavior: 'smooth' 
-            });
-
-            postElement.style.backgroundColor = '#f4d03f20'; 
-            setTimeout(() => {
-                postElement.style.backgroundColor = ''; 
-            }, 2000);
-        }
-    }
+    
 
     
 

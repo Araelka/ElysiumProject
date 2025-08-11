@@ -596,7 +596,7 @@ class CharacterController extends Controller
         ]);
 
         if (!$character->isApproved() || !$character->user->isUser()){
-            return redirect()->back();
+            return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
         }
 
         $character->user->roles()->sync([5]);

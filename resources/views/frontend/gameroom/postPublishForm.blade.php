@@ -56,21 +56,6 @@
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const postText = document.getElementById('post-text');
-        const submitButton = document.getElementById('submit-post');
-        
-        postText.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); 
-                submitPostForm(); 
-            }
-        });
-
-        submitButton.addEventListener('click', function () {
-            submitPostForm();
-        });
-    });
 
     function toggleDropdown() {
         const dropdownCharacterMenu = document.getElementById('character-dropdown');
@@ -86,79 +71,6 @@
         document.getElementById('selected-character-id').value = characterId;
 
         toggleDropdown();
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const textarea = document.getElementById('post-text');
-
-        function autoResize() {
-            textarea.style.height = 'auto'; 
-            textarea.style.height = `${textarea.scrollHeight}px`; 
-        }
-
-        textarea.addEventListener('input', autoResize);
-        autoResize();
-
-        document.addEventListener('click', function (event) {
-            const dropdownCharacterMenu = document.getElementById('character-dropdown');
-            const customDropdown = document.querySelector('.custom-dropdown');
-
-            if (!customDropdown.contains(event.target)) {
-                dropdownCharacterMenu.classList.remove('show');
-            }
-        });
-    });
-
-    function replyPost(button) {
-        const postId = button.getAttribute('data-post-id'); 
-        const parentPostIdInput = document.getElementById('parent-post-id'); 
-        const parentLink = document.getElementById('parent-link');
-        const dropdownToggle = document.getElementById('dropdown-toggle');
-        
-        document.getElementById('post-form').action = `/game-room/publish`;
-        parentPostIdInput.value = postId;
-        dropdownToggle.disabled = false;
-        dropdownToggle.style.cursor = 'pointer';
-        dropdownToggle.onmouseover = function () {
-        dropdownToggle.style.textDecoration = 'underline';
-        };
-
-        dropdownToggle.onmouseout = function () {
-            dropdownToggle.style.textDecoration = 'none';
-        };
-
-        if (postId) {
-            fetch(`/game-room/get-post-content/${postId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Сообщение не найдено');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (parentLink) {
-                        parentLink.innerHTML = '';
-
-                        parentLink.innerHTML = `
-                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
-                            <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
-                                <div class="parent-link-content">
-                                    <div style="color: #f4d03f">${data.character_name}</div>
-                                    <div>${data.content}</div>
-                                </div>
-                            </a>
-                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
-                        </div>
-                        `;
-                        parentLink.style.display = 'block'; 
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-        } else {
-            if (parentLink) {
-                parentLink.style.display = 'none';
-            }
-        }
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -204,125 +116,9 @@
         }
     });
 
-    function clearParentPost() {
-        const parentLink = document.getElementById('parent-link');
-        const parentPostIdInput = document.getElementById('parent-post-id');
-
-        if (parentLink) {
-            parentLink.innerHTML = '';
-            parentLink.style.display = 'none'; 
-        }
-
-        if (parentPostIdInput) {
-            parentPostIdInput.value = ''; 
-        }
-    }
-
-    function clearEditPost() {
-        const parentLink = document.getElementById('parent-link');
-        const parentPostIdInput = document.getElementById('parent-post-id');
-        const postText = document.getElementById('post-text');
-        const postId = document.getElementById('post-id');
-        const characterId = document.getElementById('selected-character-id');
-        const dropdownToggle = document.getElementById('dropdown-toggle');
-
-        document.getElementById('post-form').action = `/game-room/publish`;
-
-        if (parentLink) {
-            parentLink.innerHTML = '';
-            parentLink.style.display = 'none'; 
-            postText.value = '';
-            postId.value = null;
-            characterId.value = null;
-            dropdownToggle.innerText = 'Выберите персонажа';
-            dropdownToggle.disabled = false;
-            dropdownToggle.style.cursor = 'pointer';
-            
-            dropdownToggle.onmouseover = function () {
-            dropdownToggle.style.textDecoration = 'underline';
-            };
-
-            dropdownToggle.onmouseout = function () {
-                dropdownToggle.style.textDecoration = 'none';
-            };
-        }
-
-        if (parentPostIdInput) {
-            parentPostIdInput.value = ''; 
-        }
-    }
 
 
-    function editPost(button) {
-        const postId = button.getAttribute('data-post-id');
-
-        fetch(`/game-room/get-post-content/${postId}`)
-            .then(response => response.json())
-            .then(data => {                
-                document.getElementById('post-id').value = postId; 
-                document.getElementById('selected-character-id').value = data.character_uuid;
-                document.querySelector('.dropdown-toggle').innerText = `${data.character_name}`; 
-                document.getElementById('post-text').value = data.content; 
-                
-                const dropdownToggle = document.getElementById('dropdown-toggle');
-                dropdownToggle.disabled = true;
-                dropdownToggle.style.cursor = 'auto';
-                dropdownToggle.onmouseover = function () {
-                dropdownToggle.style.textDecoration = 'none';
-                };
-
-                dropdownToggle.onmouseout = function () {
-                    dropdownToggle.style.textDecoration = 'none';
-                };
-
-                const parentLink = document.getElementById('parent-link');
-                    parentLink.innerHTML = `
-                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
-                            <a href="javascript:void(0)" onclick="scrollToPost(${data.id})" style="text-decoration: none">
-                                <div class="parent-link-content">
-                                    <div style="color: #f4d03f">${data.character_name}</div>
-                                    <div>${data.content}</div>
-                                </div>
-                            </a>
-                            <div class="parent-post-close" onclick="clearEditPost()">&#10006;</div>
-                        </div>
-                    `;
-                    parentLink.style.display = 'block';
-
-                document.getElementById('post-form').action = `/game-room/edit/${postId}`;
-            })
-            .catch(error => console.error('Ошибка:', error));
-    }
     
-    function submitPostForm(btn) {
-        btn.disabled = true;
-
-        const form = document.getElementById('post-form');
-        const formData = new FormData(form);
-                
-
-        fetch(form.action, {
-            method: form.method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('#post-form input[name="_token"]').value,
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка при отправке.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                                                
-                clearEditPost();
-
-            })
-            .finally(() => {
-                btn.disabled = false;
-            });
-    }
-
-
+    
+    
 </script>

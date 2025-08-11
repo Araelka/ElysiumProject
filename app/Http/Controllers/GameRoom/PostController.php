@@ -12,6 +12,7 @@ use App\Models\Theme;
 use App\Services\TextProcessingService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ThemeController;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -25,6 +26,21 @@ class PostController extends Controller
 
     public function __construct(TextProcessingService $textProcessingService) {
         $this->textProcessingService = $textProcessingService;
+    }
+
+    protected function diffInHours ($post) {
+
+        if (!$post || !$post->created_at) {
+            return null;
+        }
+
+        $currentDate = Carbon::now();
+
+        $postUpdatedDate = Carbon::parse($post->created_at);
+
+        $diffInHours = $postUpdatedDate->diffInHours($currentDate);
+
+        return $diffInHours;
     }
     
     public function index(Request $request){
@@ -41,11 +57,17 @@ class PostController extends Controller
 
         $posts = $this->selectPostsByLocation($selectedLocationId);
 
+        $diffInHours = [];
+
+        foreach ($posts as  $post) {
+            $diffInHours += [$post->id => $this->diffInHours($post)];
+        }
+        
         $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
 
         $parentPost = Post::find($request->get('parent_post_id'));
         
-        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters', 'parentPost'));
+        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'posts', 'characters', 'parentPost', 'diffInHours'));
     }
 
     private function selectPostsByLocation ($selectedLocationId) {
@@ -63,13 +85,12 @@ class PostController extends Controller
         }
 
         try {
-
-        $validated = $request->validate([
-            'post_text' => ['required', 'string'],
-            'parent_post_id' => ['nullable', 'exists:posts,id'],
-            'location_id' => ['required', 'exists:locations,id'],
-            'character_uuid' => ['required', 'exists:characters,uuid']
-        ]);
+            $validated = $request->validate([
+                'post_text' => ['required', 'string'],
+                'parent_post_id' => ['nullable', 'exists:posts,id'],
+                'location_id' => ['required', 'exists:locations,id'],
+                'character_uuid' => ['required', 'exists:characters,uuid']
+            ]);
         }
         catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->has('parent_post_id')) {
@@ -95,8 +116,14 @@ class PostController extends Controller
 
         $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
 
+        $text = $this->textProcessingService->textProcessing($validated['post_text']);
+
+        if ($text == ''){
+            return response()->json(['success' => false]);
+        }
+
         $post = Post::create([
-            'content' => $this->textProcessingService->textProcessing($validated['post_text']),
+            'content' => $text,
             'character_id' => $characterId,
             'location_id' => $validated['location_id']
         ]);
@@ -137,8 +164,7 @@ class PostController extends Controller
                 ]
             ];
         }
-
-        
+    
         event(new PostEvent('create', $postData));
 
         return response()->json(['success' => 200]);
@@ -153,7 +179,7 @@ class PostController extends Controller
 
     public function destroy ($id){
 
-        if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isEditor()) {
+        if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isModerator()) {
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
@@ -162,7 +188,7 @@ class PostController extends Controller
 
         $replay = $post->replies()->get();
 
-         //  $post->delete();
+        $post->delete();
 
         $postData = [
             'id' => $post->id,
@@ -224,7 +250,7 @@ class PostController extends Controller
 
         return response()->json([
             'isEditable' => auth()->check() && auth()->user()->id === $post->character->user_id,
-            'isDeletable' => auth()->check() && (auth()->user()->id === $post->character->user_id || auth()->user()->isEditor()),
+            'isDeletable' => auth()->check() && (auth()->user()->id === $post->character->user_id || auth()->user()->isModerator()),
         ]);
     }
 

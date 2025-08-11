@@ -68,6 +68,14 @@
                 <div class="character-form-container">
                     @if ($selectedCharacter)
                         <div class="character-info-container">
+                            @if($selectedCharacter->comment && $selectedCharacter->isRejected())
+                                <div style="background-color: ff4d4d; border-radius: 5px; padding: 10px; color: 1a1a40;">
+                                    <strong>Причина отклонения:</strong>
+
+                                    <div>{!! nl2br(e($selectedCharacter->comment)) !!}</div>
+                                </div>
+                            @endif
+
                             <div class="character-info-section">
                                 <div class="character-main-info">
                                         @if ($selectedCharacter->images->first())
@@ -288,16 +296,6 @@
                                 @endforeach
                                 </div>
                                 @endif
-
-                                @if($selectedCharacter->comment && $selectedCharacter->isRejected())
-                                    <div>
-                                            <strong>Причина отклонения:</strong>
-
-                                            <div>{!! nl2br(e($selectedCharacter->comment)) !!}</div>
-                                        </details>
-                                    </div>
-                                @endif
-
                             </div>
                             
                         

@@ -29,7 +29,7 @@
                                     </a>
                             </div>
 
-                        @if (auth()->user()->id == $post->character->user_id)
+                        @if (auth()->user()->id == $post->character->user_id && $diffInHours[$post->id] < 24)
                             <div class="dropdown-item-post" style="padding: 0px">
                                     <a href="javascript:void(0)" data-post-id="{{ $post->id }}" onclick="editPost(this)" data-close-dropdown="true">
                                         <div style="padding: 5px 10px">
@@ -38,7 +38,7 @@
                                     </a>
                             </div>
                         @endif
-                        @if (auth()->user()->id == $post->character->user_id || Auth::user()->isEditor())
+                        @if ((auth()->user()->id == $post->character->user_id || Auth::user()->isModerator()) && $diffInHours[$post->id] < 24)
                             <div  data-post-id="{{ $post->id }}">
                                 <form id="delete-post-form-{{ $post->id }}" action={{ route('gameroom.destroy', $post->id) }} method="POST" style="margin: 0px;">
                                     @csrf
@@ -66,7 +66,7 @@
         </div>
     @endif
 
-    <p class='post-content'>{!! nl2br(e($post->content)) !!}</p>
+    <p class='post-content'>{!! $post->content !!}</p>
     <small>
         <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <div class="post-date">

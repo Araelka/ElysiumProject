@@ -37,29 +37,34 @@ class User extends Authenticatable
         return in_array(1, $this->getRoleIds());
     }
 
-    public function isEditor()
+    public function isModerator()
     {
         return array_intersect([1, 2], $this->getRoleIds()) != [];
     }
 
-    public function isGameMaster()
+    public function isEditor()
     {
         return array_intersect([1, 2, 3], $this->getRoleIds()) != [];
     }
 
-     public function isQuestionnaireSpecialist()
+    public function isGameMaster()
     {
         return array_intersect([1, 2, 4], $this->getRoleIds()) != [];
     }
 
+     public function isQuestionnaireSpecialist()
+    {
+        return array_intersect([1, 2, 5], $this->getRoleIds()) != [];
+    }
+
     public function isPlayer()
     {
-        return array_intersect([1, 2, 3, 4, 5], $this->getRoleIds()) != [];
+        return array_intersect([1, 2, 3, 4, 5, 6], $this->getRoleIds()) != [];
     }
 
     public function isUser()
     {
-        return in_array(6, $this->getRoleIds());
+        return in_array(7, $this->getRoleIds());
     }
 
     public function ban(string $reason='Нарушение правил сообщества'){
