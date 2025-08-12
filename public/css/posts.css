@@ -480,10 +480,6 @@
     background-color: #ec7063;
 }
 
-.button-bottom:active {
-    border: 0.5px solid #1a1a40;
-}
-
 .no-results {
     text-align: center;
     height: 50%;

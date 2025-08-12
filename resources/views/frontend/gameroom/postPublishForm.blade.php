@@ -114,9 +114,13 @@
         if (isLoading || !hasMorePosts) return;
 
         isLoading = true;
+        const postsContainer = document.getElementById('posts-container');
 
         try {
-            const locationId = {{ $selectedLocation->id }};
+            const locationId = {{ $selectedLocation->id ?? 'null' }};
+            if (!locationId) {
+                throw new Error('Локация не выбрана');
+            }
 
             let url = `/game-room/load-posts?location_id=${locationId}&page=${currentPage}`;
 
@@ -125,34 +129,52 @@
             }
 
             const response = await fetch(url);
-
             if (!response.ok) {
-                throw new Error('Ошибка при загрузке постов.');
+                if(response.status === 403) {
+                    throw new Error('Доступ запрещен.');
+                } else if (response.status === 400) {
+                    throw new Error('Неверный запрос.');
+                } else {
+                    throw new Error(`Ошибка сети: ${response.status}`);
+                }
             }
 
             const data = await response.json();
-            
-            if (data.posts.length > 0) {
-                if (currentPage === 1 && currentSearchQuery){
-                    const postsContainer = document.getElementById('posts-container');
+
+            if (data.posts && data.posts.length > 0) {
+                
+                if (currentPage === 1 || (currentPage === 1 && currentSearchQuery)) {
                     if (postsContainer) postsContainer.innerHTML = '';
                 }
-                data.posts.forEach(postData => addLoadPostToDOM(postData));
+
+                await addPostsToDOMBatch(data.posts);
                 currentPage++;
                 hasMorePosts = data.hasMore;
-            } else if (data.posts.length === 0 && currentPage === 1){
-                const postsContainer = document.getElementById('posts-container');
+
+                if (currentPage === 2 && !currentSearchQuery && isInitialLoad) { 
+                    postsContainer.scrollTo({
+                        top: postsContainer.scrollHeight, 
+                        behavior: 'instant'
+                    });
+                    isInitialLoad = false;
+                }
+
+            } else if (data.posts && data.posts.length === 0 && currentPage === 1) {
                 if (postsContainer) {
-                    postsContainer.innerHTML = '<div class="no-results">По вашему запросу ничего не найдено.</div>';
+                    postsContainer.innerHTML = currentSearchQuery ?
+                        '<div class="no-results">По вашему запросу ничего не найдено.</div>' :
+                        '<div class="no-results">Постов пока нет.</div>';
                 }
                 hasMorePosts = false;
             }
         } catch (error) {
-            console.error('Ошибка:', error);
-            const postsContainer = document.getElementById('posts-container');
-            if (postsContainer && currentPage === 1) { // Показываем ошибку только при первой загрузке
-                postsContainer.innerHTML = '<div class="error-loading">Ошибка загрузки постов.</div>';
+            console.error('Ошибка загрузки постов:', error);
+            if (currentPage === 1) { 
+                if (postsContainer) {
+                    postsContainer.innerHTML = `<div class="error-loading">Ошибка загрузки постов: ${error.message}</div>`;
+                }
             }
+            hasMorePosts = false;
         } finally {
             isLoading = false;
         }

@@ -78,6 +78,10 @@ class PostController extends Controller
 
         if (!empty($searchQuery)) {
             $postsQuery->where('content', 'like', '%' . $searchQuery . '%');
+
+            $postsQuery->orWhereHas('character', function($characterQuery) use ($searchQuery){
+                $characterQuery->whereRaw('CONCAT(LOWER(firstName), \' \', LOWER(secondName)) LIKE ?', ['%' . mb_strtolower($searchQuery) . '%']);
+            });
         }
 
         $posts = $postsQuery->orderBy('created_at', 'desc')
@@ -138,30 +142,12 @@ class PostController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        // try {
         $validated = $request->validate([
             'post_text' => ['required', 'string'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
             'location_id' => ['required', 'exists:locations,id'],
             'character_uuid' => ['required', 'exists:characters,uuid']
         ]);
-        // }
-        // catch (\Illuminate\Validation\ValidationException $e) {
-        //     if ($request->has('parent_post_id')) {
-        //         $parentPost = Post::find($request->input('parent_post_id'));
-        //         if ($parentPost) {
-        //             $request->session()->flash('parent_post', [
-        //                 'id' => $parentPost->id,
-        //                 'character_name' => $parentPost->character->firstName . ' ' . $parentPost->character->secondName,
-        //                 'content' => Str::limit($parentPost->content, 100),
-        //             ]);
-        //         }
-        //     }
-        //     return redirect()->back()
-        //         ->withErrors($e->errors())
-        //         ->withInput();
-        // }
-
 
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
