@@ -143,7 +143,7 @@ class PostController extends Controller
             'post_text' => ['required', 'string'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
             'location_id' => ['required', 'exists:locations,id'],
-            // 'character_uuid' => ['required', 'exists:characters,uuid']
+            'character_uuid' => ['required', 'exists:characters,uuid']
         ]);
         // }
         // catch (\Illuminate\Validation\ValidationException $e) {
@@ -163,13 +163,12 @@ class PostController extends Controller
         // }
 
 
-        // if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
-        //     return redirect()->back()->withError('У вас нет прав на совершение данного действия');
-        // }
+        if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
+            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        }
 
 
-        // $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
-        $characterId = Character::find(1)->id;
+        $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
 
         $text = $this->textProcessingService->textProcessing($validated['post_text']);
 
