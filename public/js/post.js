@@ -130,15 +130,20 @@ function clearParentPost() {
     }
 }
 
-function canEditPost(postUserId) {
-    const currentUserId = parseInt(document.querySelector('meta[name="current-user-id"]').getAttribute('content'));
-    return currentUserId === postUserId;
+function getBaseUrl() {
+    if (!cachedBaseUrl) {
+        const metaTag = document.querySelector('meta[name="base-url"]');
+        cachedBaseUrl = metaTag ? metaTag.getAttribute('content') : '/';
+    }
+    return cachedBaseUrl;
 }
 
-function canDeletePost(postUserId) {
-    const currentUserId = parseInt(document.querySelector('meta[name="current-user-id"]').getAttribute('content'));
-    const isEditor = document.querySelector('meta[name="is-editor"]').getAttribute('content') === 'true';
-    return currentUserId === postUserId || isEditor;
+function getCsrfToken() {
+    if (!cachedToken) {
+        const tokenInput = document.querySelector('#post-form input[name="_token"]');
+        cachedToken = tokenInput ? tokenInput.value : '';
+    }
+    return cachedToken;
 }
 
 async function fetchPermissions(id) {
@@ -233,7 +238,7 @@ function addPostToDOM(postData) {
                 <small>
                     <div style="display: flex; flex-direction: row; justify-content: space-between;">
                         <div class="post-date">
-                            ${new Date(postData.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false })} ${new Date(postData.created_at).toLocaleDateString('ru-RU')}
+                            ${postData.created_at}
                         </div>
                         <div>
                             ${postData.character.userLogin}
@@ -242,6 +247,7 @@ function addPostToDOM(postData) {
                 </small>
             `;
                 
+        postsContainer.scrollTop = 0;
         postsContainer.prepend(postElement);
 
     });
@@ -255,7 +261,6 @@ function addLoadPostToDOM(postData) {
         postElement.className = 'post';
         postElement.id = `post-${postData.id}`;
         postElement.dataset.postId = postData.id;
-
         
 
         postElement.innerHTML = `
@@ -284,7 +289,7 @@ function addLoadPostToDOM(postData) {
                                     <div style="padding: 5px 10px">Ответить</div>
                                 </a>
                             </div>
-                            ${postData.isEditable
+                            ${postData.isEditable && postData.diffInHours <= 24
                                 ? `
                                 <div class="dropdown-item-post" style="padding: 0px">
                                     <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="editPost(this)" data-close-dropdown="true">
@@ -294,7 +299,7 @@ function addLoadPostToDOM(postData) {
                                 `
                                 : ''
                             }
-                            ${postData.isDeletable
+                            ${(postData.isDeletable && postData.diffInHours <= 24) || postData.isModerator 
                                 ? `
                                 <div data-post-id="${postData.id}">
                                     <form id="delete-post-form-${postData.id}" action="/gameroom/${postData.id}" method="POST" style="margin: 0px;">
@@ -333,7 +338,10 @@ function addLoadPostToDOM(postData) {
                 <small>
                     <div style="display: flex; flex-direction: row; justify-content: space-between;">
                         <div class="post-date">
-                            ${new Date(postData.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false })} ${new Date(postData.created_at).toLocaleDateString('ru-RU')}
+                            ${postData.created_at != postData.updated_at
+                                ? `${ postData.updated_at } (изм)`
+                                : `${ postData.created_at }`
+                            } 
                         </div>
                         <div>
                             ${postData.character.userLogin}
@@ -355,20 +363,24 @@ function updatePostInDOM(postData) {
         const postElementDate = postElement.getElementsByClassName(`post-date`)[0];
         
         postElementContent.innerHTML = postData.content;
-        postElementDate.innerHTML = new Date(postData.updated_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' ' + new Date(postData.updated_at).toLocaleDateString('ru-RU') + ' (изм)';
+        postElementDate.innerHTML = postData.updated_at + ' (изм)';
         
     }
 }
 
 function deletePostInDOM(postData) {
-
-    console.log(postData);
     
-
     const postElement = document.getElementById(`post-${postData.id}`);
-            
+        
     if (postElement) {
         postElement.remove();
+    }
+
+    if (postData.replay) {
+        postData.replay.forEach(post => {
+            const parentPostElement = document.getElementById(`post-${post.id}`);
+            parentPostElement.getElementsByClassName('parent-link')[0].innerHTML = ''
+        });
     }
 }
 
@@ -463,24 +475,4 @@ function replyPost(button) {
             parentLink.style.display = 'none';
         }
     }
-}
-
-function scrollToPost(postId) {
-    const postsContainer = document.getElementById('posts-container'); 
-    const postElement = document.querySelector(`#post-${postId}`);
-
-    if (postElement && postsContainer) {
-            
-            const postTop = postElement.offsetTop - postsContainer.offsetTop;
-
-            postsContainer.scrollTo({
-                top: postTop,
-                behavior: 'smooth' 
-            });
-
-            postElement.style.backgroundColor = '#f4d03f20'; 
-            setTimeout(() => {
-                postElement.style.backgroundColor = ''; 
-            }, 2000);
-        }
 }

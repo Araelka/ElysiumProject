@@ -1,5 +1,7 @@
-<form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST">
+<form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST" style="position: relative">
     @csrf
+
+    <button id="button-bottom" type="button" class="button-bottom" onclick="scrollBottomPostsContainer()">⮟</button>
 
     <div style="display: flex; align-items: flex-end;">
         <div class="custom-dropdown">
@@ -57,6 +59,10 @@
 
 <script>
 
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMorePosts = true;
+
     document.addEventListener('DOMContentLoaded', function () {
         const postsContainer = document.getElementById('posts-container');
 
@@ -64,53 +70,146 @@
             postsContainer.scrollTop = 0;
         }
 
-        let currentPage = 1;
-        let isLoading = false;
-        let hasMorePosts = true;
-
-        // Функция для проверки, находится ли пользователь в верхней части контейнера
         function isScrollNearTop(container) {            
             return container.scrollHeight + container.scrollTop - container.clientHeight  <= 300 ;
         }
 
-        // Функция для загрузки постов
-        async function loadPosts() {
-            if (isLoading || !hasMorePosts) return;
-
-            isLoading = true;
-
-            try {
-                const locationId = {{ $selectedLocation->id }};
-                const response = await fetch(`/game-room/load-posts?location_id=${locationId}&page=${currentPage}`);
-                if (!response.ok) {
-                    throw new Error('Ошибка при загрузке постов.');
-                }
-
-                const data = await response.json();
-
-                if (data.posts.length > 0) {
-                    data.posts.forEach(postData => addLoadPostToDOM(postData));
-                    currentPage++;
-                    hasMorePosts = data.hasMore;
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-            } finally {
-                isLoading = false;
-            }
-        }
-
-        // Обработчик прокрутки
+        
         postsContainer.addEventListener('scroll', () => {
             if (isScrollNearTop(postsContainer)) {
                 loadPosts();
             }
         });
 
-        // Загрузка первой страницы
         loadPosts();        
 
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const postsContainer = document.getElementById('posts-container');
+        const buttonBottom = document.getElementById('button-bottom');
+
+        
+        postsContainer.addEventListener('scroll', () => {
+            if (postsContainer.scrollTop <= -100) {
+                buttonBottom.style.display = 'block';
+            } else {
+                buttonBottom.style.display = 'none';
+            }
+        });
+        
+    });
+
+    function scrollBottomPostsContainer () {
+        const postsContainer = document.getElementById('posts-container');
+        postsContainer.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    let currentSearchQuery = null;
+
+    async function loadPosts() {
+        if (isLoading || !hasMorePosts) return;
+
+        isLoading = true;
+
+        try {
+            const locationId = {{ $selectedLocation->id }};
+
+            let url = `/game-room/load-posts?location_id=${locationId}&page=${currentPage}`;
+
+            if (currentSearchQuery) {
+                url += `&search=${encodeURIComponent(currentSearchQuery)}`;
+            }
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('Ошибка при загрузке постов.');
+            }
+
+            const data = await response.json();
+            
+            if (data.posts.length > 0) {
+                if (currentPage === 1 && currentSearchQuery){
+                    const postsContainer = document.getElementById('posts-container');
+                    if (postsContainer) postsContainer.innerHTML = '';
+                }
+                data.posts.forEach(postData => addLoadPostToDOM(postData));
+                currentPage++;
+                hasMorePosts = data.hasMore;
+            } else if (data.posts.length === 0 && currentPage === 1){
+                const postsContainer = document.getElementById('posts-container');
+                if (postsContainer) {
+                    postsContainer.innerHTML = '<div class="no-results">По вашему запросу ничего не найдено.</div>';
+                }
+                hasMorePosts = false;
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            const postsContainer = document.getElementById('posts-container');
+            if (postsContainer && currentPage === 1) { // Показываем ошибку только при первой загрузке
+                postsContainer.innerHTML = '<div class="error-loading">Ошибка загрузки постов.</div>';
+            }
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    function performSearch(query) {
+        const trimmedQuery = query.trim();
+        currentSearchQuery = trimmedQuery.length > 0 ? trimmedQuery : null;
+
+        currentPage = 1;
+        hasMorePosts = true; 
+
+        const postsContainer = document.getElementById('posts-container');
+        if (postsContainer) {
+            postsContainer.innerHTML = '';
+            postsContainer.innerHTML = '<div class="loading">Поиск...</div>';
+        }
+
+        loadPosts();
+    }
+
+    async function scrollToPost(postId) {
+        let postElement = document.querySelector(`#post-${postId}`);
+        const postsContainer = document.getElementById('posts-container');
+        
+        if (!postsContainer) return;
+
+        while (!postElement && hasMorePosts && !isLoading) {
+            await loadPosts(); 
+            postElement = document.querySelector(`#post-${postId}`);
+
+            if (!postElement && hasMorePosts && !isLoading) {
+                postsContainer.scrollTo({
+                    top: -(postsContainer.scrollHeight - postsContainer.scrollTop - postsContainer.clientHeight),
+                    behavior: 'smooth'
+                });
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+
+        if (postElement) {
+            const postTop = postElement.offsetTop - postsContainer.offsetTop;
+            
+            postsContainer.scrollTo({
+                top: postTop,
+                behavior: 'smooth'
+            });
+
+            postElement.style.backgroundColor = '#f4d03f20';
+            setTimeout(() => {
+                postElement.style.backgroundColor = '';
+            }, 2000);
+        } else {
+            console.warn(`Пост не найден`);
+        }
+    }
     
     function toggleDropdown() {
         const dropdownCharacterMenu = document.getElementById('character-dropdown');
@@ -129,47 +228,31 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const parentPostId = "{{ old('parent_post_id') ?? session('parent_post.id') }}";
-        const parentLink = document.getElementById('parent-link');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const clearSearchButton = document.getElementById('clear-search');
 
-        if (parentPostId && parentLink) {
-            fetch(`/game-room/get-post-content/${parentPostId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (parentLink) {
-                        parentLink.innerHTML = `
-                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
-                            <a href="javascript:void(0)" onclick="scrollToPost(${parentPostId})" style="text-decoration: none">
-                                <div class="parent-link-content">
-                                    <div style="color: #f4d03f">${data.character_name}</div>
-                                    <div>${data.content}</div>
-                                </div>
-                            </a>
-                            <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
-                        </div>
-                        `;
-                        parentLink.style.display = 'block';
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-        } else if (session('parent_post')) {
-            const parentPost = @json(session('parent_post'));
-            if (parentPost) {
-                parentLink.innerHTML = `
-                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
-                    <a href="javascript:void(0)" onclick="scrollToPost(${parentPost.id})" style="text-decoration: none">
-                        <div class="parent-link-content">
-                            <div style="color: #f4d03f">${parentPost.character_name}</div>
-                            <div>${parentPost.content}</div>
-                        </div>
-                    </a>
-                    <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
-                </div>
-                `;
-                parentLink.style.display = 'block';
-            }
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+                clearSearchButton.style.display = 'block';
+
+                if (searchInput) {
+                    const searchTerm = searchInput.value; 
+                    performSearch(searchTerm);
+                }
+            });
+        }
+
+        if (clearSearchButton && searchInput) {
+            clearSearchButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                clearSearchButton.style.display = 'none';
+                searchInput.value = ''; 
+                performSearch(''); 
+            });
         }
     });
-
 
 </script>

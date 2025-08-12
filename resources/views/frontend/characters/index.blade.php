@@ -138,11 +138,6 @@
                                                     </div>
                                                 </div>
                                                 @endif
-                                                @if ($selectedCharacter->isDead())
-                                                    <div>
-                                                        <span style="color: #ec7063"><strong>{{ $selectedCharacter->status->name }}</strong> </span>
-                                                    </div>
-                                                @endif
                                                 
                                             </div>
                                             <hr>

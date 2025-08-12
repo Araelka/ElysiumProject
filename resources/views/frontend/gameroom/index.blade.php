@@ -29,19 +29,32 @@
             <!-- Блок для просмотра постов (80%) -->
             <div class="col-md-10 content d-flex flex-column justify-content-start">
                 @if ($selectedLocation)
-                    <h3>{{ $selectedLocation->name }}</h3>
+                <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>{{ $selectedLocation->name }}</h3>
+                    </div>
+                    <div>
+                        <form action="{{ request()->fullUrlWithQuery(['search' => '']) }}" method="GET" id="search-form">
+                            <input type="hidden" name="filter" class="search-input">
+                            <div class="search-input-wrapper">
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    id="search-input" 
+                                    value="{{ request('search') }}" 
+                                    placeholder="Поиск..." 
+                                    class="search-input"
+                                >
+
+                                <button type="button" id="clear-search" class="clear-search-button" style="display: none">×</button>
+                            </div>
+                            <button type="submit" class="search-button">Найти</button>
+                        </form>
+                    </div>
+                </div>
                 @endif
 
                 <div class="posts" id="posts-container">
-                    {{-- @if ($posts->isEmpty())
-                    @else
-                    @foreach ($posts as $post)
-                    <div>
-                        @include('frontend.gameroom.post', $post)
-                    </div>
-                    @endforeach
-
-                    @endif --}}
                 </div>
 
                 @if ($selectedLocation) 
@@ -97,22 +110,8 @@
             if (event.target.closest('[data-close-dropdown="true"]')) {
                 menu.classList.remove('show');
             }
-            
         });
     });
-
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     const postsContainer = document.querySelector('.posts');
-    //     if (postsContainer) {
-    //         postsContainer.scrollTop = postsContainer.scrollHeight;
-
-    //         const observer = new MutationObserver(function () {
-    //             postsContainer.scrollTop = postsContainer.scrollHeight;
-    //         });
-
-    //         observer.observe(postsContainer, { childList: true });
-    //     }
-    // });
 
     let currentPostId = null;
 

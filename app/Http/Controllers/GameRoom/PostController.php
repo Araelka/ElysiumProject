@@ -54,18 +54,8 @@ class PostController extends Controller
         $selectedLocationId = $request->query('location_id');
 
         $selectedLocation = Location::find($selectedLocationId);
-
-        // $posts = $this->selectPostsByLocation($selectedLocationId);
-
-        // $diffInHours = [];
-
-        // foreach ($posts as  $post) {
-        //     $diffInHours += [$post->id => $this->diffInHours($post)];
-        // }
         
         $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
-
-        // $parentPost = Post::find($request->get('parent_post_id'));
         
         return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'characters'));
     }
@@ -78,13 +68,19 @@ class PostController extends Controller
         $selectedLocationId = $request->query('location_id');
         $page = $request->query('page', 1);
         $limit = $request->query('limit', 10);
+         $searchQuery = $request->query('search');
 
         if (!$selectedLocationId) {
             return response()->json(['error' => 'Локация не выбрана'], 400);
         }
 
-        $posts = Post::where('location_id', $selectedLocationId)
-            ->orderBy('created_at', 'desc')
+        $postsQuery = Post::where('location_id', $selectedLocationId);
+
+        if (!empty($searchQuery)) {
+            $postsQuery->where('content', 'like', '%' . $searchQuery . '%');
+        }
+
+        $posts = $postsQuery->orderBy('created_at', 'desc')
             ->paginate($limit, ['*'], 'page', $page);
 
         $postData = $posts->map(function ($post) {
@@ -101,8 +97,8 @@ class PostController extends Controller
                     'userId' => $post->character->user_id,
                     'userLogin' => $post->character->user->login,
                 ],
-                'created_at' => $post->created_at->toIso8601String(),
-                'updated_at' => $post->updated_at->toIso8601String(),
+                'created_at' => $post->created_at->isoFormat('HH:mm DD.MM.YYYY'),
+                'updated_at' => $post->updated_at->isoFormat('HH:mm DD.MM.YYYY'),
                 'parentPost' => $post->parent_post_id
                     ? [
                         'id' => $post->parent->id,
@@ -114,17 +110,17 @@ class PostController extends Controller
                     ]
                     : null,
                 'isEditable' => auth()->check() && auth()->user()->id === $post->character->user_id,
-                'isDeletable' => auth()->check() && (auth()->user()->id === $post->character->user_id || auth()->user()->isModerator()),
-
+                'isDeletable' => auth()->check() && auth()->user()->id === $post->character->user_id,
+                'isModerator' => auth()->user()->isModerator(),
+                'diffInHours' => $this->diffInHours($post),
             ];
         });
-
-        $selectedLocation = Location::find($selectedLocationId);
 
         return response()->json([
             'posts' => $postData,
             'hasMore' => $posts->hasMorePages(),
             'currentPage' => $posts->currentPage(),
+            'searchQuery' => $searchQuery ?? null,
         ]);
     }
 
@@ -142,37 +138,38 @@ class PostController extends Controller
             return redirect()->back()->withError('У вас нет прав на совершение данного действия');
         }
 
-        try {
-            $validated = $request->validate([
-                'post_text' => ['required', 'string'],
-                'parent_post_id' => ['nullable', 'exists:posts,id'],
-                'location_id' => ['required', 'exists:locations,id'],
-                'character_uuid' => ['required', 'exists:characters,uuid']
-            ]);
-        }
-        catch (\Illuminate\Validation\ValidationException $e) {
-            if ($request->has('parent_post_id')) {
-                $parentPost = Post::find($request->input('parent_post_id'));
-                if ($parentPost) {
-                    $request->session()->flash('parent_post', [
-                        'id' => $parentPost->id,
-                        'character_name' => $parentPost->character->firstName . ' ' . $parentPost->character->secondName,
-                        'content' => Str::limit($parentPost->content, 100),
-                    ]);
-                }
-            }
-            return redirect()->back()
-                ->withErrors($e->errors())
-                ->withInput();
-        }
+        // try {
+        $validated = $request->validate([
+            'post_text' => ['required', 'string'],
+            'parent_post_id' => ['nullable', 'exists:posts,id'],
+            'location_id' => ['required', 'exists:locations,id'],
+            // 'character_uuid' => ['required', 'exists:characters,uuid']
+        ]);
+        // }
+        // catch (\Illuminate\Validation\ValidationException $e) {
+        //     if ($request->has('parent_post_id')) {
+        //         $parentPost = Post::find($request->input('parent_post_id'));
+        //         if ($parentPost) {
+        //             $request->session()->flash('parent_post', [
+        //                 'id' => $parentPost->id,
+        //                 'character_name' => $parentPost->character->firstName . ' ' . $parentPost->character->secondName,
+        //                 'content' => Str::limit($parentPost->content, 100),
+        //             ]);
+        //         }
+        //     }
+        //     return redirect()->back()
+        //         ->withErrors($e->errors())
+        //         ->withInput();
+        // }
 
 
-        if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
-            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
-        }
+        // if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
+        //     return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+        // }
 
 
-        $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
+        // $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
+        $characterId = Character::find(1)->id;
 
         $text = $this->textProcessingService->textProcessing($validated['post_text']);
 
@@ -200,8 +197,8 @@ class PostController extends Controller
                 'userLogin' => $post->character->user->login
             ],
             
-            'created_at' => $post->created_at->toIso8601String(),
-            'updated_at' => $post->updated_at->toIso8601String()
+            'created_at' => $post->created_at->isoFormat('HH:mm DD.MM.YYYY'),
+            'updated_at' => $post->updated_at->isoFormat('HH:mm DD.MM.YYYY'),
         ];
 
         if ($validated['parent_post_id']) {
@@ -279,7 +276,7 @@ class PostController extends Controller
         $postData = [
             'id' => $post->id,
             'content' => $post->content,            
-            'updated_at' => $post->updated_at->toIso8601String()
+            'updated_at' => $post->updated_at->isoFormat('HH:mm DD.MM.YYYY')
         ];
 
         event(new PostEvent('edit', $postData));
