@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\PostRead;
 use App\Models\Theme;
 use App\Services\TextProcessingService;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Carbon;
@@ -52,13 +53,16 @@ class PostController extends Controller
 
         $locations = Location::all();
 
+        $locationIds = $locations->pluck('id')->toArray();
+        $unreadCounts = $this->getUnreadCountsForLocations($locationIds, auth()->user()->id);
+
         $selectedLocationId = $request->query('location_id');
 
         $selectedLocation = Location::find($selectedLocationId);
         
         $characters = Character::where('user_id', auth()->user()->id)->where('status_id', 3)->get();
         
-        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'characters'));
+        return view('frontend/gameroom/index', compact('locations', 'selectedLocation', 'characters', 'unreadCounts'));
     }
 
     public function loadPosts(Request $request){
@@ -103,6 +107,7 @@ class PostController extends Controller
         $postData = $posts->map(function ($post) use($readPostIds) {
             return [
                 'id' => $post->id,
+                'location_id' => $post->location_id,
                 'content' => $post->content,
                 'character' => [
                     'firstName' => $post->character->firstName,
@@ -184,6 +189,7 @@ class PostController extends Controller
 
         $postData = [
             'id' => $post->id,
+            'location_id' => $post->location_id,
             'content' => $post->content,
             'character' => [
                 'firstName' => $post->character->firstName,
@@ -239,6 +245,7 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
 
+        $locationId = $post->location_id;
 
         $replay = $post->replies()->get();
 
@@ -246,6 +253,7 @@ class PostController extends Controller
 
         $postData = [
             'id' => $post->id,
+            'location_id' => $locationId,
             'replay' => $replay
         ];
 
@@ -327,4 +335,48 @@ class PostController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    private function getUnreadCountsForLocations(array $locationIds, $userId): array{
+        
+
+        if (empty($locationIds) || !$userId) {
+            return [];
+        }
+
+        $unreadCounts = Post::whereIn('location_id', $locationIds)
+            ->leftJoin('post_reads as pr', function ($join) use ($userId) {
+                $join->on('posts.id', '=', 'pr.post_id')
+                    ->where('pr.user_id', $userId);
+            })
+            ->whereNull('pr.post_id') 
+            ->selectRaw('location_id, count(*) as unread_count')
+            ->groupBy('location_id')
+            ->pluck('unread_count', 'location_id')
+            ->toArray();
+        $result = [];
+        foreach ($locationIds as $locId) {
+            $result[$locId] = $unreadCounts[$locId] ?? 0;
+        }
+
+        return $result;
+    }
+
+    public function getUnreadCounts(Request $request){
+        if (!auth()->user()->isPlayer()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $userId = auth()->user()->id;
+
+        $locationIds = $request->input('location_ids', []);
+        
+        if (empty($locationIds)) {
+            return response()->json(['counts' => []]);
+        }
+
+        $counts = $this->getUnreadCountsForLocations($locationIds, $userId);
+
+        return response()->json(['counts' => $counts]);
+    }
+
 }

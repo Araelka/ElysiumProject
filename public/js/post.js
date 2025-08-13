@@ -12,16 +12,20 @@ document.addEventListener('DOMContentLoaded', function () {
         forceTLS: false, 
     });
 
+    fetchUnreadCounts();
+
     const channel = pusher.subscribe('posts');
 
     channel.bind('App\\Events\\PostEvent', function (data) {        
         const { action, postData } = data;
 
         if (action === 'create') {
+            fetchUnreadCounts();
             addPostToDOM(postData);
         }else if (action === 'edit') {
             updatePostInDOM(postData);
         }else if (action === 'delete') {
+            fetchUnreadCounts();
             deletePostInDOM(postData);
         }
     });
@@ -272,7 +276,7 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center;">
-                <div class="read-post" id="read-post"> 
+                <div class="read-post" id="read-post" style="color: #f4d03f"> 
                     &#10003; 
                 </div>
                 <div class="custom-dropdown-post">
@@ -325,6 +329,24 @@ let isInitialLoad = true;
 async function addPostToDOM(postData) {
     const postsContainer = document.getElementById('posts-container');
     if (!postsContainer) return;
+
+    const currentLocId = window.currentLocationId; 
+    const postLocId = postData.location_id;  
+    
+    const isCurrentLocDefined = (currentLocId !== null && currentLocId !== undefined && currentLocId !== '' && !isNaN(currentLocId));
+    const isPostLocDefined = (postLocId !== null && postLocId !== undefined && postLocId !== '' && !isNaN(postLocId));
+
+    if (!isCurrentLocDefined) {
+        return;
+    }
+
+    if (!isPostLocDefined) {
+        return;
+    }
+
+    if (parseInt(currentLocId, 10) !== parseInt(postLocId, 10)) { 
+        return; 
+    }
 
     try {
         if (postsContainer.children.length === 1) {
@@ -548,7 +570,6 @@ function initUnreadPostsTracking() {
             }
             const data = await response.json();
             if (data.success) {
-                console.log(`Пост ${postId} отмечен как прочитанный.`);
                 return true;
             } else {
                  console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
@@ -572,21 +593,18 @@ function initUnreadPostsTracking() {
                     
                     readElement.innerText = '✓';
 
-                     // Убираем класс непрочитанного, так как он теперь прочитан
-                     post.classList.remove('post-unread');
-                     // Опционально: обновляем UI, например, убираем значок
-                     // const unreadIndicator = post.querySelector('.unread-indicator');
-                     // if (unreadIndicator) unreadIndicator.remove();
+                    post.classList.remove('post-unread');
+
+                    fetchUnreadCounts();
                  }
              }
          }
     }
 
-    // Проверяем видимость при прокрутке
     let throttleTimer;
     postsContainer.addEventListener('scroll', () => {
         clearTimeout(throttleTimer);
-        throttleTimer = setTimeout(checkUnreadPostsVisibility, 150); // Проверяем не чаще, чем раз в 150мс
+        throttleTimer = setTimeout(checkUnreadPostsVisibility, 30); // Проверяем не чаще, чем раз в 150мс
     });
 
     // Проверяем видимость при загрузке новых постов (например, через Pusher)
@@ -614,9 +632,50 @@ function initUnreadPostsTracking() {
     setTimeout(checkUnreadPostsVisibility, 100);
 }
 
-// Инициализируем отслеживание после загрузки страницы и первых постов
 document.addEventListener('DOMContentLoaded', function () {
-    // Убедимся, что посты уже загружены
-    setTimeout(initUnreadPostsTracking, 500); // Или вызвать после loadPosts()
-    // Лучше вызвать initUnreadPostsTracking() внутри loadPosts() после добавления постов
+    setTimeout(initUnreadPostsTracking, 500);
 });
+
+function updateLocationUnreadCounts(countsData) {    
+    for (const [locIdStr, count] of Object.entries(countsData)) {
+        const locId = parseInt(locIdStr, 10);
+        const link = document.querySelector(`.topic-link[href*="location_id=${locId}"]`);
+        if (link) {
+            let badge = link.querySelector('.unread-count-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'unread-count-badge';
+                    link.appendChild(badge);
+                }
+                badge.textContent = count;
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+    }
+}
+
+async function fetchUnreadCounts() {
+    const locationLinks = document.querySelectorAll('.topic-link[href*="location_id="]');
+
+    const locationIds = Array.from(locationLinks).map(link => {
+        const match = link.href.match(/location_id=(\d+)/);
+                return match ? parseInt(match[1], 10) : null;
+    }).filter(id => id !== null);
+
+    if (locationIds.length === 0) return;
+
+    try {        
+        const response = await fetch(`/game-room/unread-counts?location_ids[]=${locationIds.join('&location_ids[]=')}`);
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.counts) {            
+            updateLocationUnreadCounts(data.counts);
+        }
+    } catch (error) {
+        console.error("Ошибка при получении счетчиков непрочитанных:", error);
+    }
+}

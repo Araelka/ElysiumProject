@@ -489,3 +489,13 @@
     text-align: center;
     height: 50%;
 }
+
+.unread-count-badge {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #f4d03f;
+    color: #1a1a40; 
+    border-radius: 12px; 
+    padding: 2px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+}

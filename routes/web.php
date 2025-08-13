@@ -116,6 +116,7 @@ Route::middleware(['auth', 'player'])->group(function(){
 
         Route::get('api/posts/{id}/permissions', [PostController::class, 'getPermissions']);
         Route::post('posts/{id}/mark-as-read', [PostController::class, 'markAsRead'])->name('posts.markAsRead');
+        Route::get('unread-counts', [PostController::class, 'getUnreadCounts'])->name('posts.unreadCounts');
     });
     
 });

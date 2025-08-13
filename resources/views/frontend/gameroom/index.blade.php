@@ -18,8 +18,13 @@
                 <ul class="topics-list">
                     @foreach ($locations as $location)
                         <li><a href="{{ route('gameroom.index', ['location_id' => $location->id]) }}" 
-                            class="topic-link {{ $selectedLocation && $selectedLocation->id == $location->id ? 'active' : '' }}">
+                            class="topic-link {{ $selectedLocation && $selectedLocation->id == $location->id ? 'active' : '' }}"
+                            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
                              {{ $location->name }}
+
+                              @if (isset($unreadCounts[$location->id]) && $unreadCounts[$location->id] > 0)
+                                <span class="unread-count-badge">{{ $unreadCounts[$location->id] }}</span>
+                            @endif
                             </a>
                         </li>
                     @endforeach

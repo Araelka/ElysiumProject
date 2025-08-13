@@ -115,9 +115,10 @@
 
         isLoading = true;
         const postsContainer = document.getElementById('posts-container');
+        const locationId = {{ $selectedLocation->id ?? 'null' }};
+        window.currentLocationId = {{ $selectedLocation->id ?? 'null' }};
 
         try {
-            const locationId = {{ $selectedLocation->id ?? 'null' }};
             if (!locationId) {
                 throw new Error('Локация не выбрана');
             }
