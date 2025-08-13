@@ -183,6 +183,11 @@ async function fetchPermissions(id) {
 function createPostElement(postData, permissions, baseUrl, csrfToken) {
     const postElement = document.createElement('div');
     postElement.className = 'post';
+
+    if (!postData.isRead) {
+        postElement.classList.add('post-unread');
+    }
+
     postElement.id = `post-${postData.id}`;
     postElement.dataset.postId = postData.id;
 
@@ -267,6 +272,9 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center;">
+                <div class="read-post" id="read-post"> 
+                    &#10003; 
+                </div>
                 <div class="custom-dropdown-post">
                     <div>
                         <button type="button" class="dropdown-toggle-post" onclick="toggleDropdownPostMenu(this)">...</button>
@@ -290,6 +298,13 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
             </div>
         </small>
     `;
+
+    const readElement = postElement.getElementsByClassName('read-post')[0];
+    
+    if (!postData.isRead) {
+        readElement.innerText = '';
+    }
+
     return postElement;
 }
 
@@ -342,6 +357,7 @@ async function addPostToDOM(postData) {
 }
 
 async function addPostsToDOMBatch(postsData) {
+
     const postsContainer = document.getElementById('posts-container');
     if (!postsContainer || !postsData || postsData.length === 0) return;
 
@@ -492,3 +508,115 @@ function replyPost(button) {
         }
     }
 }
+
+let unreadPostsTrackingInitialized = false; 
+let visibilityCheckScheduled = false;
+
+function initUnreadPostsTracking() {
+    if (unreadPostsTrackingInitialized) return;
+    unreadPostsTrackingInitialized = true;
+
+    const postsContainer = document.getElementById('posts-container');
+    if (!postsContainer) return;
+
+    function isElementInViewport(el, container) {
+        const rect = el.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        const threshold = 50; 
+        return (
+            rect.bottom >= containerRect.top + threshold &&  
+            rect.top <= containerRect.bottom - threshold    
+        );
+    }
+
+    // Функция для отметки поста как прочитанного
+    async function markPostAsRead(postId) {
+        const csrfToken = getCsrfToken(); 
+        try {
+            const response = await fetch(`/game-room/posts/${postId}/mark-as-read`, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
+
+            if (!response.ok) {
+                console.warn(`Ошибка при отметке поста ${postId} как прочитанного:`, response.status);
+                return false;
+            }
+            const data = await response.json();
+            if (data.success) {
+                console.log(`Пост ${postId} отмечен как прочитанный.`);
+                return true;
+            } else {
+                 console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
+                 return false;
+            }
+        } catch (error) {
+            console.error(`Ошибка сети при отметке поста ${postId} как прочитанного:`, error);
+            return false;
+        }
+    }
+
+    // Функция для обработки видимости постов
+    async function checkUnreadPostsVisibility() {
+         const unreadPosts = postsContainer.querySelectorAll('.post-unread');
+         for (const post of unreadPosts) {
+             const postId = post.dataset.postId;
+             if (postId && isElementInViewport(post, postsContainer)) {
+                 const success = await markPostAsRead(postId);
+                 if (success) {
+                    const readElement = post.getElementsByClassName('read-post')[0];
+                    
+                    readElement.innerText = '✓';
+
+                     // Убираем класс непрочитанного, так как он теперь прочитан
+                     post.classList.remove('post-unread');
+                     // Опционально: обновляем UI, например, убираем значок
+                     // const unreadIndicator = post.querySelector('.unread-indicator');
+                     // if (unreadIndicator) unreadIndicator.remove();
+                 }
+             }
+         }
+    }
+
+    // Проверяем видимость при прокрутке
+    let throttleTimer;
+    postsContainer.addEventListener('scroll', () => {
+        clearTimeout(throttleTimer);
+        throttleTimer = setTimeout(checkUnreadPostsVisibility, 150); // Проверяем не чаще, чем раз в 150мс
+    });
+
+    // Проверяем видимость при загрузке новых постов (например, через Pusher)
+    // Можно вызвать checkUnreadPostsVisibility() после добавления постов в DOM
+    // Для этого модифицируем addPostToDOM и addPostsToDOMBatch:
+
+    // Сохраняем оригинальные функции
+    const originalAddPostToDOM = addPostToDOM;
+    const originalAddPostsToDOMBatch = addPostsToDOMBatch;
+
+    window.addPostToDOM = async function(postData) {
+        await originalAddPostToDOM(postData);
+        // После добавления нового поста проверяем видимость
+        // Новый пост добавляется в начало, поэтому он может быть сразу виден
+        setTimeout(checkUnreadPostsVisibility, 50); // Небольшая задержка, чтобы DOM обновился
+    };
+
+    window.addPostsToDOMBatch = async function(postsData) {
+       await originalAddPostsToDOMBatch(postsData);
+       // После добавления группы постов проверяем видимость
+       setTimeout(checkUnreadPostsVisibility, 50);
+    };
+
+    // Проверяем видимость при начальной загрузке
+    setTimeout(checkUnreadPostsVisibility, 100);
+}
+
+// Инициализируем отслеживание после загрузки страницы и первых постов
+document.addEventListener('DOMContentLoaded', function () {
+    // Убедимся, что посты уже загружены
+    setTimeout(initUnreadPostsTracking, 500); // Или вызвать после loadPosts()
+    // Лучше вызвать initUnreadPostsTracking() внутри loadPosts() после добавления постов
+});

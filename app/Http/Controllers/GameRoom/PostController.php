@@ -8,6 +8,7 @@ use App\Events\PostCreated;
 use App\Models\Character;
 use App\Models\Location;
 use App\Models\Post;
+use App\Models\PostRead;
 use App\Models\Theme;
 use App\Services\TextProcessingService;
 use Illuminate\Http\Request;
@@ -84,10 +85,22 @@ class PostController extends Controller
             });
         }
 
+        $postIdsForPage = (clone $postsQuery)->orderBy('created_at', 'desc')
+            ->skip(($page - 1) * $limit)
+            ->take($limit)
+            ->pluck('id'); 
+
+
+        $readPostIds = PostRead::where('user_id', auth()->user()->id)
+            ->whereIn('post_id', $postIdsForPage)
+            ->pluck('post_id')
+            ->toArray();
+
+
         $posts = $postsQuery->orderBy('created_at', 'desc')
             ->paginate($limit, ['*'], 'page', $page);
 
-        $postData = $posts->map(function ($post) {
+        $postData = $posts->map(function ($post) use($readPostIds) {
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -117,6 +130,7 @@ class PostController extends Controller
                 'isDeletable' => auth()->check() && auth()->user()->id === $post->character->user_id,
                 'isModerator' => auth()->user()->isModerator(),
                 'diffInHours' => $this->diffInHours($post),
+                'isRead' => in_array($post->id, $readPostIds),
             ];
         });
 
@@ -294,4 +308,23 @@ class PostController extends Controller
         ]);
     }
 
+    public function markAsRead($id){
+        if (!auth()->user()->isPlayer()) {
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
+        }
+
+        $userId = auth()->user()->id;
+        $postId = $id;
+
+        $post = Post::find($postId);
+        if (!$post) {
+            return response()->json(['error' => 'Пост не найден'], 404);
+        }
+
+        PostRead::firstOrCreate(
+            ['user_id' => $userId, 'post_id' => $postId]
+        );
+
+        return response()->json(['success' => true]);
+    }
 }

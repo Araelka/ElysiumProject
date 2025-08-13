@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use function PHPUnit\Framework\returnArgument;
 
 class Post extends Model
 {
@@ -28,4 +29,13 @@ class Post extends Model
     public function replies(){
         return $this->hasMany(Post::class, 'parent_post_id');
     }
+
+    public function readers(){
+        return $this->belongsToMany(User::class, 'post_reads', 'user_id');
+    }
+
+    public function isReadByUser($userId){
+        return $this->hasOne(PostRead::class)->where('user_id', $userId);
+    }
+
 }
