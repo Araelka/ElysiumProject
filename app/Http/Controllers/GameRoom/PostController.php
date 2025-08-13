@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\GameRoom;
 
 use App\Events\PostEvent;
+use App\Events\PostReadEvent;
 use App\Http\Controllers\Controller;
 use App\Events\PostCreated;
 use App\Models\Character;
@@ -72,7 +73,7 @@ class PostController extends Controller
 
         $selectedLocationId = $request->query('location_id');
         $page = $request->query('page', 1);
-        $limit = $request->query('limit', 10);
+        $limit = $request->query('limit', 20);
          $searchQuery = $request->query('search');
 
         if (!$selectedLocationId) {
@@ -100,11 +101,25 @@ class PostController extends Controller
             ->pluck('post_id')
             ->toArray();
 
+        $readByOthersMap = [];
+        if ($postIdsForPage->isNotEmpty()) {
+            $readByOthersMap = PostRead::whereIn('post_id', $postIdsForPage)
+                ->join('posts', 'post_reads.post_id', '=', 'posts.id')
+                ->join('characters', 'posts.character_id', '=', 'characters.id')
+                ->whereColumn('post_reads.user_id', '!=', 'characters.user_id')
+                ->select('post_reads.post_id')
+                ->distinct()
+                ->pluck('post_id')
+                ->flip() 
+                ->toArray(); 
+        }
+
 
         $posts = $postsQuery->orderBy('created_at', 'desc')
             ->paginate($limit, ['*'], 'page', $page);
 
-        $postData = $posts->map(function ($post) use($readPostIds) {
+        $postData = $posts->map(function ($post) use($readPostIds, $readByOthersMap) {
+            $isPostAuthor = ($post->character->user_id == auth()->user()->id);
             return [
                 'id' => $post->id,
                 'location_id' => $post->location_id,
@@ -136,6 +151,8 @@ class PostController extends Controller
                 'isModerator' => auth()->user()->isModerator(),
                 'diffInHours' => $this->diffInHours($post),
                 'isRead' => in_array($post->id, $readPostIds),
+                'isReadByOthers' => isset($readByOthersMap[$post->id]),
+                'isAuthor' => $isPostAuthor,
             ];
         });
 
@@ -329,9 +346,14 @@ class PostController extends Controller
             return response()->json(['error' => 'Пост не найден'], 404);
         }
 
-        PostRead::firstOrCreate(
+        $postRead = PostRead::firstOrCreate(
             ['user_id' => $userId, 'post_id' => $postId]
         );
+
+        if ($postRead->wasRecentlyCreated) {
+
+            event(new PostReadEvent($postId, $userId));
+        }
 
         return response()->json(['success' => true]);
     }

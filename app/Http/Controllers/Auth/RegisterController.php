@@ -23,7 +23,7 @@ class RegisterController extends Controller
             'password' => $request->input('password')
         ]);
 
-        $user->roles()->attach(6);
+        $user->roles()->attach(7);
 
         auth()->login($user);
 

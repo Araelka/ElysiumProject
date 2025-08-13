@@ -11,12 +11,14 @@ use App\Models\CharacterAttribute;
 use App\Models\CharacterDescription;
 use App\Models\CharacterImage;
 use App\Models\CharacterSkill;
+use App\Models\Post;
 use App\Models\Skill;
 use App\Services\TextProcessingService;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -599,7 +601,34 @@ class CharacterController extends Controller
             return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
         }
 
-        $character->user->roles()->sync([5]);
+        $character->user->roles()->sync([6]);
+
+
+        if ($character->user->isPlayer()){
+            $user = $character->user;
+
+            $timestamp = now();
+
+            Post::chunk(500, function($posts) use ($user, $timestamp) {
+                $postReadsData = [];
+                foreach ($posts as $post) {
+                    $postReadsData[] = [
+                        'user_id' => $user->id,
+                        'post_id' => $post->id,
+                        'created_at' => $timestamp,
+                        'updated_at' => $timestamp,
+                    ];
+                }
+
+                if (!empty($postReadsData)){
+                    try {
+                        DB::table('post_reads')->insert($postReadsData);
+                    } catch (\Exception $e) {
+                         \Log::error("Ошибка при пакетной вставке прочитанных постов для пользователя ID {$user->id}: " . $e->getMessage());
+                    }
+                }
+            });
+        }
 
         return redirect()->route('game-master.showCharactersTable', ['filter' => 'consideration']);
     }

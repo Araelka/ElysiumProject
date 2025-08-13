@@ -260,6 +260,18 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
         `;
     }
 
+    let readIndicatorsHtml = '';
+
+    if (postData.isReadByOthers) {
+        readIndicatorsHtml += `<div class="read-indicator read-by-others" style="position: absolute; right: 5px;" title="Прочитано другими">&#10003;</div>`;
+    }
+
+    if (postData.isRead) {
+        readIndicatorsHtml += `<div class="read-indicator read-by-me" title="Прочитано вами">&#10003;</div>`;
+    }
+
+    
+
     let dateHtml = '';
     if (postData.created_at != postData.updated_at) {
        dateHtml = `${postData.updated_at} (изм)`;
@@ -276,8 +288,8 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center;">
-                <div class="read-post" id="read-post" style="color: #f4d03f"> 
-                    &#10003; 
+                <div class="read-post" id="read-post" style="color: #f4d03f; display:flex; position: relative;"> 
+                    ${readIndicatorsHtml}
                 </div>
                 <div class="custom-dropdown-post">
                     <div>
@@ -373,6 +385,10 @@ async function addPostToDOM(postData) {
         }
         isInitialLoad = false; 
 
+        setTimeout(() => {
+             checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostToDOM:", err));
+        }, 0);
+
     } catch (error) {
         console.error('Ошибка при добавлении нового поста:', error);
     }
@@ -401,6 +417,10 @@ async function addPostsToDOMBatch(postsData) {
         }
 
         postsContainer.appendChild(fragment);
+
+        setTimeout(() => {
+             checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostToDOM:", err));
+        }, 0);
 
     } catch (error) {
         console.error('Ошибка при batch-добавлении постов:', error);
@@ -534,106 +554,106 @@ function replyPost(button) {
 let unreadPostsTrackingInitialized = false; 
 let visibilityCheckScheduled = false;
 
+function isElementInViewport(el, container) {
+    const rect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    const threshold = 50; 
+    return (
+        rect.bottom >= containerRect.top + threshold &&  
+        rect.top <= containerRect.bottom - threshold    
+    );
+}
+
+async function markPostAsRead(postId) {
+    const csrfToken = getCsrfToken(); 
+    try {
+        const response = await fetch(`/game-room/posts/${postId}/mark-as-read`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        });
+
+        if (!response.ok) {
+            console.warn(`Ошибка при отметке поста ${postId} как прочитанного:`, response.status);
+            return false;
+        }
+        const data = await response.json();
+        if (data.success) {
+            return true;
+        } else {
+                console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
+                return false;
+        }
+    } catch (error) {
+        console.error(`Ошибка сети при отметке поста ${postId} как прочитанного:`, error);
+        return false;
+    }
+}
+
+async function checkUnreadPostsVisibility() {
+    const postsContainer = globalPostsContainer || document.getElementById('posts-container');
+    if (!postsContainer) return;
+
+    const unreadPosts = postsContainer.querySelectorAll('.post-unread');
+    const markAsReadPromises = [];
+
+    for (const post of unreadPosts) {
+        const postId = post.dataset.postId;
+        if (postId && isElementInViewport(post, postsContainer)) {
+            markAsReadPromises.push({ postId, postElement: post, promise: markPostAsRead(postId) });
+        }
+    }
+
+    if (markAsReadPromises.length > 0) {
+        try {
+            const results = await Promise.all(markAsReadPromises.map(item => item.promise));
+
+            let anyMarkedAsRead = false;
+            for (let i = 0; i < results.length; i++) {
+                const { postId, postElement } = markAsReadPromises[i];
+                const success = results[i];
+                if (success) {
+                    const readElement = postElement.getElementsByClassName('read-post')[0];
+                    if (readElement) {
+                        readElement.innerText = '✓'; 
+                    }
+                    postElement.classList.remove('post-unread');
+                    anyMarkedAsRead = true;
+                }
+            }
+            if (anyMarkedAsRead) {
+                fetchUnreadCounts();
+            }
+        } catch (error) {
+            console.error("Ошибка при обработке результатов отметки постов как прочитанных:", error);
+        }
+    }
+}
+
 function initUnreadPostsTracking() {
     if (unreadPostsTrackingInitialized) return;
     unreadPostsTrackingInitialized = true;
 
     const postsContainer = document.getElementById('posts-container');
+    globalPostsContainer = postsContainer; 
     if (!postsContainer) return;
 
-    function isElementInViewport(el, container) {
-        const rect = el.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        
-        const threshold = 50; 
-        return (
-            rect.bottom >= containerRect.top + threshold &&  
-            rect.top <= containerRect.bottom - threshold    
-        );
-    }
-
-    // Функция для отметки поста как прочитанного
-    async function markPostAsRead(postId) {
-        const csrfToken = getCsrfToken(); 
-        try {
-            const response = await fetch(`/game-room/posts/${postId}/mark-as-read`, { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-            });
-
-            if (!response.ok) {
-                console.warn(`Ошибка при отметке поста ${postId} как прочитанного:`, response.status);
-                return false;
-            }
-            const data = await response.json();
-            if (data.success) {
-                return true;
-            } else {
-                 console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
-                 return false;
-            }
-        } catch (error) {
-            console.error(`Ошибка сети при отметке поста ${postId} как прочитанного:`, error);
-            return false;
-        }
-    }
-
-    // Функция для обработки видимости постов
-    async function checkUnreadPostsVisibility() {
-         const unreadPosts = postsContainer.querySelectorAll('.post-unread');
-         for (const post of unreadPosts) {
-             const postId = post.dataset.postId;
-             if (postId && isElementInViewport(post, postsContainer)) {
-                 const success = await markPostAsRead(postId);
-                 if (success) {
-                    const readElement = post.getElementsByClassName('read-post')[0];
-                    
-                    readElement.innerText = '✓';
-
-                    post.classList.remove('post-unread');
-
-                    fetchUnreadCounts();
-                 }
-             }
-         }
-    }
-
+    
     let throttleTimer;
     postsContainer.addEventListener('scroll', () => {
         clearTimeout(throttleTimer);
-        throttleTimer = setTimeout(checkUnreadPostsVisibility, 30); // Проверяем не чаще, чем раз в 150мс
+        throttleTimer = setTimeout(checkUnreadPostsVisibility, 30); 
     });
 
-    // Проверяем видимость при загрузке новых постов (например, через Pusher)
-    // Можно вызвать checkUnreadPostsVisibility() после добавления постов в DOM
-    // Для этого модифицируем addPostToDOM и addPostsToDOMBatch:
 
-    // Сохраняем оригинальные функции
-    const originalAddPostToDOM = addPostToDOM;
-    const originalAddPostsToDOMBatch = addPostsToDOMBatch;
-
-    window.addPostToDOM = async function(postData) {
-        await originalAddPostToDOM(postData);
-        // После добавления нового поста проверяем видимость
-        // Новый пост добавляется в начало, поэтому он может быть сразу виден
-        setTimeout(checkUnreadPostsVisibility, 50); // Небольшая задержка, чтобы DOM обновился
-    };
-
-    window.addPostsToDOMBatch = async function(postsData) {
-       await originalAddPostsToDOMBatch(postsData);
-       // После добавления группы постов проверяем видимость
-       setTimeout(checkUnreadPostsVisibility, 50);
-    };
-
-    // Проверяем видимость при начальной загрузке
-    setTimeout(checkUnreadPostsVisibility, 100);
+    setTimeout(checkUnreadPostsVisibility, 30);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(initUnreadPostsTracking, 500);
+    setTimeout(initUnreadPostsTracking, 10);
 });
 
 function updateLocationUnreadCounts(countsData) {    

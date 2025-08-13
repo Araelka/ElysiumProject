@@ -147,7 +147,7 @@
                 if (currentPage === 1 || (currentPage === 1 && currentSearchQuery)) {
                     if (postsContainer) postsContainer.innerHTML = '';
                 }
-
+                
                 await addPostsToDOMBatch(data.posts);
                 currentPage++;
                 hasMorePosts = data.hasMore;
