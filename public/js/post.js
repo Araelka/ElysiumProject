@@ -1,7 +1,23 @@
+let currentPage = 1;
+let isLoading = false;
+let hasMorePosts = true;
+let isInitialLoad = true;
+let firstUnreadPostIdOnLoad = null;
+let globalPostsContainer = null;
+let currentSearchQuery = null;
+let unreadPostsTrackingInitialized = false;
+let visibilityCheckScheduled = false;
+let scrollTimer = null;
+let cachedBaseUrl = null;
+let cachedToken = null;
+const permissionsCache = new Map();
+const pendingRequests = new Map();
+let currentPostId = null;
+let currentUnreadSeparator = null;
+
 document.addEventListener('DOMContentLoaded', function () {
     const pusherKey = 'e9b501d88e4c02269a2c'; 
     const pusherCluster = 'ap1'; 
-
     const postText = document.getElementById('post-text');
     const submitButton = document.getElementById('submit-post');
 
@@ -12,28 +28,52 @@ document.addEventListener('DOMContentLoaded', function () {
         forceTLS: false, 
     });
 
-    fetchUnreadCounts();
 
     const channel = pusher.subscribe('posts');
 
-    channel.bind('App\\Events\\PostEvent', function (data) {        
+    channel.bind('PostEvent', function (data) {
         const { action, postData } = data;
 
         if (action === 'create') {
-            fetchUnreadCounts();
             addPostToDOM(postData);
-        }else if (action === 'edit') {
-            updatePostInDOM(postData);
-        }else if (action === 'delete') {
             fetchUnreadCounts();
+        } else if (action === 'edit') {
+            updatePostInDOM(postData);
+        } else if (action === 'delete') {
             deletePostInDOM(postData);
+            fetchUnreadCounts();
+        }
+    });
+
+    channel.bind('PostRead', function (data) {
+        const { postId, readerUserId, readerCharacterName } = data;
+        const currentUserId = window.currentUserId;    
+            
+
+        if (currentUserId && parseInt(readerUserId, 10) !== parseInt(currentUserId, 10)) {
+            const postElement = document.getElementById(`post-${postId}`);
+
+            if (postElement) {
+                const readIndicatorsContainer = postElement.querySelector('.read-post');
+
+                if (readIndicatorsContainer) {
+                    let readByOthersIndicator = readIndicatorsContainer.querySelector('.read-by-others');
+                    if (!readByOthersIndicator) {
+                        readByOthersIndicator = document.createElement('div');
+                        readByOthersIndicator.className = 'read-indicator read-by-others';
+                        readByOthersIndicator.title = `Прочитано другими`;
+                        readByOthersIndicator.innerHTML = '&#10003;';
+                        readIndicatorsContainer.appendChild(readByOthersIndicator); 
+                    }
+                }
+            }
         }
     });
 
     postText.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault(); 
-            submitPostForm(submitButton); 
+            event.preventDefault();
+            submitPostForm(submitButton);
         }
     });
 
@@ -49,31 +89,93 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    const postsContainer = document.getElementById('posts-container');
+    globalPostsContainer = postsContainer;
+
+    if (postsContainer) {
+        postsContainer.scrollTop = 0;
+
+        function isScrollNearTop(container) {
+            return container.scrollHeight + container.scrollTop - container.clientHeight <= 300;
+        }
+
+        postsContainer.addEventListener('scroll', () => {
+            if (isScrollNearTop(postsContainer)) {
+                loadPosts();
+            }
+        });
+
+        const buttonBottom = document.getElementById('button-bottom');
+        if (buttonBottom) {
+            postsContainer.addEventListener('scroll', () => {
+                if (postsContainer.scrollTop <= -100) {
+                    buttonBottom.style.display = 'block';
+                } else {
+                    buttonBottom.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    loadPosts();
+    fetchUnreadCounts();
+
+    setTimeout(initUnreadPostsTracking, 1000);
+
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const clearSearchButton = document.getElementById('clear-search');
+
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (clearSearchButton) clearSearchButton.style.display = 'block';
+
+            if (searchInput) {
+                const searchTerm = searchInput.value;
+                performSearch(searchTerm);
+            }
+        });
+    }
+
+    if (clearSearchButton && searchInput) {
+        clearSearchButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            clearSearchButton.style.display = 'none';
+            searchInput.value = '';
+            performSearch('');
+        });
+    }
 });
+
 
 function autoResize() {
     const textarea = document.getElementById('post-text');
-    textarea.style.height = 'auto'; 
-    textarea.style.height = `${textarea.scrollHeight}px`; 
+    if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }
 }
 
 function submitPostForm(btn) {
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     const form = document.getElementById('post-form');
+    if (!form) return;
+
     const formData = new FormData(form);
-            
 
     fetch(form.action, {
         method: form.method,
         body: formData,
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('#post-form input[name="_token"]').value,
+            'X-CSRF-TOKEN': document.querySelector('#post-form input[name="_token"]')?.value,
         },
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Ошибка при отправке.');  
+                throw new Error('Ошибка при отправке.');
             }
             return response.json();
         })
@@ -81,8 +183,11 @@ function submitPostForm(btn) {
             clearEditPost();
             autoResize();
         })
+        .catch(error => {
+            console.error('Ошибка при отправке формы:', error);
+        })
         .finally(() => {
-            btn.disabled = false;
+            if (btn) btn.disabled = false;
         });
 }
 
@@ -93,21 +198,26 @@ function clearEditPost() {
     const postId = document.getElementById('post-id');
     const characterId = document.getElementById('selected-character-id');
     const dropdownToggle = document.getElementById('dropdown-toggle');
+    const postForm = document.getElementById('post-form');
 
-    document.getElementById('post-form').action = `/game-room/publish`;
+    if (postForm) postForm.action = `/game-room/publish`;
 
     if (parentLink) {
         parentLink.innerHTML = '';
-        parentLink.style.display = 'none'; 
-        postText.value = '';
-        postId.value = null;
-        characterId.value = null;
+        parentLink.style.display = 'none';
+    }
+
+    if (postText) postText.value = '';
+    if (postId) postId.value = null;
+    if (characterId) characterId.value = null;
+
+    if (dropdownToggle) {
         dropdownToggle.innerText = 'Выберите персонажа';
         dropdownToggle.disabled = false;
         dropdownToggle.style.cursor = 'pointer';
-        
+
         dropdownToggle.onmouseover = function () {
-        dropdownToggle.style.textDecoration = 'underline';
+            dropdownToggle.style.textDecoration = 'underline';
         };
 
         dropdownToggle.onmouseout = function () {
@@ -115,9 +225,7 @@ function clearEditPost() {
         };
     }
 
-    if (parentPostIdInput) {
-        parentPostIdInput.value = ''; 
-    }
+    if (parentPostIdInput) parentPostIdInput.value = '';
 }
 
 function clearParentPost() {
@@ -126,12 +234,10 @@ function clearParentPost() {
 
     if (parentLink) {
         parentLink.innerHTML = '';
-        parentLink.style.display = 'none'; 
+        parentLink.style.display = 'none';
     }
 
-    if (parentPostIdInput) {
-        parentPostIdInput.value = ''; 
-    }
+    if (parentPostIdInput) parentPostIdInput.value = '';
 }
 
 function getBaseUrl() {
@@ -150,18 +256,14 @@ function getCsrfToken() {
     return cachedToken;
 }
 
-const permissionsCache = new Map();
-const pendingRequests = new Map();
-let cachedBaseUrl = null;
-let cachedToken = null;
-
 async function fetchPermissions(id) {
-    if (permissionsCache.has(id.toString())) { 
-        return permissionsCache.get(id.toString());
+    const idStr = id.toString();
+    if (permissionsCache.has(idStr)) {
+        return permissionsCache.get(idStr);
     }
 
-    if (pendingRequests.has(id.toString())) {
-        return pendingRequests.get(id.toString());
+    if (pendingRequests.has(idStr)) {
+        return pendingRequests.get(idStr);
     }
 
     const requestPromise = fetch(`/game-room/api/posts/${id}/permissions`)
@@ -170,24 +272,24 @@ async function fetchPermissions(id) {
             return response.json();
         })
         .then(data => {
-            permissionsCache.set(id.toString(), data);
-            pendingRequests.delete(id.toString());
+            permissionsCache.set(idStr, data);
+            pendingRequests.delete(idStr);
             return data;
         })
         .catch(error => {
-            pendingRequests.delete(id.toString());
+            pendingRequests.delete(idStr);
             console.error(`Ошибка загрузки разрешений для поста ${id}:`, error);
             return { isEditable: false, isDeletable: false };
         });
 
-    pendingRequests.set(id.toString(), requestPromise);
+    pendingRequests.set(idStr, requestPromise);
     return requestPromise;
 }
 
 function createPostElement(postData, permissions, baseUrl, csrfToken) {
     const postElement = document.createElement('div');
     postElement.className = 'post';
-
+    
     if (!postData.isRead) {
         postElement.classList.add('post-unread');
     }
@@ -263,20 +365,18 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
     let readIndicatorsHtml = '';
 
     if (postData.isReadByOthers) {
-        readIndicatorsHtml += `<div class="read-indicator read-by-others" style="position: absolute; right: 5px;" title="Прочитано другими">&#10003;</div>`;
+        readIndicatorsHtml += `<div class="read-indicator read-by-others" title="Прочитано другими">&#10003;</div>`;
     }
 
     if (postData.isRead) {
         readIndicatorsHtml += `<div class="read-indicator read-by-me" title="Прочитано вами">&#10003;</div>`;
     }
 
-    
-
     let dateHtml = '';
     if (postData.created_at != postData.updated_at) {
-       dateHtml = `${postData.updated_at} (изм)`;
+        dateHtml = `${postData.updated_at} (изм)`;
     } else {
-       dateHtml = `${postData.created_at}`;
+        dateHtml = `${postData.created_at}`;
     }
 
     postElement.innerHTML = `
@@ -288,7 +388,7 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center;">
-                <div class="read-post" id="read-post" style="color: #f4d03f; display:flex; position: relative;"> 
+                <div class="read-post" style="display: flex; margin-right: 10px;"> 
                     ${readIndicatorsHtml}
                 </div>
                 <div class="custom-dropdown-post">
@@ -315,79 +415,77 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
         </small>
     `;
 
-    const readElement = postElement.getElementsByClassName('read-post')[0];
-    
-    if (!postData.isRead) {
-        readElement.innerText = '';
-    }
-
     return postElement;
 }
 
 function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '<',
-    '>': '>',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
+    const map = {
+        '&': '&amp;',
+        '<': '<',
+        '>': '>',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
 
-  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) {
+        return map[m];
+    });
 }
-
-let isInitialLoad = true;
 
 async function addPostToDOM(postData) {
     const postsContainer = document.getElementById('posts-container');
     if (!postsContainer) return;
 
-    const currentLocId = window.currentLocationId; 
-    const postLocId = postData.location_id;  
-    
+
+    const currentLocId = window.currentLocationId;
+    const postLocId = postData.location_id;
+
     const isCurrentLocDefined = (currentLocId !== null && currentLocId !== undefined && currentLocId !== '' && !isNaN(currentLocId));
     const isPostLocDefined = (postLocId !== null && postLocId !== undefined && postLocId !== '' && !isNaN(postLocId));
 
-    if (!isCurrentLocDefined) {
+    if (!isCurrentLocDefined || !isPostLocDefined || parseInt(currentLocId, 10) !== parseInt(postLocId, 10)) {
         return;
-    }
-
-    if (!isPostLocDefined) {
-        return;
-    }
-
-    if (parseInt(currentLocId, 10) !== parseInt(postLocId, 10)) { 
-        return; 
     }
 
     try {
         if (postsContainer.children.length === 1) {
             const firstChild = postsContainer.children[0];
             if (firstChild.classList.contains('no-results') || firstChild.classList.contains('loading')) {
-                postsContainer.innerHTML = ''; 
+                postsContainer.innerHTML = '';
             }
         }
 
         const permissions = await fetchPermissions(postData.id);
-
         const baseUrl = getBaseUrl();
         const csrfToken = getCsrfToken();
-
         const postElement = createPostElement(postData, permissions, baseUrl, csrfToken);
-
+        // markPostAsRead(postData.id);
+        
         postsContainer.insertAdjacentElement('afterbegin', postElement);
-
-        if (isInitialLoad || postsContainer.scrollTop >= -150) { 
-             postsContainer.scrollTo({
-                 top: 0, 
-                 behavior: 'smooth'
-             });
+        
+        if (!isInitialLoad && postsContainer.scrollTop <= -150) {
+            if (postData.character.userId != currentUserId) {
+                if (!currentUnreadSeparator) {
+                    currentUnreadSeparator = document.createElement('div');
+                    currentUnreadSeparator.className = 'unread-posts-separator';
+                    currentUnreadSeparator.innerHTML = '<span>Непрочитанные сообщения</span>';
+                    postsContainer.insertBefore(currentUnreadSeparator, postElement.nextSibling); 
+                    console.log("Создан новый разделитель для новых непрочитанных постов.");
+                }
+            }
         }
-        isInitialLoad = false; 
+
+        if (isInitialLoad || postsContainer.scrollTop >= -150) {
+            postsContainer.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        isInitialLoad = false;
 
         setTimeout(() => {
-             checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostToDOM:", err));
-        }, 0);
+            checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostToDOM:", err));
+        }, 30);
 
     } catch (error) {
         console.error('Ошибка при добавлении нового поста:', error);
@@ -395,57 +493,115 @@ async function addPostToDOM(postData) {
 }
 
 async function addPostsToDOMBatch(postsData) {
-
     const postsContainer = document.getElementById('posts-container');
     if (!postsContainer || !postsData || postsData.length === 0) return;
 
     try {
         const baseUrl = getBaseUrl();
         const csrfToken = getCsrfToken();
-
         const fragment = document.createDocumentFragment();
 
-        for (const postData of postsData) {
+        let separatorAdded = false;
+
+        const shouldAddSeparator = isInitialLoad && firstUnreadPostIdOnLoad;
+        
+
+        for (let i = postsData.length - 1; i >= 0; i--) {
+            const postData = postsData[i];
+            if (shouldAddSeparator && postData.id == firstUnreadPostIdOnLoad && !postData.isRead) {
+                if (!separatorAdded) {
+                    const separator = document.createElement('div');
+                    separator.className = 'unread-posts-separator';
+                    separator.innerHTML = '<span>Непрочитанные сообщения</span>';
+                    fragment.prepend(separator);
+                    separatorAdded = true;
+                    currentUnreadSeparator = separator;
+                }
+            }
+
             const permissions = {
                 isEditable: postData.isEditable,
                 isDeletable: postData.isDeletable
             };
             const postElement = createPostElement(postData, permissions, baseUrl, csrfToken);
             if (postElement) {
-                fragment.appendChild(postElement);
+                fragment.prepend(postElement);
             }
         }
 
+
         postsContainer.appendChild(fragment);
 
-        setTimeout(() => {
-             checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostToDOM:", err));
-        }, 0);
+        if (isInitialLoad) {
+            setTimeout(() => {
+                let targetScrollTop = postsContainer.scrollHeight; 
+                let targetElement = null;
+                let logMessage = "Прокрутка вниз по умолчанию.";
+
+                if (firstUnreadPostIdOnLoad) {
+                    const unreadPostElement = document.getElementById(`post-${firstUnreadPostIdOnLoad}`);
+                    if (unreadPostElement) {
+                        let separatorElement = null;
+                        let previousElement = unreadPostElement.previousElementSibling;
+                        while (previousElement) {
+                            if (previousElement.classList.contains('unread-posts-separator')) {
+                                separatorElement = previousElement;
+                                break;
+                            }
+                            previousElement = previousElement.previousElementSibling;
+                        }
+
+                        targetElement = separatorElement || unreadPostElement;
+                        targetScrollTop = targetElement.offsetTop;
+                    } 
+                } 
+
+                
+                postsContainer.scrollTo({
+                    top: targetScrollTop - postsContainer.offsetTop - 500,
+                    behavior: 'instant' 
+                });
+
+                isInitialLoad = false; 
+                initUnreadPostsTracking();
+            }, 100);
+
+        } else {
+            isInitialLoad = false;
+            if (!unreadPostsTrackingInitialized) {
+                setTimeout(() => {
+                    initUnreadPostsTracking();
+                }, 100);
+            }
+            setTimeout(() => {
+                checkUnreadPostsVisibility().catch(err => console.error("Ошибка в checkUnreadPostsVisibility из addPostsToDOMBatch:", err));
+            }, 50);
+        }
 
     } catch (error) {
         console.error('Ошибка при batch-добавлении постов:', error);
+        if (isInitialLoad) {
+             isInitialLoad = false;
+             setTimeout(() => {
+                 initUnreadPostsTracking();
+             }, 100);
+        }
     }
 }
 
-
 function updatePostInDOM(postData) {
-
     const postElement = document.getElementById(`post-${postData.id}`);
-    
     if (postElement) {
-        const postElementContent = postElement.getElementsByClassName(`post-content`)[0];
-        const postElementDate = postElement.getElementsByClassName(`post-date`)[0];
-        
-        postElementContent.innerHTML = postData.content;
-        postElementDate.innerHTML = postData.updated_at + ' (изм)';
-        
+        const postElementContent = postElement.querySelector('.post-content');
+        const postElementDate = postElement.querySelector('.post-date');
+
+        if (postElementContent) postElementContent.innerHTML = postData.content;
+        if (postElementDate) postElementDate.innerHTML = postData.updated_at + ' (изм)';
     }
 }
 
 function deletePostInDOM(postData) {
-    
     const postElement = document.getElementById(`post-${postData.id}`);
-        
     if (postElement) {
         postElement.remove();
     }
@@ -453,69 +609,89 @@ function deletePostInDOM(postData) {
     if (postData.replay) {
         postData.replay.forEach(post => {
             const parentPostElement = document.getElementById(`post-${post.id}`);
-            parentPostElement.getElementsByClassName('parent-link')[0].innerHTML = ''
+            if (parentPostElement) {
+                const parentLink = parentPostElement.querySelector('.parent-link');
+                if (parentLink) parentLink.innerHTML = '';
+            }
         });
     }
 }
 
 function editPost(button) {
     const postId = button.getAttribute('data-post-id');
+    if (!postId) return;
 
     fetch(`/game-room/get-post-content/${postId}`)
-        .then(response => response.json())
-        .then(data => {                
-            document.getElementById('post-id').value = postId; 
-            document.getElementById('selected-character-id').value = data.character_uuid;
-            document.querySelector('.dropdown-toggle').innerText = `${data.character_name}`; 
-            document.getElementById('post-text').value = data.content; 
-            
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Сообщение не найдено');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const postIdInput = document.getElementById('post-id');
+            const characterIdInput = document.getElementById('selected-character-id');
             const dropdownToggle = document.getElementById('dropdown-toggle');
-            dropdownToggle.disabled = true;
-            dropdownToggle.style.cursor = 'auto';
-            dropdownToggle.onmouseover = function () {
-            dropdownToggle.style.textDecoration = 'none';
-            };
-
-            dropdownToggle.onmouseout = function () {
-                dropdownToggle.style.textDecoration = 'none';
-            };
-
+            const postText = document.getElementById('post-text');
             const parentLink = document.getElementById('parent-link');
+            const postForm = document.getElementById('post-form');
+
+            if (postIdInput) postIdInput.value = postId;
+            if (characterIdInput) characterIdInput.value = data.character_uuid;
+            if (dropdownToggle) dropdownToggle.innerText = `${data.character_name}`;
+            if (postText) postText.value = data.content;
+
+            if (dropdownToggle) {
+                dropdownToggle.disabled = true;
+                dropdownToggle.style.cursor = 'auto';
+                dropdownToggle.onmouseover = function () {
+                    dropdownToggle.style.textDecoration = 'none';
+                };
+                dropdownToggle.onmouseout = function () {
+                    dropdownToggle.style.textDecoration = 'none';
+                };
+            }
+
+            if (parentLink) {
                 parentLink.innerHTML = `
                     <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                         <a href="javascript:void(0)" onclick="scrollToPost(${data.id})" style="text-decoration: none">
                             <div class="parent-link-content">
-                                <div style="color: #f4d03f">${data.character_name}</div>
-                                <div>${data.content}</div>
+                                <div style="color: #f4d03f">${escapeHtml(data.character_name)}</div>
+                                <div>${escapeHtml(data.content)}</div>
                             </div>
                         </a>
                         <div class="parent-post-close" onclick="clearEditPost()">&#10006;</div>
                     </div>
                 `;
                 parentLink.style.display = 'block';
+            }
 
-            document.getElementById('post-form').action = `/game-room/edit/${postId}`;
+            if (postForm) postForm.action = `/game-room/edit/${postId}`;
         })
-        .catch(error => console.error('Ошибка:', error));
+        .catch(error => console.error('Ошибка при редактировании поста:', error));
 }
 
 function replyPost(button) {
-    const postId = button.getAttribute('data-post-id'); 
-    const parentPostIdInput = document.getElementById('parent-post-id'); 
+    const postId = button.getAttribute('data-post-id');
+    const parentPostIdInput = document.getElementById('parent-post-id');
     const parentLink = document.getElementById('parent-link');
     const dropdownToggle = document.getElementById('dropdown-toggle');
-    
-    document.getElementById('post-form').action = `/game-room/publish`;
-    parentPostIdInput.value = postId;
-    dropdownToggle.disabled = false;
-    dropdownToggle.style.cursor = 'pointer';
-    dropdownToggle.onmouseover = function () {
-    dropdownToggle.style.textDecoration = 'underline';
-    };
+    const postForm = document.getElementById('post-form');
 
-    dropdownToggle.onmouseout = function () {
-        dropdownToggle.style.textDecoration = 'none';
-    };
+    if (postForm) postForm.action = `/game-room/publish`;
+    if (parentPostIdInput) parentPostIdInput.value = postId || '';
+
+    if (dropdownToggle) {
+        dropdownToggle.disabled = false;
+        dropdownToggle.style.cursor = 'pointer';
+        dropdownToggle.onmouseover = function () {
+            dropdownToggle.style.textDecoration = 'underline';
+        };
+        dropdownToggle.onmouseout = function () {
+            dropdownToggle.style.textDecoration = 'none';
+        };
+    }
 
     if (postId) {
         fetch(`/game-room/get-post-content/${postId}`)
@@ -533,17 +709,17 @@ function replyPost(button) {
                     <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start;">
                         <a href="javascript:void(0)" onclick="scrollToPost(${postId})" style="text-decoration: none">
                             <div class="parent-link-content">
-                                <div style="color: #f4d03f">${data.character_name}</div>
-                                <div>${data.content}</div>
+                                <div style="color: #f4d03f">${escapeHtml(data.character_name)}</div>
+                                <div>${escapeHtml(data.content)}</div>
                             </div>
                         </a>
                         <div class="parent-post-close" onclick="clearParentPost()">&#10006;</div>
                     </div>
                     `;
-                    parentLink.style.display = 'block'; 
+                    parentLink.style.display = 'block';
                 }
             })
-            .catch(error => console.error('Ошибка:', error));
+            .catch(error => console.error('Ошибка при ответе на пост:', error));
     } else {
         if (parentLink) {
             parentLink.style.display = 'none';
@@ -551,24 +727,28 @@ function replyPost(button) {
     }
 }
 
-let unreadPostsTrackingInitialized = false; 
-let visibilityCheckScheduled = false;
+
 
 function isElementInViewport(el, container) {
     const rect = el.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
-    
-    const threshold = 50; 
+
+    const threshold = 50;
     return (
-        rect.bottom >= containerRect.top + threshold &&  
-        rect.top <= containerRect.bottom - threshold    
+        rect.bottom >= containerRect.top + threshold &&
+        rect.top <= containerRect.bottom - threshold
     );
 }
 
 async function markPostAsRead(postId) {
-    const csrfToken = getCsrfToken(); 
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        console.warn('CSRF токен не найден');
+        return false;
+    }
+
     try {
-        const response = await fetch(`/game-room/posts/${postId}/mark-as-read`, { 
+        const response = await fetch(`/game-room/posts/${postId}/mark-as-read`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -580,12 +760,14 @@ async function markPostAsRead(postId) {
             console.warn(`Ошибка при отметке поста ${postId} как прочитанного:`, response.status);
             return false;
         }
+
         const data = await response.json();
         if (data.success) {
+            console.log(`Пост ${postId} отмечен как прочитанный.`);
             return true;
         } else {
-                console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
-                return false;
+            console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
+            return false;
         }
     } catch (error) {
         console.error(`Ошибка сети при отметке поста ${postId} как прочитанного:`, error);
@@ -616,9 +798,16 @@ async function checkUnreadPostsVisibility() {
                 const { postId, postElement } = markAsReadPromises[i];
                 const success = results[i];
                 if (success) {
-                    const readElement = postElement.getElementsByClassName('read-post')[0];
-                    if (readElement) {
-                        readElement.innerText = '✓'; 
+                    const readIndicatorsContainer = postElement.querySelector('.read-post');
+                    if (readIndicatorsContainer) {
+                        let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                        if (!readByMeIndicator){
+                            readByMeIndicator = document.createElement('div');
+                            readByMeIndicator.className = 'read-indicator read-by-me';
+                            readByMeIndicator.title = 'Прочитано вами';
+                            readByMeIndicator.innerHTML = '&#10003;';
+                            readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                        }
                     }
                     postElement.classList.remove('post-unread');
                     anyMarkedAsRead = true;
@@ -638,25 +827,31 @@ function initUnreadPostsTracking() {
     unreadPostsTrackingInitialized = true;
 
     const postsContainer = document.getElementById('posts-container');
-    globalPostsContainer = postsContainer; 
+    globalPostsContainer = postsContainer;
     if (!postsContainer) return;
 
-    
     let throttleTimer;
-    postsContainer.addEventListener('scroll', () => {
+    postsContainer.addEventListener('scroll', () => {        
         clearTimeout(throttleTimer);
-        throttleTimer = setTimeout(checkUnreadPostsVisibility, 30); 
+        throttleTimer = setTimeout(() => {
+            const isAtBottom = Math.abs(postsContainer.scrollTop) < 150;
+
+            if (isAtBottom && currentUnreadSeparator) {
+                currentUnreadSeparator.remove();
+                currentUnreadSeparator = null;
+            }
+
+            checkUnreadPostsVisibility();
+        }, 100);
     });
 
 
-    setTimeout(checkUnreadPostsVisibility, 30);
+    setTimeout(checkUnreadPostsVisibility, 500);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(initUnreadPostsTracking, 10);
-});
 
-function updateLocationUnreadCounts(countsData) {    
+
+function updateLocationUnreadCounts(countsData) {
     for (const [locIdStr, count] of Object.entries(countsData)) {
         const locId = parseInt(locIdStr, 10);
         const link = document.querySelector(`.topic-link[href*="location_id=${locId}"]`);
@@ -668,7 +863,7 @@ function updateLocationUnreadCounts(countsData) {
                     badge.className = 'unread-count-badge';
                     link.appendChild(badge);
                 }
-                badge.textContent = count;
+                if (badge) badge.textContent = count;
             } else if (badge) {
                 badge.remove();
             }
@@ -678,24 +873,286 @@ function updateLocationUnreadCounts(countsData) {
 
 async function fetchUnreadCounts() {
     const locationLinks = document.querySelectorAll('.topic-link[href*="location_id="]');
-
     const locationIds = Array.from(locationLinks).map(link => {
         const match = link.href.match(/location_id=(\d+)/);
-                return match ? parseInt(match[1], 10) : null;
+        return match ? parseInt(match[1], 10) : null;
     }).filter(id => id !== null);
 
     if (locationIds.length === 0) return;
 
-    try {        
+    try {
         const response = await fetch(`/game-room/unread-counts?location_ids[]=${locationIds.join('&location_ids[]=')}`);
-        
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        
-        if (data.counts) {            
+
+        if (data.counts) {
             updateLocationUnreadCounts(data.counts);
         }
     } catch (error) {
         console.error("Ошибка при получении счетчиков непрочитанных:", error);
     }
 }
+
+
+
+async function loadPosts() {
+    if (isLoading || (!hasMorePosts && !isInitialLoad)) return;
+
+    isLoading = true;
+    const postsContainer = document.getElementById('posts-container');
+    const loadingIndicator = document.getElementById('loading-indicator') || document.createElement('div');
+
+    if (!loadingIndicator.id) {
+        loadingIndicator.id = 'loading-indicator';
+        loadingIndicator.className = 'loading';
+        loadingIndicator.textContent = 'Загрузка...';
+    }
+
+    const locationId = window.currentLocationId;
+
+    try {
+        if (!locationId) {
+            throw new Error('Локация не выбрана');
+        }
+
+        let url = `/game-room/load-posts?location_id=${locationId}&page=${currentPage}`;
+
+        if (currentSearchQuery) {
+            url += `&search=${encodeURIComponent(currentSearchQuery)}`;
+        }
+
+        if ((currentPage > 1 || currentSearchQuery) && postsContainer) {
+            postsContainer.appendChild(loadingIndicator);
+        } else if (isInitialLoad && postsContainer) {
+            postsContainer.innerHTML = '<div class="loading">Загрузка постов...</div>';
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('Доступ запрещен.');
+            } else if (response.status === 400) {
+                throw new Error('Неверный запрос.');
+            } else {
+                throw new Error(`Ошибка сети: ${response.status}`);
+            }
+        }
+
+        const data = await response.json();
+
+        if (currentPage === 1 && !currentSearchQuery) {
+            firstUnreadPostIdOnLoad = data.firstUnreadPostId || null;
+        }
+
+        if (data.posts && data.posts.length > 0) {
+            if (currentPage === 1 && postsContainer) {
+                postsContainer.innerHTML = '';
+            }
+
+            await addPostsToDOMBatch(data.posts);
+            
+            currentPage++;
+            
+            hasMorePosts = data.hasMore;
+
+        } else if (data.posts && data.posts.length === 0 && currentPage === 1) {
+            if (postsContainer) {
+                postsContainer.innerHTML = currentSearchQuery ?
+                    '<div class="no-results">По вашему запросу ничего не найдено.</div>' :
+                    '<div class="no-results">Постов пока нет.</div>';
+            }
+            hasMorePosts = false;
+            isInitialLoad = false; 
+            initUnreadPostsTracking(); 
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки постов:', error);
+        if (currentPage === 1 && postsContainer) {
+            postsContainer.innerHTML = `<div class="error-loading">Ошибка загрузки постов: ${error.message}</div>`;
+        }
+        hasMorePosts = false;
+        isInitialLoad = false; 
+        initUnreadPostsTracking(); 
+    } finally {
+        if (loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+        isLoading = false;
+    }
+}
+
+function performSearch(query) {
+    const trimmedQuery = query.trim();
+    currentSearchQuery = trimmedQuery.length > 0 ? trimmedQuery : null;
+
+    currentPage = 1;
+    hasMorePosts = true;
+    isInitialLoad = true; 
+    firstUnreadPostIdOnLoad = null;
+
+    const postsContainer = document.getElementById('posts-container');
+    if (postsContainer) {
+        postsContainer.innerHTML = '<div class="loading">Поиск...</div>';
+    }
+
+    loadPosts();
+}
+
+async function scrollToPost(postId) {
+    let postElement = document.getElementById(`post-${postId}`);
+    const postsContainer = document.getElementById('posts-container');
+
+    if (!postsContainer) return;
+
+    while (!postElement && hasMorePosts && !isLoading) {
+        await loadPosts();
+        postElement = document.getElementById(`post-${postId}`);
+
+        if (!postElement && hasMorePosts && !isLoading) {
+            postsContainer.scrollTo({
+                top: -(postsContainer.scrollHeight - postsContainer.scrollTop - postsContainer.clientHeight),
+                behavior: 'smooth'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+    }
+
+    if (postElement) {
+        const postTop = postElement.offsetTop - postsContainer.offsetTop;
+
+        postsContainer.scrollTo({
+            top: postTop,
+            behavior: 'smooth'
+        });
+
+        postElement.style.backgroundColor = '#f4d03f20';
+        setTimeout(() => {
+            if (postElement) postElement.style.backgroundColor = '';
+        }, 2000);
+    } else {
+        console.warn(`Пост с ID ${postId} не найден`);
+    }
+}
+
+
+
+function toggleDropdown() {
+    const dropdownCharacterMenu = document.getElementById('character-dropdown');
+    if (dropdownCharacterMenu) {
+        dropdownCharacterMenu.classList.toggle('show');
+    }
+}
+
+function selectCharacter(item) {
+    const characterId = item.getAttribute('data-character-id');
+    const characterName = item.querySelector('span')?.innerText;
+
+    if (characterId && characterName) {
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+        const characterIdInput = document.getElementById('selected-character-id');
+
+        if (dropdownToggle) dropdownToggle.innerText = characterName;
+        if (characterIdInput) characterIdInput.value = characterId;
+
+        toggleDropdown();
+    }
+}
+
+function scrollBottomPostsContainer() {
+    const postsContainer = document.getElementById('posts-container');
+    if (postsContainer) {
+        postsContainer.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+}
+
+function toggleDropdownPostMenu(button) {
+    const dropdownMenu = button.closest('.custom-dropdown-post')?.querySelector('.dropdown-menu-post');
+    const allDropdownMenus = document.querySelectorAll('.dropdown-menu-post');
+    
+    allDropdownMenus.forEach(menu => {
+        if (menu !== dropdownMenu) {
+            menu.classList.remove('show');
+        }
+    });
+
+    if (dropdownMenu) {
+        dropdownMenu.classList.toggle('show');
+    }
+}
+
+
+document.addEventListener('click', function (event) {
+    const allDropdownMenus = document.querySelectorAll('.dropdown-menu-post');
+    allDropdownMenus.forEach(menu => {
+        const customDropdown = menu.closest('.custom-dropdown-post');
+        if (!customDropdown?.contains(event.target)) {
+            menu.classList.remove('show');
+        }
+        if (event.target.dataset.closeDropdown === 'true' || event.target.closest('[data-close-dropdown="true"]')) {
+            menu.classList.remove('show');
+        }
+    });
+});
+
+
+function confirmDelete(event, postId) {
+    event.preventDefault();
+    event.stopPropagation();
+    currentPostId = postId;
+    
+    const modal = document.getElementById('delete-post-modal');
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+    if (cancelDelete) {
+        cancelDelete.addEventListener('click', function () {
+            const modal = document.getElementById('delete-post-modal');
+            if (modal) modal.style.display = 'none';
+            currentPostId = null;
+        });
+    }
+
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function () {
+            if (currentPostId) {
+                const form = document.getElementById(`delete-post-form-${currentPostId}`);
+                if (form) {
+                    fetch(`/game-room/destroy/${currentPostId}`, {
+                        method: 'POST', 
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector(`#delete-post-form-${currentPostId} input[name="_token"]`)?.value
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка при удалении.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при удалении поста:', error);
+                    })
+                    .finally(() => {
+                        const modal = document.getElementById('delete-post-modal');
+                        if (modal) modal.style.display = 'none';
+                        currentPostId = null;
+                    });
+                }
+            }
+        });
+    }
+});

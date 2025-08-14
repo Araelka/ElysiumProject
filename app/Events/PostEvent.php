@@ -24,6 +24,10 @@ class PostEvent implements ShouldBroadcast
         return new Channel('posts');
     }
 
+    public function broadcastAs(){
+        return 'PostEvent';
+    }
+
     public function broadcastWith(){   
         return [
             'action' => $this->action,

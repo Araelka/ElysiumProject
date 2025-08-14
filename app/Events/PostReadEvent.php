@@ -24,15 +24,21 @@ class PostReadEvent implements ShouldBroadcast
     }
 
 
-    public function broadcastOn(): array
-    {
+    public function broadcastOn(): array{
         return [
             new Channel('posts')
         ];
     }
 
-     public function broadcastAs()
-    {
+    public function broadcastAs(){
         return 'PostRead';
+    }
+
+    public function broadcastWith(){   
+        return [
+            'postId' => $this->postId,
+            'readerUserId' => $this->readerUserId,
+            'readerCharacterName' => $this->readerCharacterName,
+        ];
     }
 }

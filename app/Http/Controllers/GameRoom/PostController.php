@@ -103,20 +103,31 @@ class PostController extends Controller
 
         $readByOthersMap = [];
         if ($postIdsForPage->isNotEmpty()) {
-            $readByOthersMap = PostRead::whereIn('post_id', $postIdsForPage)
-                ->join('posts', 'post_reads.post_id', '=', 'posts.id')
-                ->join('characters', 'posts.character_id', '=', 'characters.id')
-                ->whereColumn('post_reads.user_id', '!=', 'characters.user_id')
-                ->select('post_reads.post_id')
+            $readByOthersPostIds = PostRead::whereIn('post_id', $postIdsForPage)
+                ->where('user_id', '!=', auth()->user()->id) 
+                ->select('post_id')
                 ->distinct()
-                ->pluck('post_id')
-                ->flip() 
-                ->toArray(); 
+                ->pluck('post_id');
+            
+            foreach ($readByOthersPostIds as $postId) {
+                $readByOthersMap[$postId] = true;
+            }
         }
-
 
         $posts = $postsQuery->orderBy('created_at', 'desc')
             ->paginate($limit, ['*'], 'page', $page);
+
+        $firstUnreadPostId = null;
+        if ($page == 1 && !$searchQuery) {
+            $postsCollection = $posts->getCollection();
+            for ($i = $postsCollection->count() - 1; $i >= 0; $i--) {
+                $post = $postsCollection[$i];
+                if (!in_array($post->id, $readPostIds)) {
+                    $firstUnreadPostId = $post->id;
+                    break;
+                }
+            }
+        }
 
         $postData = $posts->map(function ($post) use($readPostIds, $readByOthersMap) {
             $isPostAuthor = ($post->character->user_id == auth()->user()->id);
@@ -161,6 +172,7 @@ class PostController extends Controller
             'hasMore' => $posts->hasMorePages(),
             'currentPage' => $posts->currentPage(),
             'searchQuery' => $searchQuery ?? null,
+            'firstUnreadPostId' => $firstUnreadPostId,
         ]);
     }
 
@@ -218,9 +230,9 @@ class PostController extends Controller
                 'userId' => $post->character->user_id,
                 'userLogin' => $post->character->user->login
             ],
-            
             'created_at' => $post->created_at->isoFormat('HH:mm DD.MM.YYYY'),
             'updated_at' => $post->updated_at->isoFormat('HH:mm DD.MM.YYYY'),
+            'isRead' => true,
         ];
 
         if ($validated['parent_post_id']) {

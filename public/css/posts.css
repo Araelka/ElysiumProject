@@ -499,3 +499,60 @@
     font-size: 0.8em;
     font-weight: bold;
 }
+
+.topic-link:hover .unread-count-badge {
+    font-weight: bold;
+    background-color: rgba(10, 14, 23, 1);
+    color: #f4d03f;
+}
+
+.topic-link.active .unread-count-badge {
+    font-weight: bold;
+    background-color: rgba(10, 14, 23, 1);
+    color: #f4d03f;
+}
+
+.read-post {
+    display: flex;
+    color: #f4d03f;
+    flex-direction: row;
+    align-items: center;
+}
+
+.read-indicator {
+    font-size: 0.9em;
+}
+
+.read-by-me {
+    color: #f4d03f;
+}
+
+.read-by-others {
+    color: #f4d03f;
+    margin: -5px;
+}
+
+.unread-posts-separator {
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0px 0px 10px;
+    color: #f4d03f;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.unread-posts-separator::before,
+.unread-posts-separator::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid #f4d03f;
+    margin: 0 10px;
+}
+
+.unread-posts-separator span {
+    white-space: nowrap;
+    padding: 0 10px;
+}
