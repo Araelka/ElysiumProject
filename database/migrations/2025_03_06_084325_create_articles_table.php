@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('theme_id')->constrained()->onDelete('cascade');
-            $table->text('content')->nullable();
+            $table->longText('content')->nullable();
             $table->timestamps();
         });
     }

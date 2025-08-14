@@ -286,14 +286,15 @@
 
 .button-group .left-buttons .save-button,
 .button-group .right-buttons .unban-button {
-    background-color: #f4d03f;
+    background-color: #f4d03f !important;
     color: #1a1a40;
     border: 2px solid #f4d03f00;
 }
 
 .button-group .left-buttons .save-button:hover,
 .button-group .right-buttons .unban-button:hover {
-    background-color: #ec7063;
+    text-decoration: none;
+    background-color: #ec7063 !important;
 }
 
 .button-group .right-buttons .reset-password-button {

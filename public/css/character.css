@@ -670,6 +670,7 @@ details[open] summary:before {
 
 .save-button {
     font-family: 'Courier New', Courier, monospace;
+    color: #1a1a40;
     padding: 5px 15px;
     font-size: 18px;
     font-weight: bold;
