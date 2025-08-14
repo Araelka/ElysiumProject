@@ -12,7 +12,6 @@
         <form action={{ route("characters.createMainInfo") }} method="POST"  enctype="multipart/form-data">
             @csrf
     @endisset
-
     
         <!-- Блок: Фото и форма -->
         <div class="form-layout">
@@ -25,11 +24,12 @@
                     @if (session('temp_photo_path'))
                         <img id="preview-image" src="{{ asset('storage/' . session('temp_photo_path')) }}" class="rounded-circle">
                         <div id="placeholder-text" class="placeholder">Изменить изображение</div>
-                    @isset($character)
-                        @elseif ($character->images->first())
-                        <img id="preview-image" src="{{ asset('storage/' . $character->images->first()->path) }}" class="rounded-circle">
-                        <div id="placeholder-text" class="placeholder">Изменить изображение</div>
-                    @endisset
+                        @isset($character)
+                            @if ($character && $character->images->first())
+                                <img id="preview-image" src="{{ asset('storage/' . $character->images->first()->path) }}" class="rounded-circle">
+                                <div id="placeholder-text" class="placeholder">Изменить изображение</div>
+                            @endif
+                        @endisset
                     @else
                         <img id="preview-image" src="#" class="rounded-circle" style="display: none;">
                         <div id="placeholder-text" class="placeholder">Загрузить изображение</div>

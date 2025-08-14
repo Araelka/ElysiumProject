@@ -15,7 +15,7 @@
                 <span id="available-points">{{ $character->getAvailablePoints() }}</span> 
             </div>
             <div class="mt-4" style="display: flex; justify-content: flex-end;">
-                <button type="submit" id="submit-button" class="btn btn-primary">Повышение уровня</button>
+                <button type="submit" id="submit-button" class="btn btn-primary">Подтвердить</button>
             </div>  
         </div>
 
