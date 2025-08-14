@@ -1,4 +1,5 @@
 @extends('frontend.layout.layout')
+@section('title', 'Игровая')
 
 <meta name="base-url" content="{{ url('/') }}/">
 
