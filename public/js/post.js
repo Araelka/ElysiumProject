@@ -460,6 +460,7 @@ async function addPostToDOM(postData) {
         const csrfToken = getCsrfToken();
         const postElement = createPostElement(postData, permissions, baseUrl, csrfToken);
         // markPostAsRead(postData.id);
+
         
         postsContainer.insertAdjacentElement('afterbegin', postElement);
         
@@ -474,6 +475,7 @@ async function addPostToDOM(postData) {
                 }
             }
         }
+
 
         if (isInitialLoad || postsContainer.scrollTop >= -150) {
             postsContainer.scrollTo({

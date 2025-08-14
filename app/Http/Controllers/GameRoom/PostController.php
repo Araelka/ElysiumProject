@@ -232,7 +232,6 @@ class PostController extends Controller
             ],
             'created_at' => $post->created_at->isoFormat('HH:mm DD.MM.YYYY'),
             'updated_at' => $post->updated_at->isoFormat('HH:mm DD.MM.YYYY'),
-            'isRead' => true,
         ];
 
         if ($validated['parent_post_id']) {
