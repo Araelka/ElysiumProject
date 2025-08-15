@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{{ asset('css/header.css') }}">
 <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 <link rel="preload" href="/images/disco-background.jpg" as="image">
+<script src="{{ asset('js/script.js') }}"></script>
 </head>
 <body>
     @include('frontend.layout.header')

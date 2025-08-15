@@ -1,3 +1,72 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const pusherKey = 'e9b501d88e4c02269a2c'; 
+    const pusherCluster = 'ap1'; 
+
+    const pusherInstance = new Pusher(pusherKey, {
+        cluster: pusherCluster,
+        forceTLS: false, 
+    });
+
+    window.globalPusherInstance = pusherInstance;    
+
+
+    const currentUserId = window.currentUserId;
+
+    if (currentUserId) {
+        window.isTabActiveGlobal = !document.hidden;
+        window.unreadNotificationCountGlobal = 0;
+        window.originalTitleGlobal = document.title;
+
+        window.updateTitleWithUnreadCountGlobal = function() {
+            if (window.unreadNotificationCountGlobal > 0) {
+                // document.title = `(${window.unreadNotificationCountGlobal}) ${window.originalTitleGlobal}`;
+                document.title = `Написан новый пост`
+            } else {
+                document.title = window.originalTitleGlobal;
+            }
+        };
+
+        window.handleVisibilityChangeGlobal = function() {
+            if (document.hidden) {
+                window.isTabActiveGlobal = false;
+                console.log("[Global Script] Вкладка стала НЕАКТИВНОЙ");
+            } else {
+                window.isTabActiveGlobal = true;
+                console.log("[Global Script] Вкладка стала АКТИВНОЙ");
+                if (window.unreadNotificationCountGlobal > 0) {
+                    console.log("[Global Script] Сбрасываем счетчик уведомлений.");
+                    window.unreadNotificationCountGlobal = 0;
+                    window.updateTitleWithUnreadCountGlobal();
+                }
+            }
+        };
+
+        window.handleGlobalNewPostNotification = function(postData) {
+            console.log(`[Global Script] Обработка глобального уведомления о новом посте. isTabActiveGlobal=${window.isTabActiveGlobal}, document.hidden=${document.hidden}`);
+            if (document.hidden || !window.isTabActiveGlobal) {
+                console.log("[Global Script] Вкладка неактивна. Увеличиваем счетчик уведомлений.");
+                window.unreadNotificationCountGlobal++;
+                window.updateTitleWithUnreadCountGlobal();
+                // Если хотите мигание, добавьте логику здесь
+            }
+        };
+
+        const globalNotificationChannel = window.globalPusherInstance.subscribe('notifications');
+
+        globalNotificationChannel.bind('NewPostNotification', function (data) {
+            const postData = data.postData || data; 
+            
+            
+            console.log(`[Global Script] Получено NewPostNotification на канале 'notifications':`, postData);
+            window.handleGlobalNewPostNotification(postData);
+        });
+
+        document.addEventListener('visibilitychange', window.handleVisibilityChangeGlobal);
+        
+    } 
+    
+});
+
 //Скрипт-обработчик меню
 document.addEventListener('DOMContentLoaded', () => {
     const mobileMenu = document.getElementById('mobile-menu');

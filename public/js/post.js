@@ -18,20 +18,17 @@ let currentUnreadSeparator = null;
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    const pusherKey = 'e9b501d88e4c02269a2c'; 
-    const pusherCluster = 'ap1'; 
     const postText = document.getElementById('post-text');
     const submitButton = document.getElementById('submit-post');
 
     const textarea = postText;
 
-    const pusher = new Pusher(pusherKey, {
-        cluster: pusherCluster,
-        forceTLS: false, 
-    });
+    let channel;
 
+    if (window.globalPusherInstance){
+        channel = window.globalPusherInstance.subscribe('posts');
+    }
 
-    const channel = pusher.subscribe('posts');
 
     channel.bind('PostEvent', function (data) {
         const { action, postData } = data;

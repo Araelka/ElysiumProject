@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\GameRoom;
 
+use App\Events\NewPostNotification;
 use App\Events\PostEvent;
 use App\Events\PostReadEvent;
 use App\Http\Controllers\Controller;
@@ -264,6 +265,8 @@ class PostController extends Controller
         }
     
         event(new PostEvent('create', $postData));
+
+        event(new NewPostNotification($postData));
 
         return response()->json(['success' => 200]);
         

@@ -9,7 +9,9 @@
         <ul class="navbar__menu" id="main-menu" role="menu" aria-hidden="true">
             <li><a href="{{ route('homePage') }}" class="navbar__link">Главная</a></li>
             @if (auth()->check() && auth()->user()->isPlayer())
-                <li><a href="{{ route('gameroom.index') }}" class="navbar__link">Игровая</a></li>
+                <li><a href="{{ route('gameroom.index') }}" class="navbar__link">Игровая
+                    <span>12</span>    
+                </a></li>
             @endif
             <li><a href="{{ route('character.publicIndex') }}" class="navbar__link">Персонажи</a></li>
             <li><a href="{{ route('wiki.index') }}"  class="navbar__link">Вики</a></li>

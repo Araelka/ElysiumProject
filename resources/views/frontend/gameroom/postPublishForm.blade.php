@@ -59,6 +59,5 @@
 
 <script>
     window.currentLocationId = {{ $selectedLocation->id ?? 'null' }};
-    window.currentUserId = {{ Auth::user()->id ?? 'null' }};
 </script>
 
