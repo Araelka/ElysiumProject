@@ -15,6 +15,8 @@ const pendingRequests = new Map();
 let currentPostId = null;
 let currentUnreadSeparator = null;
 
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const pusherKey = 'e9b501d88e4c02269a2c'; 
     const pusherCluster = 'ap1'; 
@@ -48,26 +50,26 @@ document.addEventListener('DOMContentLoaded', function () {
     channel.bind('PostRead', function (data) {
         const { postId, readerUserId, readerCharacterName } = data;
         const currentUserId = window.currentUserId;    
-            
 
-        if (currentUserId && parseInt(readerUserId, 10) !== parseInt(currentUserId, 10)) {
-            const postElement = document.getElementById(`post-${postId}`);
+        // if (currentUserId && parseInt(readerUserId, 10) !== parseInt(currentUserId, 10)) {            
+            const postElement = document.getElementById(`post-${postId}`)
+            
 
             if (postElement) {
                 const readIndicatorsContainer = postElement.querySelector('.read-post');
 
                 if (readIndicatorsContainer) {
-                    let readByOthersIndicator = readIndicatorsContainer.querySelector('.read-by-others');
-                    if (!readByOthersIndicator) {
-                        readByOthersIndicator = document.createElement('div');
-                        readByOthersIndicator.className = 'read-indicator read-by-others';
-                        readByOthersIndicator.title = `Прочитано другими`;
-                        readByOthersIndicator.innerHTML = '&#10003;';
-                        readIndicatorsContainer.appendChild(readByOthersIndicator); 
-                    }
-                }
+                    let readByOthersIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                    if (readByOthersIndicator) {                        
+                        // readByOthersIndicator = document.createElement('div');
+                        // readByOthersIndicator.className = 'read-indicator read-by-me';
+                        // readByOthersIndicator.title = `Прочитано другими`;
+                        readByOthersIndicator.innerHTML = 'Прочитано';
+                        // readIndicatorsContainer.prepend(readByOthersIndicator); 
+                    } 
+                } 
             }
-        }
+        // } 
     });
 
     postText.addEventListener('keydown', function (event) {
@@ -266,7 +268,7 @@ async function fetchPermissions(id) {
         return pendingRequests.get(idStr);
     }
 
-    const requestPromise = fetch(`/game-room/api/posts/${id}/permissions`)
+    const requestPromise = fetch(`/game-room/posts/${id}/permissions`)
         .then(response => {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return response.json();
@@ -364,14 +366,19 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
 
     let readIndicatorsHtml = '';
 
-    if (postData.isReadByOthers) {
-        readIndicatorsHtml += `<div class="read-indicator read-by-others" title="Прочитано другими">&#10003;</div>`;
+    if (postData.isRead && !postData.isReadByOthers) {
+        readIndicatorsHtml = `<div class="read-indicator read-by-me" title="Прочитано вами">Доставлено</div>`;
+    }
+    
+    if (postData.isReadByOthers && !postData.isRead) {
+        readIndicatorsHtml = `<div class="read-indicator read-by-me" title="Прочитано другими">Не прочитано</div>`;
     }
 
-    if (postData.isRead) {
-        readIndicatorsHtml += `<div class="read-indicator read-by-me" title="Прочитано вами">&#10003;</div>`;
+    if (postData.isReadByOthers && postData.isRead) {
+        readIndicatorsHtml = `<div class="read-indicator read-by-me" title="Прочитано другими">Прочитано</div>`;
     }
 
+    
     let dateHtml = '';
     if (postData.created_at != postData.updated_at) {
         dateHtml = `${postData.updated_at} (изм)`;
@@ -459,8 +466,43 @@ async function addPostToDOM(postData) {
         const baseUrl = getBaseUrl();
         const csrfToken = getCsrfToken();
         const postElement = createPostElement(postData, permissions, baseUrl, csrfToken);
-        // markPostAsRead(postData.id);
+        const currentUserId = window.currentUserId;
 
+                
+        
+        if (currentUserId && postData.character && postData.character.userId &&
+            parseInt(currentUserId, 10) === parseInt(postData.character.userId, 10)) {
+
+            if (!postData.isRead) {
+                postElement.classList.remove('post-unread');
+                const readIndicatorsContainer = postElement.querySelector('.read-post');
+                if (readIndicatorsContainer) {
+                    let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                    if (!readByMeIndicator){
+                        readByMeIndicator = document.createElement('div');
+                        readByMeIndicator.className = 'read-indicator read-by-me';
+                        readByMeIndicator.title = 'Прочитано вами';
+                        readByMeIndicator.innerHTML = 'Доставлено';
+                        readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                    }
+                }
+            } 
+        } else if (currentUserId && postData.character && postData.character.userId &&
+            parseInt(currentUserId, 10) !== parseInt(postData.character.userId, 10)){
+            if (!postData.isRead) {
+                const readIndicatorsContainer = postElement.querySelector('.read-post');
+                if (readIndicatorsContainer) {
+                    let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                    if (!readByMeIndicator){
+                        readByMeIndicator = document.createElement('div');
+                        readByMeIndicator.className = 'read-indicator read-by-me';
+                        readByMeIndicator.title = 'Прочитано вами';
+                        readByMeIndicator.innerHTML = 'Не прочитано';
+                        readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                    }
+                }
+            } 
+        }
         
         postsContainer.insertAdjacentElement('afterbegin', postElement);
         
@@ -471,7 +513,6 @@ async function addPostToDOM(postData) {
                     currentUnreadSeparator.className = 'unread-posts-separator';
                     currentUnreadSeparator.innerHTML = '<span>Непрочитанные сообщения</span>';
                     postsContainer.insertBefore(currentUnreadSeparator, postElement.nextSibling); 
-                    console.log("Создан новый разделитель для новых непрочитанных постов.");
                 }
             }
         }
@@ -759,20 +800,16 @@ async function markPostAsRead(postId) {
         });
 
         if (!response.ok) {
-            console.warn(`Ошибка при отметке поста ${postId} как прочитанного:`, response.status);
             return false;
         }
 
         const data = await response.json();
         if (data.success) {
-            console.log(`Пост ${postId} отмечен как прочитанный.`);
             return true;
         } else {
-            console.warn(`Ошибка при отметке поста ${postId} как прочитанного (сервер):`, data);
             return false;
         }
     } catch (error) {
-        console.error(`Ошибка сети при отметке поста ${postId} как прочитанного:`, error);
         return false;
     }
 }
@@ -800,17 +837,17 @@ async function checkUnreadPostsVisibility() {
                 const { postId, postElement } = markAsReadPromises[i];
                 const success = results[i];
                 if (success) {
-                    const readIndicatorsContainer = postElement.querySelector('.read-post');
-                    if (readIndicatorsContainer) {
-                        let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
-                        if (!readByMeIndicator){
-                            readByMeIndicator = document.createElement('div');
-                            readByMeIndicator.className = 'read-indicator read-by-me';
-                            readByMeIndicator.title = 'Прочитано вами';
-                            readByMeIndicator.innerHTML = '&#10003;';
-                            readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
-                        }
-                    }
+                    // const readIndicatorsContainer = postElement.querySelector('.read-post');
+                    // if (readIndicatorsContainer) {
+                    //     let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                    //     if (!readByMeIndicator){
+                    //         readByMeIndicator = document.createElement('div');
+                    //         readByMeIndicator.className = 'read-indicator read-by-me';
+                    //         readByMeIndicator.title = 'Прочитано вами';
+                    //         readByMeIndicator.innerHTML = '&#10003;';
+                    //         readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                    //     }
+                    // }
                     postElement.classList.remove('post-unread');
                     anyMarkedAsRead = true;
                 }
@@ -836,7 +873,7 @@ function initUnreadPostsTracking() {
     postsContainer.addEventListener('scroll', () => {        
         clearTimeout(throttleTimer);
         throttleTimer = setTimeout(() => {
-            const isAtBottom = Math.abs(postsContainer.scrollTop) < 150;
+            const isAtBottom = Math.abs(postsContainer.scrollTop) === 0;
 
             if (isAtBottom && currentUnreadSeparator) {
                 currentUnreadSeparator.remove();
@@ -1062,13 +1099,62 @@ function selectCharacter(item) {
     }
 }
 
-function scrollBottomPostsContainer() {
+async function scrollBottomPostsContainer() {
     const postsContainer = document.getElementById('posts-container');
     if (postsContainer) {
+
         postsContainer.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
+
+        const unreadPosts = postsContainer.querySelectorAll('.post-unread');
+        
+        const markAsReadPromises = [];
+
+        for (const post of unreadPosts) {
+            const postId = post.dataset.postId;
+            if (postId) {
+                markAsReadPromises.push(markPostAsRead(postId)); 
+            }
+        }
+        
+        if (markAsReadPromises.length > 0) {
+            try {
+                const results = await Promise.all(markAsReadPromises);
+
+                let anyMarkedAsRead = false;
+
+                results.forEach((success, index) => {
+                    if (success) {
+                        const postElement = unreadPosts[index]; 
+                        if (postElement) { 
+                             postElement.classList.remove('post-unread');
+                             anyMarkedAsRead = true;
+                             
+                             const readIndicatorsContainer = postElement.querySelector('.read-post');
+                             if (readIndicatorsContainer) {
+                                 let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                                 if (!readByMeIndicator){
+                                     readByMeIndicator = document.createElement('div');
+                                     readByMeIndicator.className = 'read-indicator read-by-me';
+                                     readByMeIndicator.title = 'Прочитано вами';
+                                     readByMeIndicator.innerHTML = '&#10003;';
+                                     readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                                 }
+                             }
+                        }
+                    }
+                });
+                
+                if (anyMarkedAsRead) {
+                    fetchUnreadCounts();
+                }
+            } catch (error) {
+                console.error("Ошибка при обработке результатов отметки постов как прочитанных:", error);
+            }
+        }
+
     }
 }
 

@@ -83,10 +83,11 @@ class PostController extends Controller
         $postsQuery = Post::where('location_id', $selectedLocationId);
 
         if (!empty($searchQuery)) {
-            $postsQuery->where('content', 'like', '%' . $searchQuery . '%');
-
-            $postsQuery->orWhereHas('character', function($characterQuery) use ($searchQuery){
-                $characterQuery->whereRaw('CONCAT(LOWER(firstName), \' \', LOWER(secondName)) LIKE ?', ['%' . mb_strtolower($searchQuery) . '%']);
+            $postsQuery->where(function($searchQueryClosure) use ($searchQuery) {
+                $searchQueryClosure->where('content', 'like', '%' . $searchQuery . '%')
+                    ->orWhereHas('character', function($characterQuery) use ($searchQuery) {
+                        $characterQuery->whereRaw('CONCAT(LOWER(firstName), \' \', LOWER(secondName)) LIKE ?', ['%' . mb_strtolower($searchQuery) . '%']);
+                    });
             });
         }
 
@@ -130,7 +131,6 @@ class PostController extends Controller
         }
 
         $postData = $posts->map(function ($post) use($readPostIds, $readByOthersMap) {
-            $isPostAuthor = ($post->character->user_id == auth()->user()->id);
             return [
                 'id' => $post->id,
                 'location_id' => $post->location_id,
@@ -163,7 +163,6 @@ class PostController extends Controller
                 'diffInHours' => $this->diffInHours($post),
                 'isRead' => in_array($post->id, $readPostIds),
                 'isReadByOthers' => isset($readByOthersMap[$post->id]),
-                'isAuthor' => $isPostAuthor,
             ];
         });
 
@@ -198,9 +197,13 @@ class PostController extends Controller
         ]);
 
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id){
-            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
         }
 
+        
+        if (!Character::where('uuid', $validated['character_uuid'])->first()->isApproved()){
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
+        }
 
         $characterId = Character::where('uuid', $validated['character_uuid'])->first()->id;
 
@@ -215,6 +218,13 @@ class PostController extends Controller
             'character_id' => $characterId,
             'location_id' => $validated['location_id']
         ]);
+
+        PostRead::firstOrCreate([
+            'user_id' => auth()->user()->id, 
+            'post_id' => $post->id
+        ]);
+
+        event(new PostReadEvent($post->id, auth()->user()->id));
 
         $postData = [
             'id' => $post->id,
@@ -268,7 +278,7 @@ class PostController extends Controller
     public function destroy ($id){
 
         if (auth()->user()->id != Post::findOrFail($id)->character()->first()->user_id && !auth()->user()->isModerator()) {
-            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
         }
 
         $post = Post::findOrFail($id);
@@ -295,7 +305,7 @@ class PostController extends Controller
         
         if (auth()->user()->id != Character::where('uuid', $request->input('character_uuid'))->first()->user_id 
         || $request->input('character_uuid') != Post::findOrFail($request->input('post_id'))->character()->first()->uuid){
-            return redirect()->back()->withError('У вас нет прав на совершение данного действия');
+            return response()->json(['error' => 'У вас нет прав на совершение данного действия'], 403);
         }
 
         $validated = $request->validate(
