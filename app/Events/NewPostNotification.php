@@ -9,18 +9,19 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class NewPostNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $postData;
+    public $authorUserId;
     /**
      * Create a new event instance.
      */
-    public function __construct($postData)
+    public function __construct($authorUserId)
     {
-        $this->postData = $postData;
+        $this->authorUserId = $authorUserId;
     }
 
     /**
@@ -40,7 +41,7 @@ class NewPostNotification implements ShouldBroadcast
 
     public function broadcastWith(){   
         return [
-            'postData' => $this->postData,
+            'postData' => $this->authorUserId,
         ];
     }
 }

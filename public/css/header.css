@@ -226,6 +226,14 @@ body {
     cursor: pointer;
 }
 
+.notifications-posts {
+    border-radius: 12px;
+    color: #1a1a40;
+    font-size: 14px;
+    border: 2px solid #f4d03f;
+    background-color: #f4d03f;
+}
+
 
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {

@@ -266,6 +266,12 @@ class PostController extends Controller
     
         event(new PostEvent('create', $postData));
 
+        $postData = [
+            'locationId' => $post->location_id,
+            'authorUserId' => $post->character->user_id
+        ];
+
+
         event(new NewPostNotification($postData));
 
         return response()->json(['success' => 200]);

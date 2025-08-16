@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
         window.unreadNotificationCountGlobal = 0;
         window.originalTitleGlobal = document.title;
 
+        const notificationsPosts = document.getElementById('notifications-posts');
+
         window.updateTitleWithUnreadCountGlobal = function() {
             if (window.unreadNotificationCountGlobal > 0) {
                 // document.title = `(${window.unreadNotificationCountGlobal}) ${window.originalTitleGlobal}`;
@@ -29,36 +31,43 @@ document.addEventListener('DOMContentLoaded', function () {
         window.handleVisibilityChangeGlobal = function() {
             if (document.hidden) {
                 window.isTabActiveGlobal = false;
-                console.log("[Global Script] Вкладка стала НЕАКТИВНОЙ");
             } else {
                 window.isTabActiveGlobal = true;
-                console.log("[Global Script] Вкладка стала АКТИВНОЙ");
                 if (window.unreadNotificationCountGlobal > 0) {
-                    console.log("[Global Script] Сбрасываем счетчик уведомлений.");
                     window.unreadNotificationCountGlobal = 0;
                     window.updateTitleWithUnreadCountGlobal();
                 }
             }
         };
 
-        window.handleGlobalNewPostNotification = function(postData) {
-            console.log(`[Global Script] Обработка глобального уведомления о новом посте. isTabActiveGlobal=${window.isTabActiveGlobal}, document.hidden=${document.hidden}`);
+        window.handleGlobalNewPostNotification = function(userId) {
+            const authorUserId = userId;
+            const currentUserId = window.currentUserId;
+
+            const currentUserIdInt = currentUserId ? parseInt(currentUserId, 10) : null;
+            const authorUserIdInt = authorUserId ? parseInt(authorUserId, 10) : null;
+
+            if (currentUserIdInt === authorUserIdInt) {
+                return; 
+            }
+
             if (document.hidden || !window.isTabActiveGlobal) {
-                console.log("[Global Script] Вкладка неактивна. Увеличиваем счетчик уведомлений.");
                 window.unreadNotificationCountGlobal++;
                 window.updateTitleWithUnreadCountGlobal();
-                // Если хотите мигание, добавьте логику здесь
             }
+            
+            window.unreadNotificationCountGlobal++;
+            notificationsPosts.style.display = 'block';
+            notificationsPosts.innerText = window.unreadNotificationCountGlobal;
+
         };
 
         const globalNotificationChannel = window.globalPusherInstance.subscribe('notifications');
 
         globalNotificationChannel.bind('NewPostNotification', function (data) {
-            const postData = data.postData || data; 
-            
-            
-            console.log(`[Global Script] Получено NewPostNotification на канале 'notifications':`, postData);
-            window.handleGlobalNewPostNotification(postData);
+            const authorUserId = data.postData.authorUserId || data;   
+        
+            window.handleGlobalNewPostNotification(authorUserId);
         });
 
         document.addEventListener('visibilitychange', window.handleVisibilityChangeGlobal);
