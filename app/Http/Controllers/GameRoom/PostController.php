@@ -56,6 +56,7 @@ class PostController extends Controller
         $locations = Location::all();
 
         $locationIds = $locations->pluck('id')->toArray();
+        
         $unreadCounts = $this->getUnreadCountsForLocations($locationIds, auth()->user()->id);
 
         $selectedLocationId = $request->query('location_id');
@@ -395,19 +396,36 @@ class PostController extends Controller
             return [];
         }
 
-        $unreadCounts = Post::whereIn('location_id', $locationIds)
+        $unreadCountsQuery = Post::whereIn('posts.location_id', $locationIds)
             ->leftJoin('post_reads as pr', function ($join) use ($userId) {
                 $join->on('posts.id', '=', 'pr.post_id')
                     ->where('pr.user_id', $userId);
             })
-            ->whereNull('pr.post_id') 
-            ->selectRaw('location_id, count(*) as unread_count')
-            ->groupBy('location_id')
+            ->whereNull('pr.post_id');
+
+           
+         $unreadCounts = (clone $unreadCountsQuery)
+            ->selectRaw('posts.location_id, count(*) as unread_count')
+            ->groupBy('posts.location_id')
             ->pluck('unread_count', 'location_id')
             ->toArray();
+
+        $unreadRepliesCounts = (clone $unreadCountsQuery)
+            ->join('posts as parent_posts', 'posts.parent_post_id', '=', 'parent_posts.id')
+            ->join('characters as parent_characters', 'parent_posts.character_id', '=', 'parent_characters.id')
+            ->where('parent_characters.user_id', $userId) 
+            ->selectRaw('posts.location_id, count(*) as unread_replies_count')
+            ->groupBy('posts.location_id')
+            ->pluck('unread_replies_count', 'location_id')
+            ->toArray();
+
         $result = [];
+
         foreach ($locationIds as $locId) {
-            $result[$locId] = $unreadCounts[$locId] ?? 0;
+            $result[$locId] = [
+                'total' => $unreadCounts[$locId] ?? 0,
+                'replies_to_me' => $unreadRepliesCounts[$locId] ?? 0
+            ];
         }
 
         return $result;

@@ -23,8 +23,15 @@
                             style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
                              {{ $location->name }}
 
-                              @if (isset($unreadCounts[$location->id]) && $unreadCounts[$location->id] > 0)
-                                <span class="unread-count-badge">{{ $unreadCounts[$location->id] }}</span>
+                            @if (isset($unreadCounts[$location->id]) && $unreadCounts[$location->id]['total'] > 0)
+                            <div class="badge-container">
+                                    @if ($unreadCounts[$location->id]['replies_to_me'] > 0)
+                                    <div class="replies-to-me-count-badge">↳</div>
+                                    @endif
+                                <div class="unread-count-badge">
+                                    {{ $unreadCounts[$location->id]['total'] }}
+                                </div>
+                            </div>
                             @endif
                             </a>
                         </li>

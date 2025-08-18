@@ -556,3 +556,10 @@
     white-space: nowrap;
     padding: 0 10px;
 }
+
+.badge-container {
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    gap: 5px;
+}

@@ -870,23 +870,47 @@ function initUnreadPostsTracking() {
 
 
 
-function updateLocationUnreadCounts(countsData) {
+function updateLocationUnreadCounts(countsData) {    
     for (const [locIdStr, count] of Object.entries(countsData)) {
+        
         const locId = parseInt(locIdStr, 10);
         const link = document.querySelector(`.topic-link[href*="location_id=${locId}"]`);
         if (link) {
-            let badge = link.querySelector('.unread-count-badge');        
-                            
-            if (count > 0) {
+            let badge = link.querySelector('.unread-count-badge');    
+            let repliesBadge = link.querySelector('.replies-to-me-count-badge');   
+            let badgeContainer = link.querySelector('.badge-container');  
+            
+            if (!badgeContainer) {
+                badgeContainer = document.createElement('div');
+                badgeContainer.className = 'badge-container';
+                link.appendChild(badgeContainer);
+            }
+
+
+            if (count['total'] > 0) {
                 if (!badge) {
-                    badge = document.createElement('span');
+                    badge = document.createElement('div');
                     badge.className = 'unread-count-badge';
-                    link.appendChild(badge);
+                    badgeContainer.append(badge);
                 }
-                if (badge) badge.textContent = count;
+                if (badge) {
+                    badge.textContent = count['total'];
+                }
+                if (count['replies_to_me'] > 0){                    
+                    if (!repliesBadge){                        
+                        repliesBadge = document.createElement('div');                        
+                        repliesBadge.className = 'replies-to-me-count-badge';
+                        repliesBadge.textContent = '↳';
+                        badgeContainer.prepend(repliesBadge);
+                        
+                    }
+                } 
             } else if (badge) {
                 badge.remove();
-            }
+                if (repliesBadge) {
+                    repliesBadge.remove();
+                }
+            } 
         }
     }
 }
@@ -905,11 +929,12 @@ async function fetchUnreadCounts() {
         const response = await fetch(`/game-room/unread-counts?location_ids[]=${locationIds.join('&location_ids[]=')}`);
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+        const data = await response.json();        
+        
                 
         if (data.counts) {       
             try {                
-                if (data.counts[currentLocationId] == 0) {
+                if (data.counts[currentLocationId]['total'] == 0) {
                     window.markLocationNotificationsAsRead(currentLocationId);
                 }
             } catch {

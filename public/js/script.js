@@ -17,10 +17,58 @@ document.addEventListener('DOMContentLoaded', function () {
         window.originalTitleGlobal = document.title;
         const notificationsPosts = document.getElementById('notifications-posts');
 
+        let blinkInterval = null;
+        let blinkCounter = 0;
+        const maxBlinksForActiveTab = 3;
+        const blinkIntervalMs = 1000;
+        let hasBlinkedForCurrentNotifications = true; 
+
+        function startTitleBlinking(isTabActive){
+            if (blinkInterval) {
+                return
+            }
+
+            blinkInterval = 0;
+            const unreadChatsCount = unreadLocationIdsSet.size;
+            const blinkText = `Новый пост!`;
+
+            const blinkFunction = () => {
+                if (isTabActive) {
+                    if (blinkCounter < maxBlinksForActiveTab * 2) {
+                        if (blinkCounter % 2 === 0){
+                            document.title = blinkText;
+                        } else {
+                            document.title = window.originalTitleGlobal;
+                        }
+                        blinkCounter++;
+                        
+                    } else {
+                        stopTitleBlinking();
+                        hasBlinkedForCurrentNotifications = true;                     
+                        window.updateUnreadChatsDisplay();
+                    }
+                } else {
+                    if (document.title === blinkText) {
+                        document.title = window.originalTitleGlobal;
+                    } else {
+                        document.title = blinkText;
+                    }
+                }
+            };
+
+            blinkInterval = setInterval(blinkFunction, blinkIntervalMs);
+        }
+
+        function stopTitleBlinking() {
+            if (blinkInterval) {
+                clearInterval(blinkInterval);
+                blinkInterval = null;
+                blinkCounter = 0;
+            }
+        }
+
         let unreadLocationIdsSet = new Set();
         
-
-
         const savedUnreadLocations = localStorage.getItem('unreadLocationIds'); 
         if (savedUnreadLocations) {
             const parsedLocations = JSON.parse(savedUnreadLocations);
@@ -36,18 +84,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         window.updateUnreadChatsDisplay = function(){
+            stopTitleBlinking();
+            hasBlinkedForCurrentNotifications = false;
+
             const unreadChatsCount = unreadLocationIdsSet.size;
-            
+            document.title = window.originalTitleGlobal;
 
             if (unreadChatsCount > 0) {
-                document.title = `(${unreadChatsCount}) ${window.originalTitleGlobal}`;
+                // document.title = `${unreadChatsCount} новый пост`;
 
                 if (notificationsPosts) {
                     notificationsPosts.style.display = 'block';
                     notificationsPosts.innerText = unreadChatsCount;
                 }
             } else {
-                document.title = window.originalTitleGlobal;
+                // document.title = window.originalTitleGlobal;
 
                 if (notificationsPosts) {
                     notificationsPosts.style.display = 'none';
@@ -74,12 +125,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            if (!unreadLocationIdsSet.has(postLocationId)) {
+            const isNewLocation = !unreadLocationIdsSet.has(postLocationId);
+
+            if (isNewLocation) {
                 unreadLocationIdsSet.add(postLocationId);
                 saveUnreadLocationsToStorage();
-                window.updateUnreadChatsDisplay();
+                stopTitleBlinking();
+                hasBlinkedForCurrentNotifications = false;
+                if(window.isTabActiveGlobal) {
+                    startTitleBlinking(true);
+                } else {
+                    startTitleBlinking(false);
+                }
+                // window.updateUnreadChatsDisplay();
+                if (notificationsPosts) {
+                    notificationsPosts.style.display = 'block';
+                    notificationsPosts.innerText = unreadLocationIdsSet.size;
+                }
             } else {
-                window.updateUnreadChatsDisplay();
+                // window.updateUnreadChatsDisplay();
+                if (notificationsPosts) {
+                    notificationsPosts.innerText = unreadLocationIdsSet.size;
+                }
             }
         };
 
@@ -95,7 +162,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.isTabActiveGlobal =false;
             } else {
                 window.isTabActiveGlobal = true;
+                stopTitleBlinking();
                 window.updateUnreadChatsDisplay();
+                hasBlinkedForActiveOnLastNotification = false;
             }
         });
         
@@ -103,7 +172,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const locIdInt = parseInt(locationId, 10);
             if (unreadLocationIdsSet.has(locIdInt)){
                 unreadLocationIdsSet.delete(locIdInt);
-                saveUnreadLocationsToStorage();                
+                saveUnreadLocationsToStorage();          
+                hasBlinkedForCurrentNotifications = false;
+                stopTitleBlinking();
                 window.updateUnreadChatsDisplay();
             }
         }
