@@ -40,19 +40,19 @@
                         <h3>{{ $selectedLocation->name }}</h3>
                     </div>
                     <div>
-                        <form action="{{ request()->fullUrlWithQuery(['search' => '']) }}" method="GET" id="search-form">
+                        <form action="{{ request()->fullUrlWithQuery(['search' => '']) }}" method="GET" id="post-search-form">
                             <input type="hidden" name="filter" class="search-input">
                             <div class="search-input-wrapper">
                                 <input 
                                     type="text" 
                                     name="search" 
-                                    id="search-input" 
+                                    id="post-search-input" 
                                     value="{{ request('search') }}" 
                                     placeholder="Поиск..." 
                                     class="search-input"
                                 >
 
-                                <button type="button" id="clear-search" class="clear-search-button" style="display: none">×</button>
+                                <button type="button" id="post-clear-search" class="clear-search-button" style="display: none">×</button>
                             </div>
                             <button type="submit" class="search-button">Найти</button>
                         </form>

@@ -14,64 +14,99 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (currentUserId) {
         window.isTabActiveGlobal = !document.hidden;
-        window.unreadNotificationCountGlobal = 0;
         window.originalTitleGlobal = document.title;
-
         const notificationsPosts = document.getElementById('notifications-posts');
 
-        window.updateTitleWithUnreadCountGlobal = function() {
-            if (window.unreadNotificationCountGlobal > 0) {
-                // document.title = `(${window.unreadNotificationCountGlobal}) ${window.originalTitleGlobal}`;
-                document.title = `Написан новый пост`
+        let unreadLocationIdsSet = new Set();
+        
+
+
+        const savedUnreadLocations = localStorage.getItem('unreadLocationIds'); 
+        if (savedUnreadLocations) {
+            const parsedLocations = JSON.parse(savedUnreadLocations);
+            if (Array.isArray(parsedLocations)) {
+                unreadLocationIdsSet = new Set(parsedLocations);
+            } 
+        }
+
+        
+
+        function saveUnreadLocationsToStorage(){
+            localStorage.setItem('unreadLocationIds', JSON.stringify(Array.from(unreadLocationIdsSet)));
+        }
+
+        window.updateUnreadChatsDisplay = function(){
+            const unreadChatsCount = unreadLocationIdsSet.size;
+            
+
+            if (unreadChatsCount > 0) {
+                document.title = `(${unreadChatsCount}) ${window.originalTitleGlobal}`;
+
+                if (notificationsPosts) {
+                    notificationsPosts.style.display = 'block';
+                    notificationsPosts.innerText = unreadChatsCount;
+                }
             } else {
                 document.title = window.originalTitleGlobal;
-            }
-        };
 
-        window.handleVisibilityChangeGlobal = function() {
-            if (document.hidden) {
-                window.isTabActiveGlobal = false;
-            } else {
-                window.isTabActiveGlobal = true;
-                if (window.unreadNotificationCountGlobal > 0) {
-                    window.unreadNotificationCountGlobal = 0;
-                    window.updateTitleWithUnreadCountGlobal();
+                if (notificationsPosts) {
+                    notificationsPosts.style.display = 'none';
+                    notificationsPosts.innerText = '';
                 }
             }
         };
 
-        window.handleGlobalNewPostNotification = function(userId) {
-            const authorUserId = userId;
-            const currentUserId = window.currentUserId;
+        window.updateUnreadChatsDisplay();
+
+
+        window.handleGlobalNewPostNotification = function(data) {
+            const authorUserId = data.authorUserId;
 
             const currentUserIdInt = currentUserId ? parseInt(currentUserId, 10) : null;
             const authorUserIdInt = authorUserId ? parseInt(authorUserId, 10) : null;
+            const postLocationId = data.locationId ? parseInt(data.locationId, 10) : null;
 
             if (currentUserIdInt === authorUserIdInt) {
-                return; 
+                return;
             }
 
-            if (document.hidden || !window.isTabActiveGlobal) {
-                window.unreadNotificationCountGlobal++;
-                window.updateTitleWithUnreadCountGlobal();
+            if (!postLocationId) {
+                return;
             }
-            
-            window.unreadNotificationCountGlobal++;
-            notificationsPosts.style.display = 'block';
-            notificationsPosts.innerText = window.unreadNotificationCountGlobal;
 
+            if (!unreadLocationIdsSet.has(postLocationId)) {
+                unreadLocationIdsSet.add(postLocationId);
+                saveUnreadLocationsToStorage();
+                window.updateUnreadChatsDisplay();
+            } else {
+                window.updateUnreadChatsDisplay();
+            }
         };
 
         const globalNotificationChannel = window.globalPusherInstance.subscribe('notifications');
 
         globalNotificationChannel.bind('NewPostNotification', function (data) {
-            const authorUserId = data.postData.authorUserId || data;   
-        
-            window.handleGlobalNewPostNotification(authorUserId);
+            const postData = data.postData;
+            window.handleGlobalNewPostNotification(postData);
         });
 
-        document.addEventListener('visibilitychange', window.handleVisibilityChangeGlobal);
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                window.isTabActiveGlobal =false;
+            } else {
+                window.isTabActiveGlobal = true;
+                window.updateUnreadChatsDisplay();
+            }
+        });
         
+        window.markLocationNotificationsAsRead = function(locationId) {
+            const locIdInt = parseInt(locationId, 10);
+            if (unreadLocationIdsSet.has(locIdInt)){
+                unreadLocationIdsSet.delete(locIdInt);
+                saveUnreadLocationsToStorage();                
+                window.updateUnreadChatsDisplay();
+            }
+        }
     } 
     
 });
@@ -183,8 +218,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ОБРАБОТЧИК ПОИСКА
 document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.querySelector('.search-input');
-    const clearSearchButton = document.querySelector('.clear-search-button');
+    // const searchInput = document.querySelector('.search-input');
+    // const clearSearchButton = document.querySelector('.clear-search-button');
+
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const clearSearchButton = document.getElementById('clear-search');
 
     // Обработчик для нажатия Enter в поле поиска
     searchInput.addEventListener('keydown', function (event) {

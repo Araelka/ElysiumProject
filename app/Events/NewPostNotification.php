@@ -15,13 +15,13 @@ class NewPostNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $authorUserId;
+    public $postData;
     /**
      * Create a new event instance.
      */
-    public function __construct($authorUserId)
+    public function __construct($postData)
     {
-        $this->authorUserId = $authorUserId;
+        $this->postData = $postData;
     }
 
     /**
@@ -41,7 +41,7 @@ class NewPostNotification implements ShouldBroadcast
 
     public function broadcastWith(){   
         return [
-            'postData' => $this->authorUserId,
+            'postData' => $this->postData,
         ];
     }
 }

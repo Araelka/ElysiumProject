@@ -227,6 +227,7 @@ body {
 }
 
 .notifications-posts {
+    padding: 0px 8px;
     border-radius: 12px;
     color: #1a1a40;
     font-size: 14px;

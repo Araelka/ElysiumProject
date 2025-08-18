@@ -45,10 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     channel.bind('PostRead', function (data) {
-        const { postId, readerUserId, readerCharacterName } = data;
-        const currentUserId = window.currentUserId;    
-
-        // if (currentUserId && parseInt(readerUserId, 10) !== parseInt(currentUserId, 10)) {            
+        const { postId, readerUserId, readerCharacterName } = data;  
+      
             const postElement = document.getElementById(`post-${postId}`)
             
 
@@ -58,15 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (readIndicatorsContainer) {
                     let readByOthersIndicator = readIndicatorsContainer.querySelector('.read-by-me');
                     if (readByOthersIndicator) {                        
-                        // readByOthersIndicator = document.createElement('div');
-                        // readByOthersIndicator.className = 'read-indicator read-by-me';
-                        // readByOthersIndicator.title = `Прочитано другими`;
                         readByOthersIndicator.innerHTML = 'Прочитано';
-                        // readIndicatorsContainer.prepend(readByOthersIndicator); 
                     } 
                 } 
             }
-        // } 
     });
 
     postText.addEventListener('keydown', function (event) {
@@ -121,9 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setTimeout(initUnreadPostsTracking, 1000);
 
-    const searchForm = document.getElementById('search-form');
-    const searchInput = document.getElementById('search-input');
-    const clearSearchButton = document.getElementById('clear-search');
+    const searchForm = document.getElementById('post-search-form');
+    const searchInput = document.getElementById('post-search-input');
+    const clearSearchButton = document.getElementById('post-clear-search');
 
     if (searchForm) {
         searchForm.addEventListener('submit', function (event) {
@@ -801,6 +794,7 @@ async function markPostAsRead(postId) {
         }
 
         const data = await response.json();
+        
         if (data.success) {
             return true;
         } else {
@@ -834,22 +828,11 @@ async function checkUnreadPostsVisibility() {
                 const { postId, postElement } = markAsReadPromises[i];
                 const success = results[i];
                 if (success) {
-                    // const readIndicatorsContainer = postElement.querySelector('.read-post');
-                    // if (readIndicatorsContainer) {
-                    //     let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
-                    //     if (!readByMeIndicator){
-                    //         readByMeIndicator = document.createElement('div');
-                    //         readByMeIndicator.className = 'read-indicator read-by-me';
-                    //         readByMeIndicator.title = 'Прочитано вами';
-                    //         readByMeIndicator.innerHTML = '&#10003;';
-                    //         readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
-                    //     }
-                    // }
                     postElement.classList.remove('post-unread');
                     anyMarkedAsRead = true;
                 }
             }
-            if (anyMarkedAsRead) {
+            if (anyMarkedAsRead) {                
                 fetchUnreadCounts();
             }
         } catch (error) {
@@ -892,7 +875,8 @@ function updateLocationUnreadCounts(countsData) {
         const locId = parseInt(locIdStr, 10);
         const link = document.querySelector(`.topic-link[href*="location_id=${locId}"]`);
         if (link) {
-            let badge = link.querySelector('.unread-count-badge');
+            let badge = link.querySelector('.unread-count-badge');        
+                            
             if (count > 0) {
                 if (!badge) {
                     badge = document.createElement('span');
@@ -914,6 +898,7 @@ async function fetchUnreadCounts() {
         return match ? parseInt(match[1], 10) : null;
     }).filter(id => id !== null);
 
+
     if (locationIds.length === 0) return;
 
     try {
@@ -921,8 +906,16 @@ async function fetchUnreadCounts() {
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
+                
+        if (data.counts) {       
+            try {                
+                if (data.counts[currentLocationId] == 0) {
+                    window.markLocationNotificationsAsRead(currentLocationId);
+                }
+            } catch {
 
-        if (data.counts) {
+            }
+                
             updateLocationUnreadCounts(data.counts);
         }
     } catch (error) {
