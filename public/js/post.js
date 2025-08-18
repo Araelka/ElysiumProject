@@ -902,7 +902,6 @@ function updateLocationUnreadCounts(countsData) {
                         repliesBadge.className = 'replies-to-me-count-badge';
                         repliesBadge.textContent = '↳';
                         badgeContainer.prepend(repliesBadge);
-                        
                     }
                 } 
             } else if (badgeContainer) {
