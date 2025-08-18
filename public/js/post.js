@@ -905,11 +905,8 @@ function updateLocationUnreadCounts(countsData) {
                         
                     }
                 } 
-            } else if (badge) {
-                badge.remove();
-                if (repliesBadge) {
-                    repliesBadge.remove();
-                }
+            } else if (badgeContainer) {
+                badgeContainer.remove();
             } 
         }
     }
