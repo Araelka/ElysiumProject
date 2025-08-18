@@ -2,6 +2,7 @@
     @csrf
 
     <button id="button-bottom" type="button" class="button-bottom" onclick="scrollBottomPostsContainer()">⮟</button>
+    <button id="button-unread-replies" type="button" class="button-bottom" onclick="scrollToUnreadReplies()">⤶</button>
 
     <div style="display: flex; align-items: flex-end;">
         <div class="custom-dropdown">

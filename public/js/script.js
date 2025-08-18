@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             blinkInterval = 0;
             const unreadChatsCount = unreadLocationIdsSet.size;
-            const blinkText = `Новый пост!`;
+            const blinkText = `Новый пост`;
 
             const blinkFunction = () => {
                 if (isTabActive) {
