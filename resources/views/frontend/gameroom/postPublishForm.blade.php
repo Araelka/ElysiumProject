@@ -1,4 +1,4 @@
-<form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST" style="position: relative">
+<form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST" style="position: relative; padding-left: 2px; padding-right: 2px;">
     @csrf
 
     <button id="button-bottom" type="button" class="button-bottom" onclick="handleBottomButton()">

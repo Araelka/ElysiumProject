@@ -18,7 +18,7 @@
                 <h3>Локации</h3>
                 <ul class="topics-list">
                     @foreach ($locations as $location)
-                        <li style="padding-right: 5px"><a href="{{ route('gameroom.index', ['location_id' => $location->id]) }}" 
+                        <li style="padding-right: 2px; padding-left: 2px;"><a href="{{ route('gameroom.index', ['location_id' => $location->id]) }}" 
                             class="topic-link {{ $selectedLocation && $selectedLocation->id == $location->id ? 'active' : '' }}"
                             style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
                             {{ $location->name }}
