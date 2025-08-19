@@ -490,7 +490,7 @@ class AdminController extends Controller
             return redirect()->back();
         }
 
-        $character->user->roles()->sync([5]);
+        $character->user->roles()->sync([6]);
 
         return redirect()->back();
     }

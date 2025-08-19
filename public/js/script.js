@@ -91,15 +91,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.title = window.originalTitleGlobal;
 
             if (unreadChatsCount > 0) {
-                // document.title = `${unreadChatsCount} новый пост`;
-
                 if (notificationsPosts) {
                     notificationsPosts.style.display = 'block';
                     notificationsPosts.innerText = unreadChatsCount;
                 }
             } else {
-                // document.title = window.originalTitleGlobal;
-
                 if (notificationsPosts) {
                     notificationsPosts.style.display = 'none';
                     notificationsPosts.innerText = '';
@@ -137,13 +133,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     startTitleBlinking(false);
                 }
-                // window.updateUnreadChatsDisplay();
                 if (notificationsPosts) {
                     notificationsPosts.style.display = 'block';
                     notificationsPosts.innerText = unreadLocationIdsSet.size;
                 }
             } else {
-                // window.updateUnreadChatsDisplay();
                 if (notificationsPosts) {
                     notificationsPosts.innerText = unreadLocationIdsSet.size;
                 }

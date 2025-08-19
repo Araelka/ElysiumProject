@@ -1009,8 +1009,8 @@ async function loadPosts() {
         } else if (data.posts && data.posts.length === 0 && currentPage === 1) {
             if (postsContainer) {
                 postsContainer.innerHTML = currentSearchQuery ?
-                    '<div class="no-results">По вашему запросу ничего не найдено.</div>' :
-                    '<div class="no-results">Постов пока нет.</div>';
+                    '<div class="no-results">По вашему запросу ничего не найдено</div>' :
+                    '<div class="no-results">Постов пока нет</div>';
             }
             hasMorePosts = false;
             isInitialLoad = false; 
