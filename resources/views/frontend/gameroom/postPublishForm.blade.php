@@ -1,7 +1,7 @@
 <form id="post-form" class="post-form" action={{ route('gameroom.publish') }} method="POST" style="position: relative">
     @csrf
 
-    <button id="button-bottom" type="button" class="button-bottom" onclick="scrollBottomPostsContainer()">⮟</button>
+    <button id="button-bottom" type="button" class="button-bottom" onclick="handleBottomButton()">⮟</button>
 
 
     <div style="display: flex; align-items: flex-end;">

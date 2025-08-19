@@ -1167,6 +1167,115 @@ async function scrollBottomPostsContainer() {
         }
 
     }
+} 
+
+async function scrollToUnreadReplies(){
+    const postsContainer = document.getElementById('posts-container');
+
+    if (!postsContainer) {
+        return;
+    }
+
+    const allUnreadPosts = Array.from(postsContainer.querySelectorAll('.post-unread'));
+
+    let firstUnreadReplyElement = null;
+    let firstUnreadReplyIndex = -1;
+
+    for (let i = allUnreadPosts.length - 1; i  >= 0; i--){
+        const postElement = allUnreadPosts[i];
+        const parentLink = postElement.querySelector('.parent-link');
+        if (parentLink){
+            firstUnreadReplyElement = postElement;
+            firstUnreadReplyIndex = i;
+            break;
+        }
+    }
+
+    if (firstUnreadReplyElement) {
+        const unreadPostIdsToMark = [];
+        const postsToMarkAsRead = allUnreadPosts.slice(firstUnreadReplyIndex + 1);
+
+        for(const postElement of postsToMarkAsRead) {
+            const postId = postElement.dataset.postId;
+            if(postId){
+                unreadPostIdsToMark.push(postId);
+            }
+        }
+
+        const postTop = firstUnreadReplyElement.offsetTop - postsContainer.offsetTop;
+        postsContainer.scrollTo({
+            top: postTop,
+            behavior: 'smooth'
+        });
+
+        firstUnreadReplyElement.style.backgroundColor = '#f4d03f20';
+        setTimeout(() => {
+            if (firstUnreadReplyElement){
+                firstUnreadReplyElement.style.backgroundColor = '';
+            }
+        }, 2000);
+        
+        if (unreadPostIdsToMark.length > 0){
+            try{
+                const markPromises = unreadPostIdsToMark.map(id => markPostAsRead(id));
+                const result = await Promise.all(markPromises);
+
+                for (const postElement of postsToMarkAsRead) {
+                    postElement.classList.remove('post-unread');
+
+                    const readIndicatorsContainer = postElement.querySelector('read-post');
+                    if (readIndicatorsContainer) {
+                        let readByMeIndicator = readIndicatorsContainer.querySelector('.read-by-me');
+                        if (!readByMeIndicator){
+                            readByMeIndicator = document.createElement('div');
+                            readByMeIndicator.className = 'read-indicator read-by-me';
+                            readByMeIndicator.title = 'Прочитано вами';
+                            readByMeIndicator.innerHTML = '&#10003;';
+                            readIndicatorsContainer.insertBefore(readByMeIndicator, readIndicatorsContainer.firstChild);
+                        }
+                    }
+
+                    fetchUnreadCounts();
+                }
+            } catch {
+                console.error("Ошибка при отметке предыдущих постов как прочитанных:", error);
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
+} 
+
+
+async function handleBottomButton(){
+    const postsContainer = document.getElementById('posts-container');
+
+    if (!postsContainer){
+        scrollBottomPostsContainer();
+        return;
+    }
+
+    const unreadPosts = postsContainer.querySelectorAll('.post-unread');
+    let firstUnreadReplyElement = null;
+
+    const unreadPostsArray = Array.from(unreadPosts); 
+
+    for (let i = unreadPostsArray.length - 1; i >= 0; i--){
+        const postElement = unreadPostsArray[i];
+        const parentLink = postElement.querySelector('.parent-link');
+        if (parentLink){
+            firstUnreadReplyElement = postElement;
+            break;
+        }
+    }
+
+    if (firstUnreadReplyElement){
+        await scrollToUnreadReplies();
+    } else {
+        await scrollBottomPostsContainer();
+    }
+    
 }
 
 function toggleDropdownPostMenu(button) {
