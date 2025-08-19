@@ -281,7 +281,7 @@ class AdminController extends Controller
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
         })->withCount('posts');
 
-        $locations = $query->paginate(12);
+        $locations = $query->paginate(20);
 
         $locations->appends([
             'search' => $searchTerm

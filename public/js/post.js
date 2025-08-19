@@ -327,7 +327,12 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
     let dropdownMenuHtml = `
         <div class="dropdown-item-post" style="padding: 0px">
             <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="replyPost(this)" data-close-dropdown="true">
-                <div style="padding: 5px 10px">Ответить</div>
+            <div style="display: flex; flex-direction: row; align-items: center; padding: 0px 10px; gap: 5px;">
+                <div>
+                    <svg  xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24"><path class="reply-svg" d="M21.949 17.684A13.529 13.529 0 0 0 11 8.146V5a1 1 0 0 0-1.707-.707l-7 7a1 1 0 0 0 0 1.414l7 7A1 1 0 0 0 10 20a.987.987 0 0 0 .383-.076A1 1 0 0 0 11 19v-3c3.632-.017 5.629-.025 9.4 2.8a1 1 0 0 0 1.549-1.116zM10 14a1 1 0 0 0-1 1v1.586L4.414 12 9 7.414V9.04a1 1 0 0 0 .92 1 11.217 11.217 0 0 1 8.72 5.287C15.723 13.86 13.475 13.986 10 14z"/></svg>
+                </div>
+                <div style="padding: 5px 0px">Ответить</div>
+            </div>
             </a>
         </div>
     `;
@@ -336,7 +341,12 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
         dropdownMenuHtml += `
             <div class="dropdown-item-post" style="padding: 0px">
                 <a href="javascript:void(0)" data-post-id="${postData.id}" onclick="editPost(this)" data-close-dropdown="true">
-                    <div style="padding: 5px 10px">Редактировать</div>
+                <div style="display: flex; flex-direction: row; align-items: center; padding: 0px 10px; gap: 5px;">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24"><path class="edit-svg" d="M20.7 5.2a1.024 1.024 0 0 1 0 1.448l-2.626 2.628-3.35-3.35L17.35 3.3a1.024 1.024 0 0 1 1.448 0zm-4.166 5.614-3.35-3.35-8.509 8.511L3 21l5.025-1.675z"/></svg>
+                    </div>
+                    <div style="padding: 5px 0px">Изменить</div>
+                </div>
                 </a>
             </div>
         `;
@@ -348,7 +358,12 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                 <form id="delete-post-form-${postData.id}" action="/gameroom/${postData.id}" method="POST" style="margin: 0px;">
                     <input type="hidden" name="_token" value="${csrfToken}">
                     <input type="hidden" name="_method" value="DELETE">
-                    <button class="dropdown-item-delete-post" type="button" onclick="confirmDelete(event, ${postData.id})" data-close-dropdown="true">Удалить</button>
+                    <button class="dropdown-item-delete-post" type="button" onclick="confirmDelete(event, ${postData.id})" data-close-dropdown="true">
+                        <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24"><path class="delete-svg" d="M5.755 20.283 4 8h16l-1.755 12.283A2 2 0 0 1 16.265 22h-8.53a2 2 0 0 1-1.98-1.717zM21 4h-5V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v1H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2z"/></svg>
+                            Удалить
+                        </div>
+                    </button>
                 </form>
             </div>
         `;
@@ -389,9 +404,9 @@ function createPostElement(postData, permissions, baseUrl, csrfToken) {
                     ${readIndicatorsHtml}
                 </div>
                 <div class="custom-dropdown-post">
-                    <div>
+
                         <button type="button" class="dropdown-toggle-post" onclick="toggleDropdownPostMenu(this)">...</button>
-                    </div>
+
                     <div class="dropdown-menu-post">
                         ${dropdownMenuHtml}
                     </div>
@@ -1290,6 +1305,16 @@ function toggleDropdownPostMenu(button) {
 
     if (dropdownMenu) {
         dropdownMenu.classList.toggle('show');
+    }
+}
+
+function changeVisibilitySearchForm(){
+    searchForm = document.getElementById('post-search-form');
+
+    if (searchForm && searchForm.style.display === 'none'){
+        searchForm.style.display = 'block';
+    } else if (searchForm && searchForm.style.display !== 'none') {
+        searchForm.style.display = 'none';
     }
 }
 

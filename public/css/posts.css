@@ -5,8 +5,23 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow-y: auto;
 }
 
+.topics-list::-webkit-scrollbar {
+    width: 2px; /* Ширина полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.topics-list::-webkit-scrollbar-track {
+    background: #00000000; /* Фон полосы прокрутки */
+    border-radius: 5px; 
+}
+
+.topics-list::-webkit-scrollbar-thumb {
+    background-color: #f4d03f; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Закругление полосы прокрутки */
+}
 
 .topic-link {
     font-family: 'Courier New', Courier, monospace;
@@ -343,6 +358,10 @@
     display: inline-block;
 }
 
+.custom-dropdown-post:hover .dropdown-toggle-post {
+    color: #ec7063 !important;
+}
+
 .dropdown-menu-post {
     position: absolute;
     top: 0%; 
@@ -379,6 +398,27 @@
 .dropdown-item-post:hover {
     background-color: #f4d03f;
     color: #1a1a40;
+}
+
+.reply-svg {
+    fill: #fff;
+}
+
+.dropdown-item-post:hover  .reply-svg{
+    fill: #1a1a40;
+}
+
+.delete-svg {
+    fill: #ec7063;
+}
+
+.edit-svg {
+    fill: #fff;
+}
+
+
+.dropdown-item-post:hover  .edit-svg{
+    fill: #1a1a40;
 }
 
 .dropdown-item-delete-post {
@@ -465,12 +505,14 @@
 }
 
 .button-bottom {
+    cursor: pointer;
     display: none;
     font-size: 24px; 
     border-radius: 50%; 
     position: absolute; 
     right: 10px; 
     top: -40px;
+    padding: 6px 6px;
     color: #1a1a40;
     background-color: #f4d03f;
     border: 2px solid transparent;
@@ -562,4 +604,24 @@
     flex-direction: row; 
     align-items: center; 
     gap: 5px;
+}
+
+.post-search-button {
+    cursor: pointer;
+    background-color: transparent; 
+    border-radius: 5px;
+    padding: 0px; 
+    border: 0px;
+}
+
+.post-search-button:hover .post-search-button-svg{
+    fill: #ec7063;
+}
+
+.send-svg {
+    fill: #f4d03f;
+}
+
+.post-form__button:hover .send-svg {
+    fill: #ec7063;
 }
